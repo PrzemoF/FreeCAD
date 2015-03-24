@@ -243,11 +243,11 @@ class _JobControlTaskPanel:
         # Module OpenSCAD wb is doing similiar thing in searchforopenscadexe().
         from platform import system
         if system() == 'Linux':
-            self.CalculixBinary = 'ccx'
+            self.calculix_bin = 'ccx'
         elif system() == 'Windows':
-            self.CalculixBinary = FreeCAD.getHomePath() + 'bin/ccx.exe'
+            self.calculix_bin = FreeCAD.getHomePath() + 'bin/ccx.exe'
         else:
-            self.CalculixBinary = 'ccx'
+            self.calculix_bin = 'ccx'
         self.TempDir = FreeCAD.ActiveDocument.TransientDir.replace('\\', '/') + '/FemAnl_' + self.obj.Uid[-4:]
         if not os.path.isdir(self.TempDir):
             os.mkdir(self.TempDir)
@@ -571,14 +571,13 @@ class _JobControlTaskPanel:
         print 'runCalculix'
         self.Start = time.time()
 
-        self.femConsoleMessage("CalculiX binary: {}".format(self.CalculixBinary))
+        self.femConsoleMessage("CalculiX binary: {}".format(self.calculix_bin))
         self.femConsoleMessage("Run Calculix...")
 
         # run Claculix
-        print 'run Calclulix at: ', self.CalculixBinary , '  with: ', self.Basename
-        self.Calculix.start(self.CalculixBinary, ['-i',self.Basename])
-        
-        
+        print 'run Calclulix at: ', self.calculix_bin, '  with: ', self.Basename
+        self.Calculix.start(self.calculix_bin, ['-i', self.Basename])
+
         QApplication.restoreOverrideCursor()
     
 class _ResultControlTaskPanel:
