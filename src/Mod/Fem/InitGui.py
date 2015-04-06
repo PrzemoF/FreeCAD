@@ -33,32 +33,9 @@
 
 class FemWorkbench ( Workbench ):
 	"Fem workbench object"
-	Icon = """
-			/* XPM */
-			static const char *Fem_Box[]={
-			"16 16 3 1",
-			". c None",
-			"# c #000000",
-			"a c #c6c642",
-			"................",
-			".......#######..",
-			"......#aaaaa##..",
-			".....#aaaaa###..",
-			"....#aaaaa##a#..",
-			"...#aaaaa##aa#..",
-			"..#aaaaa##aaa#..",
-			".########aaaa#..",
-			".#aaaaa#aaaaa#..",
-			".#aaaaa#aaaa##..",
-			".#aaaaa#aaa##...",
-			".#aaaaa#aa##....",
-			".#aaaaa#a##... .",
-			".#aaaaa###......",
-			".########.......",
-			"................"};
-			"""
-	MenuText = "Fem"
-	ToolTip = "Fem workbench"
+        def __init__(self):
+            self.__class__.Icon = "./Mod/Fem/Gui/Resources/icons/preferences-fem.svg"
+
 
 	def Initialize(self):
 		# load the module

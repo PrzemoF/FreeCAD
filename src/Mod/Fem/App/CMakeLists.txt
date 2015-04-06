@@ -145,6 +145,10 @@ SET(Fem_SRCS
     ${Python_SRCS}
 )
 
+SET(Icon_SVG
+    Gui/Resources/icons/preferences-fem.svg
+)
+
 FILE( GLOB Driver_Resources Driver/*.py )
 
 
@@ -158,6 +162,7 @@ fc_target_copy_resource(Fem
 	${Driver_Resources} 
 	Init.py 
     ${FemScripts_SRCS}
+    ${Icon_SVG}
     )
 
 SET_BIN_DIR(Fem Fem /Mod/Fem)
