@@ -34,13 +34,15 @@
 class FemWorkbench ( Workbench ):
 	"Fem workbench object"
         def __init__(self):
-            self.__class__.Icon = "./Mod/Fem/Gui/Resources/icons/preferences-fem.svg"
-
+            self.__class__.Icon = FreeCAD.getResourceDir()+"Mod/Fem/Gui/Resources/icons/preferences-fem.svg"
+            self.__class__.MenuText = "FEM"
+            self.__class__.ToolTip = "FEM workbench"
 
 	def Initialize(self):
 		# load the module
 		import Fem
 		import FemGui
+
 	def GetClassName(self):
 		return "FemGui::Workbench"
 
