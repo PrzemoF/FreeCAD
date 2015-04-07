@@ -160,16 +160,6 @@ fc_target_copy_resource(Fem
     ${FemScripts_SRCS}
     )
 
-SET(Icon_SVG
-    Gui/Resources/icons/preferences-fem.svg
-)
-
-fc_target_copy_resource(Fem
-    ${CMAKE_SOURCE_DIR}/src/Mod/Fem
-    ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_DATADIR}/Mod/Fem
-    ${Icon_SVG}
-    )
-
 SET_BIN_DIR(Fem Fem /Mod/Fem)
 SET_PYTHON_PREFIX_SUFFIX(Fem)
 
