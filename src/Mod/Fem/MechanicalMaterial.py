@@ -139,7 +139,11 @@ class _MechanicalMaterialTaskPanel:
         if not previous_mat_path:
             print "Previously used material cannot be found in material directories. Using transient material."
             self.add_transient_material(self.previous_material)
-            index = self.form.cb_materials.findData(self.previous_material['General_name'])
+            if 'General_name' in self.previous_material:
+		    material_name = self.previous_material['General_name']
+            else:
+		    material_name = 'None'
+	    index = self.form.cb_materials.findData(material_name)
             self.chooseMat(index)
         else:
             index = self.form.cb_materials.findData(previous_mat_path)
@@ -218,7 +222,10 @@ class _MechanicalMaterialTaskPanel:
         self.print_mat_data(self.obj.Material)
 
     def add_transient_material(self, material):
-        material_name = material['General_name']
+        if 'General_name' in self.previous_material:
+	    material_name = self.previous_material['General_name']
+        else:
+	    material_name = 'None'
         self.form.cb_materials.addItem(QtGui.QIcon(":/icons/help-browser.svg"), material_name, material_name)
         self.materials[material_name] = material
 
