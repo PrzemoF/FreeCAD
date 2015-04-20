@@ -639,20 +639,20 @@ class _ResultControlTaskPanel:
 
     def typeChanged(self, index):
         selected = self.form.comboBox_Type.itemData(index)
-        sel_key = selected.keys()[0]
-        sel_value = selected[sel_key]
-        if sel_key == "None":
+        if selected[0] == "None":
             self.MeshObject.ViewObject.NodeColor = {}
             self.MeshObject.ViewObject.ElementColor = {}
             return
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
         if self.DisplacementObject:
-            if sel_key in ("U1", "U2", "U3", "Uabs"):
-                (min,max,avg) = self.MeshObject.ViewObject.setNodeColorByResult(self.DisplacementObject, sel_value)
+            if selected[0] in ("U1", "U2", "U3", "Uabs"):
+                (minm, maxm, avg) = self.MeshObject.ViewObject.setNodeColorByResult(self.DisplacementObject, selected[1])
+                unit = "mm"
         if self.StressObject:
-            if sel_key in ("Sabs"):
-                (min,max,avg) = self.MeshObject.ViewObject.setNodeColorByResult(self.StressObject)
+            if selected[0] in ("Sabs"):
+                (minm, maxm, avg) = self.MeshObject.ViewObject.setNodeColorByResult(self.StressObject)
+                unit = "MPa"
 
         self.form.lineEdit_Max.setText(str(max))
         self.form.lineEdit_Min.setText(str(min))
@@ -696,7 +696,7 @@ class _ResultControlTaskPanel:
         #print "Update-------------------------------"
         self.MeshObject = None
         self.form.comboBox_Type.clear()
-        self.form.comboBox_Type.addItem("None", {"None":0})
+        self.form.comboBox_Type.addItem("None", ("None", 0))
         if FemGui.getActiveAnalysis():
             for i in FemGui.getActiveAnalysis().Member:
                 if i.isDerivedFrom("Fem::FemMeshObject"):
@@ -706,15 +706,15 @@ class _ResultControlTaskPanel:
             if i.isDerivedFrom("Fem::FemResultVector"):
                 if i.DataType == 'Displacement':
                     self.DisplacementObject = i
-                    self.form.comboBox_Type.addItem("U1   (Disp. X)", {"U1":0})
-                    self.form.comboBox_Type.addItem("U2   (Disp. Y)", {"U2":1})
-                    self.form.comboBox_Type.addItem("U3   (Disp. Z)", {"U3":2})
-                    self.form.comboBox_Type.addItem("Uabs (Disp. abs)", {"Uabs":3})
+                    self.form.comboBox_Type.addItem("U1   (Disp. X)", ("U1", 0))
+                    self.form.comboBox_Type.addItem("U2   (Disp. Y)", ("U2", 1))
+                    self.form.comboBox_Type.addItem("U3   (Disp. Z)", ("U3", 2))
+                    self.form.comboBox_Type.addItem("Uabs (Disp. abs)", ("Uabs", 3))
         for i in FemGui.getActiveAnalysis().Member:
             if i.isDerivedFrom("Fem::FemResultValue"):
                 if i.DataType == 'VonMisesStress':
                     self.StressObject = i
-                    self.form.comboBox_Type.addItem("Sabs (Von Mises Stress)", {"Sabs":0})
+                    self.form.comboBox_Type.addItem("Sabs (Von Mises Stress)", ("Sabs", 0))
 
     def accept(self):
         FreeCADGui.Control.closeDialog()
