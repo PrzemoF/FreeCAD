@@ -492,15 +492,16 @@ class _JobControlTaskPanel:
         PR = float(self.MaterialObject.Material['PoissonRatio'])
         print 'PR = ', PR
 
+        material_name = matmap['Name'][:80]
         # write material properties
         inpfile.write('\n\n***********************************************************\n')
         inpfile.write('** material\n')
         inpfile.write('** unit is MPa = N/mm2\n')
-        inpfile.write('*MATERIAL, Name=' + matmap['Name'] + '\n')
+        inpfile.write('*MATERIAL, Name=' + material_name + '\n')
         inpfile.write('*ELASTIC \n')
         inpfile.write('{0:.3f}, '.format(YM.Value * 1E-3))
         inpfile.write('{0:.3f}\n'.format(PR))
-        inpfile.write('*SOLID SECTION, Elset=Eall, Material=' + matmap['Name'] + '\n')
+        inpfile.write('*SOLID SECTION, Elset=Eall, Material=' + material_name + '\n')
 
         # write step beginn
         inpfile.write('\n\n\n\n***********************************************************\n')
