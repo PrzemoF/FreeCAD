@@ -481,26 +481,26 @@ class _JobControlTaskPanel:
             inpfile.write('\n\n')
 
         # get material properties
-        YM = FreeCAD.Units.Quantity(self.MaterialObject.Material['Mechanical_youngsmodulus'])
+        YM = FreeCAD.Units.Quantity(self.MaterialObject.Material['YoungsModulus'])
         if YM.Unit.Type == '':
-            print 'Material "Mechanical_youngsmodulus" has no Unit, asuming kPa!'
+            print 'Material "YoungsModulus" has no Unit, asuming kPa!'
             YM = FreeCAD.Units.Quantity(YM.Value, FreeCAD.Units.Unit('Pa'))
         else:
             print 'YM unit: ', YM.Unit.Type
         print 'YM = ', YM
 
-        PR = float(self.MaterialObject.Material['FEM_poissonratio'])
+        PR = float(self.MaterialObject.Material['PoissonRatio'])
         print 'PR = ', PR
 
         # write material properties
         inpfile.write('\n\n***********************************************************\n')
         inpfile.write('** material\n')
         inpfile.write('** unit is MPa = N/mm2\n')
-        inpfile.write('*MATERIAL, Name=' + matmap['General_name'] + '\n')
+        inpfile.write('*MATERIAL, Name=' + matmap['Name'] + '\n')
         inpfile.write('*ELASTIC \n')
         inpfile.write('{0:.3f}, '.format(YM.Value * 1E-3))
         inpfile.write('{0:.3f}\n'.format(PR))
-        inpfile.write('*SOLID SECTION, Elset=Eall, Material=' + matmap['General_name'] + '\n')
+        inpfile.write('*SOLID SECTION, Elset=Eall, Material=' + matmap['Name'] + '\n')
 
         # write step beginn
         inpfile.write('\n\n\n\n***********************************************************\n')
