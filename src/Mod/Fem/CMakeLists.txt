@@ -11,6 +11,7 @@ INSTALL(
         InitGui.py
         convert2TetGen.py
         CalculixLib.py
+        CalculiXInpWriter.py
         FemExample.py
         FemLib.py
         MechanicalAnalysis.py

@@ -71,6 +71,7 @@ SET(FemScripts_SRCS
     convert2TetGen.py
     FemLib.py
     CalculixLib.py
+    CalculiXInpWriter.py
     MechanicalAnalysis.ui
     MechanicalAnalysis.py
     MechanicalMaterial.ui
