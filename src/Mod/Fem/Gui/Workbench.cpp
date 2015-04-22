@@ -57,7 +57,6 @@ Gui::ToolBarItem* Workbench::setupToolBars() const
     fem->setCommand("FEM");
     *fem << "Fem_NewMechanicalAnalysis"
          << "Fem_MechanicalMaterial"
-         << "Fem_MechanicalJobControl"
          << "Separator"
          << "Fem_CreateNodesSet"
          << "Separator"
@@ -67,6 +66,7 @@ Gui::ToolBarItem* Workbench::setupToolBars() const
          << "Fem_ConstraintGear"   
          << "Fem_ConstraintPulley"
          << "Separator"
+         << "Fem_MechanicalJobControl"
          << "Fem_ShowResult";
     return root;
 }
@@ -80,7 +80,6 @@ Gui::MenuItem* Workbench::setupMenuBar() const
     fem->setCommand("&FEM");
     *fem << "Fem_MechanicalMaterial"
          << "Fem_NewMechanicalAnalysis"
-         << "Fem_MechanicalJobControl"
          << "Separator"
          << "Fem_CreateNodesSet"
          << "Separator"
@@ -90,6 +89,7 @@ Gui::MenuItem* Workbench::setupMenuBar() const
          << "Fem_ConstraintGear"   
          << "Fem_ConstraintPulley"
          << "Separator"
+         << "Fem_MechanicalJobControl"
          << "Fem_ShowResult";
 
     return root;
