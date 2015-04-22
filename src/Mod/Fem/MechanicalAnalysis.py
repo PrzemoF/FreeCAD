@@ -486,8 +486,8 @@ class _ResultControlTaskPanel:
                 (minm, maxm, avg) = self.MeshObject.ViewObject.setNodeColorByResult(self.StressObject)
                 unit = "MPa"
 
-        self.form.lineEdit_Max.setText(str(max))
-        self.form.lineEdit_Min.setText(str(min))
+        self.form.lineEdit_Max.setText(str(maxm))
+        self.form.lineEdit_Min.setText(str(minm))
         self.form.lineEdit_Avg.setText(str(avg))
 
         QtGui.qApp.restoreOverrideCursor()
