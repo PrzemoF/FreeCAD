@@ -20,7 +20,7 @@
 #*                                                                         *
 #***************************************************************************
 
-import CalculixLib
+import ccxFrdReader
 import FreeCAD
 import os
 import sys
@@ -341,7 +341,7 @@ class _JobControlTaskPanel:
 
         if os.path.isfile(self.base_name + '.frd'):
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            CalculixLib.importFrd(self.base_name + '.frd', FemGui.getActiveAnalysis())
+            ccxFrdReader.importFrd(self.base_name + '.frd', FemGui.getActiveAnalysis())
             QApplication.restoreOverrideCursor()
             self.femConsoleMessage("Loading results done!", "#00AA00")
         else:
@@ -374,7 +374,7 @@ class _JobControlTaskPanel:
         if self.check_prerequisites():
             QApplication.setOverrideCursor(Qt.WaitCursor)
             try:
-                import InpWriter as iw
+                import ccxInpWriter as iw
                 inp_writer = iw.inp_writer(self.TempDir, self.MeshObject, self.MaterialObjects,
                                            self.FixedObjects, self.ForceObjects)
                 self.base_name = inp_writer.write_calculix_input_file()

@@ -69,7 +69,7 @@ SOURCE_GROUP("Module" FILES ${Mod_SRCS})
 
 SET(FemScripts_SRCS
     convert2TetGen.py
-    CalculixLib.py
+    ccxFrdReader.py
     ccxInpWriter.py
     MechanicalAnalysis.ui
     MechanicalAnalysis.py
@@ -156,7 +156,7 @@ fc_target_copy_resource(Fem
     ${FemScripts_SRCS}
     )
 
-SET_BIN_DIR(Fem Fem /Mod/Fem)
+SET_BIN_DIR(Fem Fem /Mod/Fem /Mod/Fem/CalculiX)
 SET_PYTHON_PREFIX_SUFFIX(Fem)
 
 INSTALL(TARGETS Fem DESTINATION ${CMAKE_INSTALL_LIBDIR})
