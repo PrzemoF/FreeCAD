@@ -84,7 +84,6 @@ class _CommandNewMechanicalAnalysis:
         return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is None
 
 
-
 class _CommandFemFromShape:
     def GetResources(self):
         return {'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_CreateFromShape", "Create FEM mesh"),
