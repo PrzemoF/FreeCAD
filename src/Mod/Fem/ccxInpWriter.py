@@ -106,11 +106,7 @@ class inp_writer:
             inpfile.write('{0:.3f}, '.format(YM.Value * 1E-3))
             inpfile.write('{0:.3f}\n'.format(PR))
             # write element properties
-            if len(self.material_objects) == 1:
-                inpfile.write('*SOLID SECTION, ELSET=' + material_object['Object'].Name + ', MATERIAL=' + material_name + '\n\n')
-            else:
-                if material_object['Object'].Name == 'MechanicalMaterial':
-                    inpfile.write('*SOLID SECTION, ELSET=' + material_object['Object'].Name + ', MATERIAL=' + material_name + '\n\n')
+            inpfile.write('*SOLID SECTION, ELSET=' + mat_obj.Name + ', MATERIAL=' + material_name + '\n\n')
 
         # write step begin
         inpfile.write('\n\n\n\n***********************************************************\n')
