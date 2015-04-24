@@ -127,18 +127,12 @@ class inp_writer:
         inpfile.write('\n\n***********************************************************\n')
         inpfile.write('** materials\n')
         inpfile.write('** youngs modulus unit is MPa = N/mm2\n')
-        for material_object in self.material_objects:
+        for m in self.material_objects:
+            mat_obj = m['Object']
             # get material properties
-            YM = FreeCAD.Units.Quantity(material_object['Object'].Material['YoungsModulus'])
-            if YM.Unit.Type == '':
-                print 'Material "YoungsModulus" has no Unit, asuming kPa!'
-                YM = FreeCAD.Units.Quantity(YM.Value, FreeCAD.Units.Unit('Pa'))
-            else:
-                print 'YM unit: ', YM.Unit.Type
-            print 'YM = ', YM
-            PR = float(material_object['Object'].Material['PoissonRatio'])
-            print 'PR = ', PR
-            material_name = material_object['Object'].Material['Name'][:80]
+            YM = FreeCAD.Units.Quantity(mat_obj.Material['YoungsModulus'])
+            PR = float(mat_obj.Material['PoissonRatio'])
+            material_name = mat_obj.Material['Name'][:80]
             # write material properties
             inpfile.write('*MATERIAL, NAME=' + material_name + '\n')
             inpfile.write('*ELASTIC \n')
