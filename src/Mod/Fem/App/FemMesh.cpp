@@ -404,6 +404,96 @@ std::set<long> FemMesh::getSurfaceNodes(long ElemId, short FaceId, float Angle) 
     return result;
 }
 
+std::map<long, int> FemMesh::getVolumesByFace(const TopoDS_Face &face) const
+{
+    std::map<long, int> result;
+    typedef std::map<int, std::vector<int> > nodes_in_volumes;
+    nodes_in_volumes mesh_nodes;
+    static std::map<std::string, std::vector<int> > elemOrderMap;
+
+    static std::map<int, std::string> volTypeMap;
+    std::set<long> nodes_on_face = FemMesh::getNodesByFace(face);
+
+    std::vector<int> c3d4  = boost::assign::list_of(1)(0)(2)(3);
+    std::vector<int> c3d10 = boost::assign::list_of(1)(0)(2)(3)(4)(6)(5)(8)(7)(9);
+    elemOrderMap.insert(std::make_pair("C3D4", c3d4));
+    volTypeMap.insert(std::make_pair(elemOrderMap["C3D4"].size(), "C3D4"));
+    elemOrderMap.insert(std::make_pair("C3D10", c3d10));
+    volTypeMap.insert(std::make_pair(elemOrderMap["C3D10"].size(), "C3D10"));
+
+    SMDS_VolumeIteratorPtr aVolIter = myMesh->GetMeshDS()->volumesIterator();
+    std::set<int> element_nodes;
+    while (aVolIter->more()) {
+        const SMDS_MeshVolume* aVol = aVolIter->next();
+        std::pair<int, std::vector<int> > apair;
+        apair.first = aVol->GetID();
+
+        int numNodes = aVol->NbNodes();
+        std::map<int, std::string>::iterator it = volTypeMap.find(numNodes);
+        if (it != volTypeMap.end()) {
+            const std::vector<int>& order = elemOrderMap[it->second];
+            for (std::vector<int>::const_iterator jt = order.begin(); jt != order.end(); ++jt) {
+                int vid = aVol->GetNode(*jt)->GetID();
+                apair.second.push_back(vid);
+            }
+            mesh_nodes.insert(apair);
+        }
+    }
+
+        for (nodes_in_volumes::iterator niv = mesh_nodes.begin(); niv != mesh_nodes.end(); ++niv) {
+            std::set<int> element_face_nodes;
+            for (std::vector<int>::iterator kt = niv->second.begin(); kt != niv->second.end(); ++kt) {
+                for (std::set<long>::iterator n = nodes_on_face.begin(); n != nodes_on_face.end(); ++n) {
+                    if (*kt == *n) {
+                        element_face_nodes.insert(*kt);
+                    }
+                }
+            }
+//Add 3 points match for C3D4 elements
+            if (element_face_nodes.size() == 6) {
+                std::set <int> face;
+//There has to be a better way to define set
+                face.insert(0);
+                face.insert(1);
+                face.insert(2);
+                face.insert(3);
+//"Find" instead of double for loop to find missing point?
+                for (std::set<int>::iterator efn = element_face_nodes.begin(); efn != element_face_nodes.end(); ++efn) {
+                    for (unsigned i=0; i<4; i++) {
+                        if (niv->second[i] == *efn) {
+                            face.erase(i);
+                        }
+                    }
+                }
+//Check if there is only one element
+                int missing_node = *face.begin() + 1;
+                int face_ccx;
+/* for tetrahedral elements:
+ Face 1: 1-2-3, missing point 4 means it's face 0
+ Face 2: 1-4-2, missing point 3 means it's face 2
+ Face 3: 2-4-3, missing point 1 means it's face 3
+ Face 4: 3-4-1, missing point 2 means it's face 4 */
+
+//Use switch is c++ has it
+                if (missing_node == 1)
+                    face_ccx = 3;
+                if (missing_node == 2)
+                    face_ccx = 4;
+                if (missing_node == 3)
+                    face_ccx = 2;
+                if (missing_node == 4)
+                    face_ccx = 1;
+//rename variables, compress
+                std::pair<long, int> myapair;
+                myapair.first = niv->first;
+                myapair.second = face_ccx;
+                result.insert(myapair);
+            }
+        }
+
+      return result;
+}
+
 std::set<long> FemMesh::getNodesByFace(const TopoDS_Face &face) const
 {
     std::set<long> result;
