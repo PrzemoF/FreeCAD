@@ -188,7 +188,7 @@ class inp_writer:
                     v = self.mesh_object.FemMesh.getVolumesByFace(elem)
                     f.write("** Load on face {}\n".format(e))
                     for i in v:
-                        f.write("{},P{},{}\n".format(i[0], i[1], -1 * frc_obj.Force))
+                        f.write("{},P{},{}\n".format(i[0], i[1], frc_obj.Force))
 
     def write_outputs_types(self, f):
         f.write('\n** outputs --> frd file\n')
