@@ -407,10 +407,7 @@ std::set<long> FemMesh::getSurfaceNodes(long ElemId, short FaceId, float Angle) 
 std::map<int, int> FemMesh::getVolumesByFace(const TopoDS_Face &face) const
 {
     std::map<int, int> result;
-    std::set<int> nbf = FemMesh::getNodesByFace(face);
-    std::set<int> nodes_on_face;
-    nodes_on_face.insert(nbf.begin(), nbf.end());
-    nbf.clear();
+    std::set<int> nodes_on_face = FemMesh::getNodesByFace(face);
 
     static std::map<int, std::vector<int> > elem_order;
     if (elem_order.empty()) {
