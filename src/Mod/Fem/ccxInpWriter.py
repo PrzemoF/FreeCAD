@@ -183,7 +183,7 @@ class inp_writer:
             for o, e in frc_obj.References:
                 elem = o.Shape.getElement(e)
                 if elem.ShapeType == 'Face':
-                    v = self.mesh_object.FemMesh.getVolumesByFace(elem)
+                    v = self.mesh_object.FemMesh.getccxVolumesByFace(elem)
                     f.write("** Load on face {}\n".format(e))
                     for i in v:
                         f.write("{},P{},{}\n".format(i[0], i[1], frc_obj.Force))

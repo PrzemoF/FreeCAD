@@ -514,7 +514,7 @@ PyObject* FemMeshPy::setTransform(PyObject *args)
     Py_Return;
 }
 
-PyObject* FemMeshPy::getVolumesByFace(PyObject *args)
+PyObject* FemMeshPy::getccxVolumesByFace(PyObject *args)
 {
     PyObject *pW;
     if (!PyArg_ParseTuple(args, "O!", &(Part::TopoShapeFacePy::Type), &pW))
@@ -528,7 +528,7 @@ PyObject* FemMeshPy::getVolumesByFace(PyObject *args)
             return 0;
         }
         Py::List ret;
-        std::map<int, int> resultSet = getFemMeshPtr()->getVolumesByFace(fc);
+        std::map<int, int> resultSet = getFemMeshPtr()->getccxVolumesByFace(fc);
         for (std::map<int, int>::const_iterator it = resultSet.begin();it!=resultSet.end();++it) {
 		Py::List vol_face;
                 vol_face.append(Py::Int(it->first));

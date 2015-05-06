@@ -94,7 +94,7 @@ public:
     /// retrieving by vertex
     std::set<int> getNodesByVertex(const TopoDS_Vertex &vertex) const;
     /// retrieving volume IDs by face
-    std::map<int, int> getVolumesByFace(const TopoDS_Face &face) const;
+    std::map<int, int> getccxVolumesByFace(const TopoDS_Face &face) const;
     //@}
 
     /** @name Placement control */

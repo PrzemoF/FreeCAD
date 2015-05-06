@@ -404,7 +404,11 @@ std::set<long> FemMesh::getSurfaceNodes(long ElemId, short FaceId, float Angle) 
     return result;
 }
 
-std::map<int, int> FemMesh::getVolumesByFace(const TopoDS_Face &face) const
+/* That function returns map containing volume ID and face number
+ * as per CalculiX definition for tetrahedral elements. See CalculiX
+ * documentation for the details.
+ */
+std::map<int, int> FemMesh::getccxVolumesByFace(const TopoDS_Face &face) const
 {
     std::map<int, int> result;
     std::set<int> nodes_on_face = FemMesh::getNodesByFace(face);
