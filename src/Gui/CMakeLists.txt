@@ -191,6 +191,7 @@ set(Gui_MOC_HDRS
     DlgSettingsImageImp.h
     DlgSettingsMacroImp.h
     DlgSettingsUnitsImp.h
+    DlgSettingsWorkbenchesImp.h
     DlgTipOfTheDayImp.h
     DlgToolbarsImp.h
     TaskDlgRelocation.h
@@ -280,6 +281,7 @@ SET(Gui_UIC_SRCS
     DlgReportView.ui
     DlgSettings3DView.ui
     DlgSettingsUnits.ui
+    DlgSettingsWorkbenches.ui
     DlgSettingsViewColor.ui
     DlgSettingsColorGradient.ui
     DlgSettingsDocument.ui
@@ -466,6 +468,7 @@ SET(Dialog_Settings_CPP_SRCS
     DlgReportViewImp.cpp
     DlgSettings3DViewImp.cpp
     DlgSettingsUnitsImp.cpp
+    DlgSettingsWorkbenchesImp.cpp
     DlgSettingsViewColor.cpp
     DlgSettingsColorGradientImp.cpp
     DlgSettingsDocumentImp.cpp
@@ -480,6 +483,7 @@ SET(Dialog_Settings_HPP_SRCS
     DlgReportViewImp.h
     DlgSettings3DViewImp.h
     DlgSettingsUnitsImp.h
+    DlgSettingsWorkbenchesImp.h
     DlgSettingsViewColor.h
     DlgSettingsColorGradientImp.h
     DlgSettingsDocumentImp.h
@@ -496,6 +500,7 @@ SET(Dialog_Settings_SRCS
     DlgReportView.ui
     DlgSettings3DView.ui
     DlgSettingsUnits.ui
+    DlgSettingsWorkbenches.ui
     DlgSettingsViewColor.ui
     DlgSettingsColorGradient.ui
     DlgSettingsDocument.ui

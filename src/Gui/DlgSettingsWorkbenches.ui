@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Gui::Dialog::DlgSettingsWorkbenches</class>
+ <widget class="QWidget" name="Gui::Dialog::DlgSettingsWorkbenches">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>380</width>
+    <height>630</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Workbenches</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QGroupBox" name="GroupBox6">
+     <property name="title">
+      <string>Visible workbenches</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="12" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_part_wb">
+        <property name="toolTip">
+         <string>Part workbench</string>
+        </property>
+        <property name="text">
+         <string>Part</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Part</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="25" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_test_framework_wb">
+        <property name="toolTip">
+         <string>Test framework workbench</string>
+        </property>
+        <property name="text">
+         <string>Test framework</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Test framework</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="24" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_start_wb">
+        <property name="toolTip">
+         <string>Start workbench</string>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Start</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_inspection_wb">
+        <property name="toolTip">
+         <string>Inspection workbench</string>
+        </property>
+        <property name="text">
+         <string>Inspection</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Inspection</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_none_wb">
+        <property name="toolTip">
+         <string>None workbench</string>
+        </property>
+        <property name="text">
+         <string>None</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>&lt;none&gt;</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_openscad_wb">
+        <property name="toolTip">
+         <string>OpenSCAD workbench</string>
+        </property>
+        <property name="text">
+         <string>OpenSCAD</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>OpenSCAD</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="27" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>79</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_arch_wb">
+        <property name="toolTip">
+         <string>Architectural workbench</string>
+        </property>
+        <property name="text">
+         <string>Arch</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Arch</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_complete_wb">
+        <property name="toolTip">
+         <string>Complete workbench</string>
+        </property>
+        <property name="text">
+         <string>Complete</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Complete</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_fem_wb">
+        <property name="toolTip">
+         <string>Finite Element Method analysis workbench</string>
+        </property>
+        <property name="text">
+         <string>FEM</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>FEM</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_draft_wb">
+        <property name="toolTip">
+         <string>Draft workbench</string>
+        </property>
+        <property name="text">
+         <string>Draft</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Draft</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_drawing_wb">
+        <property name="toolTip">
+         <string>Drawing workbench</string>
+        </property>
+        <property name="text">
+         <string>Drawing</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Drawing</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_image_wb">
+        <property name="toolTip">
+         <string>Image workbench</string>
+        </property>
+        <property name="text">
+         <string>Image</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Image</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="23" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_spreadsheet_wb">
+        <property name="toolTip">
+         <string>Spreadsheet workbench</string>
+        </property>
+        <property name="text">
+         <string>Spreadsheet</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Spreadsheet</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_mesh_design_wb">
+        <property name="toolTip">
+         <string>Mesh design workbench</string>
+        </property>
+        <property name="text">
+         <string>Mesh design</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Mesh design</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="21" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_ship_wb">
+        <property name="toolTip">
+         <string>Ship workbench</string>
+        </property>
+        <property name="text">
+         <string>Ship</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Ship</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_part_design_wb">
+        <property name="toolTip">
+         <string>Part Design workbench</string>
+        </property>
+        <property name="text">
+         <string>Part Design</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Part Design</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_plot_wb">
+        <property name="toolTip">
+         <string>Plot workbench</string>
+        </property>
+        <property name="text">
+         <string>Plot</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Plot</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="17" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_points_wb">
+        <property name="toolTip">
+         <string>Points workbench</string>
+        </property>
+        <property name="text">
+         <string>Points</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Points</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="18" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_raytracing_wb">
+        <property name="toolTip">
+         <string>Raytracing workbench</string>
+        </property>
+        <property name="text">
+         <string>Raytracing</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Raytracing</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="19" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_reverse_engineering_wb">
+        <property name="toolTip">
+         <string>Reverse Engineering workbench</string>
+        </property>
+        <property name="text">
+         <string>Reverse Engineering</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Reverse Engineering</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="22" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_sketcher_wb">
+        <property name="toolTip">
+         <string>Sketcher workbench</string>
+        </property>
+        <property name="text">
+         <string>Sketcher</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Sketcher</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="20" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_robot_wb">
+        <property name="toolTip">
+         <string>Robot workbench</string>
+        </property>
+        <property name="text">
+         <string>Robot</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Robot</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="26" column="0">
+       <widget class="Gui::PrefCheckBox" name="cb_web_wb">
+        <property name="toolTip">
+         <string>Web workbench</string>
+        </property>
+        <property name="text">
+         <string>Web</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>Web</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Workbenches</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>Gui::PrefCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>Gui/PrefWidgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

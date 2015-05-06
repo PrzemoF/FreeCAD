@@ -530,16 +530,21 @@ void WorkbenchGroup::refreshWorkbenchList()
         menuText[text] = items[index];
     }
 
+    ParameterGrp::handle hGrp = App::GetApplication().GetParameterGroupByPath
+        ("User parameter:BaseApp/Preferences/Workbenches");
     int i=0;
     for (QMap<QString, QString>::Iterator it = menuText.begin(); it != menuText.end(); ++it, i++) {
-        QPixmap px = Application::Instance->workbenchIcon(it.value());
-        QString tip = Application::Instance->workbenchToolTip(it.value());
-        workbenches[i]->setObjectName(it.value());
-        workbenches[i]->setIcon(px);
-        workbenches[i]->setText(it.key());
-        workbenches[i]->setToolTip(tip);
-        workbenches[i]->setStatusTip(tr("Select the '%1' workbench").arg(it.key()));
-        workbenches[i]->setVisible(true);
+        QString text = Application::Instance->workbenchMenuText(it.value());
+        if (hGrp->GetBool(text.toLatin1(), true)) {
+            QPixmap px = Application::Instance->workbenchIcon(it.value());
+            QString tip = Application::Instance->workbenchToolTip(it.value());
+            workbenches[i]->setObjectName(it.value());
+            workbenches[i]->setIcon(px);
+            workbenches[i]->setText(it.key());
+            workbenches[i]->setToolTip(tip);
+            workbenches[i]->setStatusTip(tr("Select the '%1' workbench").arg(it.key()));
+            workbenches[i]->setVisible(true);
+        }
         // Note: See remark at WorkbenchComboBox::onWorkbenchActivated
         // Calling setChecked() here causes to uncheck the current item
         // item in comboboxes these action were added to.
