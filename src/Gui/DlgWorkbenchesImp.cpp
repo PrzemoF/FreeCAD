@@ -59,13 +59,6 @@ struct GroupMap_find {
 
 /* TRANSLATOR Gui::Dialog::DlgWorkbenches */
 
-/**
- *  Constructs a DlgWorkbenches which is a child of 'parent', with the
- *  name 'name' and widget flags set to 'f'
- *
- *  The dialog will by default be modeless, unless you set 'modal' to
- *  TRUE to construct a modal dialog.
- */
 DlgWorkbenches::DlgWorkbenches(DlgWorkbenches::Type t, QWidget* parent)
     : CustomizeActionPage(parent), type(t)
 {
@@ -104,26 +97,27 @@ DlgWorkbenches::DlgWorkbenches(DlgWorkbenches::Type t, QWidget* parent)
         categoryBox->addItem(it->second);
         categoryBox->setItemData(index, QVariant(it->first), Qt::UserRole);
     }
-
+*/
     // fills the combo box with all available workbenches
+    int index;
     QStringList workbenches = Application::Instance->workbenches();
     workbenches.sort();
     index = 1;
-    workbenchBox->addItem(QApplication::windowIcon(), tr("Global"));
-    workbenchBox->setItemData(0, QVariant(QString::fromAscii("Global")), Qt::UserRole);
+    //lw_all_workbenches->addItem(QApplication::windowIcon(), tr("Global"));
+    //lw_all_workbenches->setItemData(0, QVariant(QString::fromAscii("Global")), Qt::UserRole);
     for (QStringList::Iterator it = workbenches.begin(); it != workbenches.end(); ++it) {
         QPixmap px = Application::Instance->workbenchIcon(*it);
         QString mt = Application::Instance->workbenchMenuText(*it);
         if (mt != QLatin1String("<none>")) {
-            if (px.isNull())
-                workbenchBox->addItem(mt);
-            else
-                workbenchBox->addItem(px, mt);
-            workbenchBox->setItemData(index, QVariant(*it), Qt::UserRole);
+         //   if (px.isNull())
+                lw_all_workbenches->addItem(mt);
+         //   else
+         //       lw_all_workbenches->addItem(px, mt);
+         //  lw_all_workbenches->setItemData(index, QVariant(*it), Qt::UserRole);
             index++;
         }
     }
-
+/*
     QStringList labels; 
     labels << tr("Icon") << tr("Command");
     commandTreeWidget->setHeaderLabels(labels);
@@ -139,10 +133,10 @@ DlgWorkbenches::DlgWorkbenches(DlgWorkbenches::Type t, QWidget* parent)
     Workbench* w = WorkbenchManager::instance()->active();
     if (w) {
         QString name = QString::fromAscii(w->name().c_str());
-        int index = workbenchBox->findData(name);
-        workbenchBox->setCurrentIndex(index);
+        int index = cbx_active_workbenches->findData(name);
+        cbx_active_workbenches->setCurrentIndex(index);
     }
-    on_workbenchBox_activated(workbenchBox->currentIndex());
+    on_cbx_active_workbenches_activated(cbx_active_workbenches->currentIndex());
 */
 }
 
@@ -181,7 +175,7 @@ void DlgWorkbenches::moveDownCustomCommand(const QString&, const QByteArray&)
 
 void DlgWorkbenches::hideEvent(QHideEvent * event)
 {
-/*    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+/*    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     QString workbench = data.toString();
     exportWorkbenches(workbench.toAscii());
 
@@ -215,9 +209,9 @@ void DlgWorkbenches::on_categoryBox_activated(int index)
 */
 }
 
-void DlgWorkbenches::on_workbenchBox_activated(int index)
+void DlgWorkbenches::on_cbx_active_workbenches_activated(int index)
 {
- /*   QVariant data = workbenchBox->itemData(index, Qt::UserRole);
+ /*   QVariant data = cbx_active_workbenches->itemData(index, Qt::UserRole);
     QString workbench = data.toString();
     toolbarTreeWidget->clear();
 
@@ -341,7 +335,7 @@ void DlgWorkbenches::on_moveActionRightButton_clicked()
         }
     }
 
-    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     QString workbench = data.toString();
     exportWorkbenches(workbench.toAscii());
 */
@@ -377,7 +371,7 @@ void DlgWorkbenches::on_moveActionLeftButton_clicked()
         delete item;
     }
 
-    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     QString workbench = data.toString();
     exportWorkbenches(workbench.toAscii());
 */
@@ -417,7 +411,7 @@ void DlgWorkbenches::on_moveActionUpButton_clicked()
         }
     }
 
-    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     QString workbench = data.toString();
     exportWorkbenches(workbench.toAscii());
 */
@@ -457,7 +451,7 @@ void DlgWorkbenches::on_moveActionDownButton_clicked()
         }
     }
 
-    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     QString workbench = data.toString();
     exportWorkbenches(workbench.toAscii());
 */
@@ -485,7 +479,7 @@ void DlgWorkbenches::on_newButton_clicked()
         item->setCheckState(0, Qt::Checked);
         toolbarTreeWidget->setItemExpanded(item, true);
 
-        QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+        QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
         QString workbench = data.toString();
         exportWorkbenches(workbench.toAscii());
         addCustomToolbar(text);
@@ -504,7 +498,7 @@ void DlgWorkbenches::on_deleteButton_clicked()
         delete item;
     }
 
-    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     QString workbench = data.toString();
     exportWorkbenches(workbench.toAscii());
 */
@@ -538,7 +532,7 @@ void DlgWorkbenches::on_renameButton_clicked()
     }
 
     if (renamed) {
-        QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+        QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
         QString workbench = data.toString();
         exportWorkbenches(workbench.toAscii());
     }
@@ -673,7 +667,7 @@ DlgWorkbenchesImp::~DlgWorkbenchesImp()
 
 void DlgWorkbenchesImp::addCustomToolbar(const QString& name)
 {/*
-    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     Workbench* w = WorkbenchManager::instance()->active();
     if (w && w->name() == std::string((const char*)data.toByteArray())) {
         QToolBar* bar = getMainWindow()->addToolBar(name);
@@ -685,7 +679,7 @@ void DlgWorkbenchesImp::addCustomToolbar(const QString& name)
 void DlgWorkbenchesImp::removeCustomToolbar(const QString& name)
 {
 /*
-    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     Workbench* w = WorkbenchManager::instance()->active();
     if (w && w->name() == std::string((const char*)data.toByteArray())) {
         QList<QToolBar*> bars = getMainWindow()->findChildren<QToolBar*>(name);
@@ -701,7 +695,7 @@ void DlgWorkbenchesImp::removeCustomToolbar(const QString& name)
 
 void DlgWorkbenchesImp::renameCustomToolbar(const QString& old_name, const QString& new_name)
 {
- /*   QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+ /*   QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
 
     Workbench* w = WorkbenchManager::instance()->active();
     if (w && w->name() == std::string((const char*)data.toByteArray())) {
@@ -718,7 +712,7 @@ void DlgWorkbenchesImp::renameCustomToolbar(const QString& old_name, const QStri
 
 void DlgWorkbenchesImp::addCustomCommand(const QString& name, const QByteArray& cmd)
 {
- /*   QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+ /*   QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     Workbench* w = WorkbenchManager::instance()->active();
     if (w && w->name() == std::string((const char*)data.toByteArray())) {
         QList<QToolBar*> bars = getMainWindow()->findChildren<QToolBar*>(name);
@@ -739,7 +733,7 @@ void DlgWorkbenchesImp::addCustomCommand(const QString& name, const QByteArray& 
 
 void DlgWorkbenchesImp::removeCustomCommand(const QString& name, const QByteArray& userdata)
 {
- /*   QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+ /*   QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     Workbench* w = WorkbenchManager::instance()->active();
     if (w && w->name() == std::string((const char*)data.toByteArray())) {
         QList<QToolBar*> bars = getMainWindow()->findChildren<QToolBar*>(name);
@@ -770,7 +764,7 @@ void DlgWorkbenchesImp::removeCustomCommand(const QString& name, const QByteArra
 
 void DlgWorkbenchesImp::moveUpCustomCommand(const QString& name, const QByteArray& userdata)
 {
-/*    QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+/*    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     Workbench* w = WorkbenchManager::instance()->active();
     if (w && w->name() == std::string((const char*)data.toByteArray())) {
         QList<QToolBar*> bars = getMainWindow()->findChildren<QToolBar*>(name);
@@ -809,7 +803,7 @@ void DlgWorkbenchesImp::moveUpCustomCommand(const QString& name, const QByteArra
 
 void DlgWorkbenchesImp::moveDownCustomCommand(const QString& name, const QByteArray& userdata)
 {
- /*   QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
+ /*   QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     Workbench* w = WorkbenchManager::instance()->active();
     if (w && w->name() == std::string((const char*)data.toByteArray())) {
         QList<QToolBar*> bars = getMainWindow()->findChildren<QToolBar*>(name);

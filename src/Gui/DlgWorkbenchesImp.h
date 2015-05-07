@@ -50,7 +50,7 @@ protected:
 
 protected Q_SLOTS:
     void on_categoryBox_activated(int index);
-    void on_workbenchBox_activated(int index);
+    void on_cbx_active_workbenches_activated(int index);
     void on_moveActionRightButton_clicked();
     void on_moveActionLeftButton_clicked();
     void on_moveActionUpButton_clicked();

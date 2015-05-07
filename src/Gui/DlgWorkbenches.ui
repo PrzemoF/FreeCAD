@@ -174,19 +174,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QComboBox" name="cbx_all_workbenches"/>
-     </item>
-     <item>
-      <widget class="QTreeWidget" name="tw_all_workbenches">
-       <property name="rootIsDecorated">
-        <bool>false</bool>
-       </property>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
-        </property>
-       </column>
-      </widget>
+      <widget class="QListWidget" name="lw_all_workbenches"/>
      </item>
     </layout>
    </item>
@@ -199,14 +187,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QComboBox" name="cbx_active_workbenches"/>
-     </item>
-     <item>
-      <widget class="QTreeWidget" name="tw_active_workbenches">
-       <property name="columnCount">
-        <number>0</number>
-       </property>
-      </widget>
+      <widget class="QListWidget" name="lw_active_workbenches"/>
      </item>
     </layout>
    </item>
