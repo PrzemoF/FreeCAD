@@ -40,6 +40,7 @@
 #include "Application.h"
 #include "Command.h"
 #include "DlgUndoRedo.h"
+#include "DlgWorkbenchesImp.h"
 #include "FileDialog.h"
 #include "MainWindow.h"
 #include "WhatsThis.h"
@@ -519,26 +520,38 @@ void WorkbenchGroup::refreshWorkbenchList()
 {
     QString active = QString::fromAscii(WorkbenchManager::instance()->active()->name().c_str());
     QStringList items = Application::Instance->workbenches();
-    
+
+    QString enabled_wbs;
+    QStringList enabled_wbs_list;
+    ParameterGrp::handle hGrp;
+
+    hGrp = App::GetApplication().GetParameterGroupByPath("User parameter:BaseApp/Workbenches");
+    enabled_wbs = QString::fromStdString(hGrp->GetASCII("Enabled", "ALL").c_str());
+    enabled_wbs_list = enabled_wbs.split(QLatin1String(","), QString::SkipEmptyParts);
+
     QList<QAction*> workbenches = _group->actions();
     int numWorkbenches = std::min<int>(workbenches.count(), items.count());
 
-    // sort by workbench menu text
-    QMap<QString, QString> menuText;
-    for (int index = 0; index < numWorkbenches; index++) {
-        QString text = Application::Instance->workbenchMenuText(items[index]);
-        menuText[text] = items[index];
+    const QString all_workbenches = QString::fromAscii("ALL");
+    if (enabled_wbs_list.at(0) == all_workbenches) {
+        items.removeFirst();
+        for (QStringList::Iterator it = items.begin(); it != items.end(); ++it) {
+            enabled_wbs_list.append(*it);
+        }
+        enabled_wbs_list.sort();
     }
-
     int i=0;
-    for (QMap<QString, QString>::Iterator it = menuText.begin(); it != menuText.end(); ++it, i++) {
-        QPixmap px = Application::Instance->workbenchIcon(it.value());
-        QString tip = Application::Instance->workbenchToolTip(it.value());
-        workbenches[i]->setObjectName(it.value());
+    for (QStringList::Iterator it = enabled_wbs_list.begin(); it != enabled_wbs_list.end(); ++it, i++) {
+        QString s = *it;
+        QString name = Application::Instance->workbenchMenuText(*it);
+        QPixmap px = Application::Instance->workbenchIcon(*it);
+        QString tip = Application::Instance->workbenchToolTip(*it);
+        workbenches[i]->setObjectName(*it);
         workbenches[i]->setIcon(px);
-        workbenches[i]->setText(it.key());
+        workbenches[i]->setText(name);
         workbenches[i]->setToolTip(tip);
-        workbenches[i]->setStatusTip(tr("Select the '%1' workbench").arg(it.key()));
+        workbenches[i]->setStatusTip(tr("Select the '%1' workbench").arg(name));
+        workbenches[i]->setVisible(false);
         workbenches[i]->setVisible(true);
         // Note: See remark at WorkbenchComboBox::onWorkbenchActivated
         // Calling setChecked() here causes to uncheck the current item
