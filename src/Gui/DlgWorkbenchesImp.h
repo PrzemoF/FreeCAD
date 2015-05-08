@@ -49,10 +49,10 @@ protected:
     virtual ~DlgWorkbenches();
 
 protected Q_SLOTS:
-    void on_moveActionRightButton_clicked();
-    void on_moveActionLeftButton_clicked();
-    void on_moveActionUpButton_clicked();
-    void on_moveActionDownButton_clicked();
+    void on_add_to_active_workbenches_btn_clicked();
+    void on_remove_from_active_workbenches_btn_clicked();
+    void on_move_workbench_up_btn_clicked();
+    void on_move_workbench_down_btn_clicked();
     void onAddMacroAction(const QByteArray&);
     void onRemoveMacroAction(const QByteArray&);
     void onModifyMacroAction(const QByteArray&);

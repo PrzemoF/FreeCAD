@@ -63,10 +63,10 @@ DlgWorkbenches::DlgWorkbenches(DlgWorkbenches::Type t, QWidget* parent)
     : CustomizeActionPage(parent), type(t)
 {
     this->setupUi(this);
-    moveActionRightButton->setIcon(BitmapFactory().pixmap(":/icons/button_right.svg"));
-    moveActionLeftButton->setIcon(BitmapFactory().pixmap(":/icons/button_left.svg"));
-    moveActionDownButton->setIcon(BitmapFactory().pixmap(":/icons/button_down.svg"));
-    moveActionUpButton->setIcon(BitmapFactory().pixmap(":/icons/button_up.svg"));
+    add_to_active_workbenches_btn->setIcon(BitmapFactory().pixmap(":/icons/button_right.svg"));
+    remove_from_active_workbenches_btn->setIcon(BitmapFactory().pixmap(":/icons/button_left.svg"));
+    move_workbench_down_btn->setIcon(BitmapFactory().pixmap(":/icons/button_down.svg"));
+    move_workbench_up_btn->setIcon(BitmapFactory().pixmap(":/icons/button_up.svg"));
 /*
     CommandManager & cCmdMgr = Application::Instance->commandManager();
     std::map<std::string,Command*> sCommands = cCmdMgr.getCommands();
@@ -278,9 +278,9 @@ void DlgWorkbenches::exportWorkbenches(const QByteArray& workbench)
 }
 
 /** Adds a new action */
-void DlgWorkbenches::on_moveActionRightButton_clicked()
+void DlgWorkbenches::on_add_to_active_workbenches_btn_clicked()
 {
-qDebug("on_moveActionRightButton_clicked");
+qDebug("on_add_to_active_workbenches_btn_clicked");
 /*
     QTreeWidgetItem* item = commandTreeWidget->currentItem();
     if (item) {
@@ -307,9 +307,9 @@ qDebug("on_moveActionRightButton_clicked");
 }
 
 /** Removes an action */
-void DlgWorkbenches::on_moveActionLeftButton_clicked()
+void DlgWorkbenches::on_remove_from_active_workbenches_btn_clicked()
 {
-qDebug("on_moveActionLeftButton_clicked");
+qDebug("on_remove_from_active_workbenches_btn_clicked");
 /*
     QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
     if (item && item->parent() && toolbarTreeWidget->isItemSelected(item)) {
@@ -344,9 +344,9 @@ qDebug("on_moveActionLeftButton_clicked");
 }
 
 /** Moves up an action */
-void DlgWorkbenches::on_moveActionUpButton_clicked()
+void DlgWorkbenches::on_move_workbench_up_btn_clicked()
 {
-qDebug("on_moveActionUpButton_clicked");
+qDebug("on_move_workbench_up_btn_clicked");
 /*
     QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
     if (item && item->parent() && toolbarTreeWidget->isItemSelected(item)) {
@@ -385,9 +385,9 @@ qDebug("on_moveActionUpButton_clicked");
 }
 
 /** Moves down an action */
-void DlgWorkbenches::on_moveActionDownButton_clicked()
+void DlgWorkbenches::on_move_workbench_down_btn_clicked()
 {
-qDebug("on_moveActionDownButton_clicked");
+qDebug("on_move_workbench_down_btn_clicked");
 /*
     QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
     if (item && item->parent() && toolbarTreeWidget->isItemSelected(item)) {
