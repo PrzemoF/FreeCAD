@@ -183,32 +183,6 @@ void DlgWorkbenches::hideEvent(QHideEvent * event)
 */
 }
 
-void DlgWorkbenches::on_categoryBox_activated(int index)
-{
- /*   QVariant data = categoryBox->itemData(index, Qt::UserRole);
-    QString group = data.toString();
-    commandTreeWidget->clear();
-
-    CommandManager & cCmdMgr = Application::Instance->commandManager();
-    std::vector<Command*> aCmds = cCmdMgr.getGroupCommands(group.toAscii());
-
-    // Create a separator item
-    QTreeWidgetItem* sepitem = new QTreeWidgetItem(commandTreeWidget);
-    sepitem->setText(1, tr("<Separator>"));
-    sepitem->setData(1, Qt::UserRole, QByteArray("Separator"));
-    sepitem->setSizeHint(0, QSize(32, 32));
-    for (std::vector<Command*>::iterator it = aCmds.begin(); it != aCmds.end(); ++it) {
-        QTreeWidgetItem* item = new QTreeWidgetItem(commandTreeWidget);
-        item->setText(1, qApp->translate((*it)->className(), (*it)->getMenuText()));
-        item->setToolTip(1, qApp->translate((*it)->className(), (*it)->getToolTipText()));
-        item->setData(1, Qt::UserRole, QByteArray((*it)->getName()));
-        item->setSizeHint(0, QSize(32, 32));
-        if ((*it)->getPixmap())
-            item->setIcon(0, BitmapFactory().pixmap((*it)->getPixmap()));
-    }
-*/
-}
-
 void DlgWorkbenches::on_cbx_active_workbenches_activated(int index)
 {
  /*   QVariant data = cbx_active_workbenches->itemData(index, Qt::UserRole);
@@ -454,88 +428,6 @@ void DlgWorkbenches::on_moveActionDownButton_clicked()
     QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
     QString workbench = data.toString();
     exportWorkbenches(workbench.toAscii());
-*/
-}
-
-void DlgWorkbenches::on_newButton_clicked()
-{
-/*
-    bool ok;
-    QString text = QString::fromAscii("Custom%1").arg(toolbarTreeWidget->topLevelItemCount()+1);
-    text = QInputDialog::getText(this, tr("New toolbar"), tr("Toolbar name:"), QLineEdit::Normal, text, &ok);
-    if (ok) {
-        // Check for duplicated name
-        for (int i=0; i<toolbarTreeWidget->topLevelItemCount(); i++) {
-            QTreeWidgetItem* toplevel = toolbarTreeWidget->topLevelItem(i);
-            QString groupName = toplevel->text(0);
-            if (groupName == text) {
-                QMessageBox::warning(this, tr("Duplicated name"), tr("The toolbar name '%1' is already used").arg(text));
-                return;
-            }
-        }
-
-        QTreeWidgetItem* item = new QTreeWidgetItem(toolbarTreeWidget);
-        item->setText(0, text);
-        item->setCheckState(0, Qt::Checked);
-        toolbarTreeWidget->setItemExpanded(item, true);
-
-        QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
-        QString workbench = data.toString();
-        exportWorkbenches(workbench.toAscii());
-        addCustomToolbar(text);
-    }
-*/
-}
-
-void DlgWorkbenches::on_deleteButton_clicked()
-{
-/*
-    QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
-    if (item && !item->parent() && toolbarTreeWidget->isItemSelected(item)) {
-        int index = toolbarTreeWidget->indexOfTopLevelItem(item);
-        toolbarTreeWidget->takeTopLevelItem(index);
-        removeCustomToolbar(item->text(0));
-        delete item;
-    }
-
-    QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
-    QString workbench = data.toString();
-    exportWorkbenches(workbench.toAscii());
-*/
-}
-
-void DlgWorkbenches::on_renameButton_clicked()
-{
-/*
-    bool renamed = false;
-    QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
-    if (item && !item->parent() && toolbarTreeWidget->isItemSelected(item)) {
-        bool ok;
-        QString old_text = item->text(0);
-        QString text = QInputDialog::getText(this, tr("Rename toolbar"), tr("Toolbar name:"),
-            QLineEdit::Normal, old_text, &ok);
-        if (ok && text != old_text) {
-            // Check for duplicated name
-            for (int i=0; i<toolbarTreeWidget->topLevelItemCount(); i++) {
-                QTreeWidgetItem* toplevel = toolbarTreeWidget->topLevelItem(i);
-                QString groupName = toplevel->text(0);
-                if (groupName == text && toplevel != item) {
-                    QMessageBox::warning(this, tr("Duplicated name"), tr("The toolbar name '%1' is already used").arg(text));
-                    return;
-                }
-            }
-
-            item->setText(0, text);
-            renameCustomToolbar(old_text, text);
-            renamed = true;
-        }
-    }
-
-    if (renamed) {
-        QVariant data = cbx_active_workbenches->itemData(cbx_active_workbenches->currentIndex(), Qt::UserRole);
-        QString workbench = data.toString();
-        exportWorkbenches(workbench.toAscii());
-    }
 */
 }
 

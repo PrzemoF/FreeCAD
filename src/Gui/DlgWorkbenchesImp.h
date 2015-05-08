@@ -49,15 +49,11 @@ protected:
     virtual ~DlgWorkbenches();
 
 protected Q_SLOTS:
-    void on_categoryBox_activated(int index);
     void on_cbx_active_workbenches_activated(int index);
     void on_moveActionRightButton_clicked();
     void on_moveActionLeftButton_clicked();
     void on_moveActionUpButton_clicked();
     void on_moveActionDownButton_clicked();
-    void on_newButton_clicked();
-    void on_renameButton_clicked();
-    void on_deleteButton_clicked();
     void onAddMacroAction(const QByteArray&);
     void onRemoveMacroAction(const QByteArray&);
     void onModifyMacroAction(const QByteArray&);
