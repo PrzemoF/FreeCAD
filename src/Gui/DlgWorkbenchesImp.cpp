@@ -110,7 +110,8 @@ DlgWorkbenches::DlgWorkbenches(DlgWorkbenches::Type t, QWidget* parent)
         QString mt = Application::Instance->workbenchMenuText(*it);
         if (mt != QLatin1String("<none>")) {
          //   if (px.isNull())
-                lw_all_workbenches->addItem(mt);
+       //         lw_all_workbenches->addItem(mt);
+		lw_all_workbenches->addItem(new QListWidgetItem(QIcon(px), mt));
          //   else
          //       lw_all_workbenches->addItem(px, mt);
          //  lw_all_workbenches->setItemData(index, QVariant(*it), Qt::UserRole);
