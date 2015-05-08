@@ -281,10 +281,12 @@ void DlgWorkbenches::exportWorkbenches(const QByteArray& workbench)
 void DlgWorkbenches::on_add_to_active_workbenches_btn_clicked()
 {
 qDebug("on_add_to_active_workbenches_btn_clicked");
-/*
-    QTreeWidgetItem* item = commandTreeWidget->currentItem();
+
+    QListWidgetItem* item = lw_all_workbenches->currentItem();
     if (item) {
-        QTreeWidgetItem* current = toolbarTreeWidget->currentItem();
+	qDebug("gonna add " + item->text().toLatin1() + " to active wbs");
+    }
+ /*       QTreeWidgetItem* current = toolbarTreeWidget->currentItem();
         if (!current)
             current = toolbarTreeWidget->topLevelItem(0);
         else if (current->parent())
