@@ -49,7 +49,6 @@ protected:
     virtual ~DlgWorkbenches();
 
 protected Q_SLOTS:
-    void on_cbx_active_workbenches_activated(int index);
     void on_moveActionRightButton_clicked();
     void on_moveActionLeftButton_clicked();
     void on_moveActionUpButton_clicked();

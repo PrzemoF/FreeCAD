@@ -102,21 +102,21 @@ DlgWorkbenches::DlgWorkbenches(DlgWorkbenches::Type t, QWidget* parent)
     int index;
     QStringList workbenches = Application::Instance->workbenches();
     workbenches.sort();
-    index = 1;
+    index = 0;
     //lw_all_workbenches->addItem(QApplication::windowIcon(), tr("Global"));
     //lw_all_workbenches->setItemData(0, QVariant(QString::fromAscii("Global")), Qt::UserRole);
     for (QStringList::Iterator it = workbenches.begin(); it != workbenches.end(); ++it) {
         QPixmap px = Application::Instance->workbenchIcon(*it);
         QString mt = Application::Instance->workbenchMenuText(*it);
-        if (mt != QLatin1String("<none>")) {
+        //if (mt != QLatin1String("<none>")) {
          //   if (px.isNull())
        //         lw_all_workbenches->addItem(mt);
-		lw_all_workbenches->addItem(new QListWidgetItem(QIcon(px), mt));
+	    lw_all_workbenches->addItem(new QListWidgetItem(QIcon(px), mt));
          //   else
          //       lw_all_workbenches->addItem(px, mt);
-         //  lw_all_workbenches->setItemData(index, QVariant(*it), Qt::UserRole);
+            lw_all_workbenches->item(index)->setData(Qt::UserRole, QVariant(*it));
             index++;
-        }
+        //}
     }
 /*
     QStringList labels; 
@@ -181,17 +181,6 @@ void DlgWorkbenches::hideEvent(QHideEvent * event)
     exportWorkbenches(workbench.toAscii());
 
     CustomizeActionPage::hideEvent(event);
-*/
-}
-
-void DlgWorkbenches::on_cbx_active_workbenches_activated(int index)
-{
- /*   QVariant data = cbx_active_workbenches->itemData(index, Qt::UserRole);
-    QString workbench = data.toString();
-    toolbarTreeWidget->clear();
-
-    QByteArray workbenchname = workbench.toAscii();
-    importWorkbenches(workbenchname);
 */
 }
 
@@ -291,6 +280,7 @@ void DlgWorkbenches::exportWorkbenches(const QByteArray& workbench)
 /** Adds a new action */
 void DlgWorkbenches::on_moveActionRightButton_clicked()
 {
+qDebug("on_moveActionRightButton_clicked");
 /*
     QTreeWidgetItem* item = commandTreeWidget->currentItem();
     if (item) {
@@ -319,6 +309,7 @@ void DlgWorkbenches::on_moveActionRightButton_clicked()
 /** Removes an action */
 void DlgWorkbenches::on_moveActionLeftButton_clicked()
 {
+qDebug("on_moveActionLeftButton_clicked");
 /*
     QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
     if (item && item->parent() && toolbarTreeWidget->isItemSelected(item)) {
@@ -355,6 +346,7 @@ void DlgWorkbenches::on_moveActionLeftButton_clicked()
 /** Moves up an action */
 void DlgWorkbenches::on_moveActionUpButton_clicked()
 {
+qDebug("on_moveActionUpButton_clicked");
 /*
     QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
     if (item && item->parent() && toolbarTreeWidget->isItemSelected(item)) {
@@ -395,6 +387,7 @@ void DlgWorkbenches::on_moveActionUpButton_clicked()
 /** Moves down an action */
 void DlgWorkbenches::on_moveActionDownButton_clicked()
 {
+qDebug("on_moveActionDownButton_clicked");
 /*
     QTreeWidgetItem* item = toolbarTreeWidget->currentItem();
     if (item && item->parent() && toolbarTreeWidget->isItemSelected(item)) {
