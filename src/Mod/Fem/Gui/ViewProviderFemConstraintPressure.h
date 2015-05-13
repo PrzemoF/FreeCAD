@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 
-#ifndef GUI_VIEWPROVIDERFEMCONSTRAINTNORMALSTRESS_H
-#define GUI_VIEWPROVIDERFEMCONSTRAINTNORMALSTRESS_H
+#ifndef GUI_VIEWPROVIDERFEMCONSTRAINTPRESSURE_H
+#define GUI_VIEWPROVIDERFEMCONSTRAINTPRESSURE_H
 
 #include <TopoDS_Shape.hxx>
 
@@ -52,14 +52,14 @@ class View3DInventorViewer;
 namespace FemGui
 {
 
-class FemGuiExport ViewProviderFemConstraintNormalStress : public FemGui::ViewProviderFemConstraint
+class FemGuiExport ViewProviderFemConstraintPressure : public FemGui::ViewProviderFemConstraint
 {
-    PROPERTY_HEADER(FemGui::ViewProviderFemConstraintNormalStress);
+    PROPERTY_HEADER(FemGui::ViewProviderFemConstraintPressure);
 
 public:
     /// Constructor
-    ViewProviderFemConstraintNormalStress();
-    virtual ~ViewProviderFemConstraintNormalStress();
+    ViewProviderFemConstraintPressure();
+    virtual ~ViewProviderFemConstraintPressure();
 
     virtual void updateData(const App::Property*);
 
@@ -75,4 +75,4 @@ private:
 } //namespace FemGui
 
 
-#endif // GUI_VIEWPROVIDERFEMCONSTRAINTNORMALSTRESS_H
+#endif // GUI_VIEWPROVIDERFEMCONSTRAINTPRESSURE_H

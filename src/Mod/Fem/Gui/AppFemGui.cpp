@@ -45,7 +45,7 @@
 #include "ViewProviderFemConstraintBearing.h"
 #include "ViewProviderFemConstraintFixed.h"
 #include "ViewProviderFemConstraintForce.h"
-#include "ViewProviderFemConstraintNormalStress.h"
+#include "ViewProviderFemConstraintPressure.h"
 #include "ViewProviderFemConstraintGear.h"
 #include "ViewProviderFemConstraintPulley.h"
 #include "ViewProviderResult.h"
@@ -96,7 +96,7 @@ void FemGuiExport initFemGui()
     FemGui::ViewProviderFemConstraintBearing   ::init();
     FemGui::ViewProviderFemConstraintFixed     ::init();
     FemGui::ViewProviderFemConstraintForce     ::init();
-    FemGui::ViewProviderFemConstraintNormalStress     ::init();
+    FemGui::ViewProviderFemConstraintPressure     ::init();
     FemGui::ViewProviderFemConstraintGear      ::init();
     FemGui::ViewProviderFemConstraintPulley    ::init();
     FemGui::ViewProviderResult                 ::init();

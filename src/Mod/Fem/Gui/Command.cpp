@@ -321,39 +321,39 @@ bool CmdFemConstraintForce::isActive(void)
 
 //=====================================================================================
 
-DEF_STD_CMD_A(CmdFemConstraintNormalStress);
+DEF_STD_CMD_A(CmdFemConstraintPressure);
 
-CmdFemConstraintNormalStress::CmdFemConstraintNormalStress()
-  : Command("Fem_ConstraintNormalStress")
+CmdFemConstraintPressure::CmdFemConstraintPressure()
+  : Command("Fem_ConstraintPressure")
 {
     sAppModule      = "Fem";
     sGroup          = QT_TR_NOOP("Fem");
     sMenuText       = QT_TR_NOOP("Create FEM force constraint");
     sToolTipText    = QT_TR_NOOP("Create FEM constraint for a force acting on a geometric entity");
-    sWhatsThis      = "Fem_ConstraintNormalStress";
+    sWhatsThis      = "Fem_ConstraintPressure";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_ConstraintNormalStress";
+    sPixmap         = "Fem_ConstraintPressure";
 }
 
-void CmdFemConstraintNormalStress::activated(int iMsg)
+void CmdFemConstraintPressure::activated(int iMsg)
 {
     Fem::FemAnalysis        *Analysis;
 
     if(getConstraintPrerequisits(&Analysis))
         return;
 
-    std::string FeatName = getUniqueObjectName("FemConstraintNormalStress");
+    std::string FeatName = getUniqueObjectName("FemConstraintPressure");
 
     openCommand("Make FEM constraint force on geometry");
-    doCommand(Doc,"App.activeDocument().addObject(\"Fem::ConstraintNormalStress\",\"%s\")",FeatName.c_str());
-    doCommand(Doc,"App.activeDocument().%s.NormalStress = 0.0",FeatName.c_str());
+    doCommand(Doc,"App.activeDocument().addObject(\"Fem::ConstraintPressure\",\"%s\")",FeatName.c_str());
+    doCommand(Doc,"App.activeDocument().%s.Pressure = 0.0",FeatName.c_str());
     doCommand(Doc,"App.activeDocument().%s.Member = App.activeDocument().%s.Member + [App.activeDocument().%s]",Analysis->getNameInDocument(),Analysis->getNameInDocument(),FeatName.c_str());
     updateActive();
 
     doCommand(Gui,"Gui.activeDocument().setEdit('%s')",FeatName.c_str());
 }
 
-bool CmdFemConstraintNormalStress::isActive(void)
+bool CmdFemConstraintPressure::isActive(void)
 {
     return hasActiveDocument();
 }
@@ -646,7 +646,7 @@ void CreateFemCommands(void)
     rcCmdMgr.addCommand(new CmdFemConstraintBearing());
     rcCmdMgr.addCommand(new CmdFemConstraintFixed());
     rcCmdMgr.addCommand(new CmdFemConstraintForce());
-    rcCmdMgr.addCommand(new CmdFemConstraintNormalStress());
+    rcCmdMgr.addCommand(new CmdFemConstraintPressure());
     rcCmdMgr.addCommand(new CmdFemConstraintGear());
     rcCmdMgr.addCommand(new CmdFemConstraintPulley());
 }

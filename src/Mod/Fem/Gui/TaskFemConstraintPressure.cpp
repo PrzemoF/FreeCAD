@@ -39,8 +39,8 @@
 # include <gp_Lin.hxx>
 #endif
 
-#include "ui_TaskFemConstraintNormalStress.h"
-#include "TaskFemConstraintNormalStress.h"
+#include "ui_TaskFemConstraintPressure.h"
+#include "TaskFemConstraintPressure.h"
 #include <App/Application.h>
 #include <App/Document.h>
 #include <App/PropertyGeo.h>
@@ -51,7 +51,7 @@
 #include <Gui/WaitCursor.h>
 #include <Gui/Selection.h>
 #include <Gui/Command.h>
-#include <Mod/Fem/App/FemConstraintNormalStress.h>
+#include <Mod/Fem/App/FemConstraintPressure.h>
 #include <Mod/Part/App/PartFeature.h>
 
 #include <Base/Console.h>
@@ -59,14 +59,14 @@
 using namespace FemGui;
 using namespace Gui;
 
-/* TRANSLATOR FemGui::TaskFemConstraintNormalStress */
+/* TRANSLATOR FemGui::TaskFemConstraintPressure */
 
-TaskFemConstraintNormalStress::TaskFemConstraintNormalStress(ViewProviderFemConstraintNormalStress *ConstraintView,QWidget *parent)
-    : TaskFemConstraint(ConstraintView, parent, "Fem_ConstraintNormalStress")
+TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPressure *ConstraintView,QWidget *parent)
+    : TaskFemConstraint(ConstraintView, parent, "Fem_ConstraintPressure")
 {
     // we need a separate container widget to add all controls to
     proxy = new QWidget(this);
-    ui = new Ui_TaskFemConstraintNormalStress();
+    ui = new Ui_TaskFemConstraintPressure();
     ui->setupUi(proxy);
     QMetaObject::connectSlotsByName(this);
 
@@ -78,7 +78,7 @@ TaskFemConstraintNormalStress::TaskFemConstraintNormalStress(ViewProviderFemCons
     ui->lw_references->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     connect(ui->if_normal_stress, SIGNAL(valueChanged(double)),
-            this, SLOT(onNormalStressChanged(double)));
+            this, SLOT(onPressureChanged(double)));
     connect(ui->b_add_reference, SIGNAL(pressed()),
             this, SLOT(onButtonReference()));
 //    connect(ui->buttonDirection, SIGNAL(pressed()),
@@ -96,8 +96,8 @@ TaskFemConstraintNormalStress::TaskFemConstraintNormalStress(ViewProviderFemCons
     ui->cb_reverse_direction->blockSignals(true);
 
     // Get the feature data
-    Fem::ConstraintNormalStress* pcConstraint = static_cast<Fem::ConstraintNormalStress*>(ConstraintView->getObject());
-    double f = pcConstraint->NormalStress.getValue();
+    Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(ConstraintView->getObject());
+    double f = pcConstraint->Pressure.getValue();
     std::vector<App::DocumentObject*> Objects = pcConstraint->References.getValues();
     std::vector<std::string> SubElements = pcConstraint->References.getSubValues();
     std::vector<std::string> dirStrings = pcConstraint->Direction.getSubValues();
@@ -127,7 +127,7 @@ TaskFemConstraintNormalStress::TaskFemConstraintNormalStress(ViewProviderFemCons
     updateUI();
 }
 
-void TaskFemConstraintNormalStress::updateUI()
+void TaskFemConstraintPressure::updateUI()
 {
     if (ui->lw_references->model()->rowCount() == 0) {
         // Go into reference selection mode if no reference has been selected yet
@@ -138,14 +138,14 @@ void TaskFemConstraintNormalStress::updateUI()
 //    std::string ref = ui->lw_references->item(0)->text().toStdString();
 //    int pos = ref.find_last_of(":");
 /*    if (ref.substr(pos+1, 6) == "Vertex")
-        ui->labelNormalStress->setText(tr("Point load"));
+        ui->labelPressure->setText(tr("Point load"));
     else if (ref.substr(pos+1, 4) == "Edge")
-        ui->labelNormalStress->setText(tr("Line load"));
+        ui->labelPressure->setText(tr("Line load"));
     else if (ref.substr(pos+1, 4) == "Face")*/
         ui->l_normal_stress->setText(tr("Area load"));
 }
 
-void TaskFemConstraintNormalStress::onSelectionChanged(const Gui::SelectionChanges& msg)
+void TaskFemConstraintPressure::onSelectionChanged(const Gui::SelectionChanges& msg)
 {
     if (msg.Type == Gui::SelectionChanges::AddSelection) {
         // Don't allow selection in other document
@@ -160,7 +160,7 @@ void TaskFemConstraintNormalStress::onSelectionChanged(const Gui::SelectionChang
             return;
 
         std::vector<std::string> references(1,subName);
-        Fem::ConstraintNormalStress* pcConstraint = static_cast<Fem::ConstraintNormalStress*>(ConstraintView->getObject());
+        Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(ConstraintView->getObject());
         App::DocumentObject* obj = ConstraintView->getObject()->getDocument()->getObject(msg.pObjectName);
         Part::Feature* feat = static_cast<Part::Feature*>(obj);
         TopoDS_Shape ref = feat->Shape.getShape().getSubShape(subName.c_str());
@@ -207,14 +207,14 @@ void TaskFemConstraintNormalStress::onSelectionChanged(const Gui::SelectionChang
                     QMessageBox::warning(this, tr("Selection error"), tr("Only planar faces can be picked"));
                     return;
                 }
-            } else if (subName.substr(0,4) == "Edge") {
+            }/* else if (subName.substr(0,4) == "Edge") {
                 BRepAdaptor_Curve line(TopoDS::Edge(ref));
                 if (line.GetType() != GeomAbs_Line) {
                     QMessageBox::warning(this, tr("Selection error"), tr("Only linear edges can be picked"));
                     return;
                 }
-            } else {
-                QMessageBox::warning(this, tr("Selection error"), tr("Only faces and edges can be picked"));
+            }*/ else {
+                QMessageBox::warning(this, tr("Selection error"), tr("Only faces can be picked"));
                 return;
             }
             pcConstraint->Direction.setValue(obj, references);
@@ -229,20 +229,20 @@ void TaskFemConstraintNormalStress::onSelectionChanged(const Gui::SelectionChang
     }
 }
 
-void TaskFemConstraintNormalStress::onNormalStressChanged(double f)
+void TaskFemConstraintPressure::onPressureChanged(double f)
 {
-    Fem::ConstraintNormalStress* pcConstraint = static_cast<Fem::ConstraintNormalStress*>(ConstraintView->getObject());
-    pcConstraint->NormalStress.setValue(f);
+    Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(ConstraintView->getObject());
+    pcConstraint->Pressure.setValue(f);
 }
 
-void TaskFemConstraintNormalStress::onReferenceDeleted() {
+void TaskFemConstraintPressure::onReferenceDeleted() {
     int row = ui->lw_references->currentIndex().row();
     TaskFemConstraint::onReferenceDeleted(row);
     ui->lw_references->model()->removeRow(row);
     ui->lw_references->setCurrentRow(0, QItemSelectionModel::ClearAndSelect);
 }
 /*
-void TaskFemConstraintNormalStress::onButtonDirection(const bool pressed) {
+void TaskFemConstraintPressure::onButtonDirection(const bool pressed) {
     if (pressed) {
         selectionMode = seldir;
     } else {
@@ -252,20 +252,23 @@ void TaskFemConstraintNormalStress::onButtonDirection(const bool pressed) {
     Gui::Selection().clearSelection();
 }
 */
-void TaskFemConstraintNormalStress::onCheckReverse(const bool pressed)
+void TaskFemConstraintPressure::onCheckReverse(const bool pressed)
 {
-    Fem::ConstraintNormalStress* pcConstraint = static_cast<Fem::ConstraintNormalStress*>(ConstraintView->getObject());
+    Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(ConstraintView->getObject());
     pcConstraint->Reversed.setValue(pressed);
 }
 
-double TaskFemConstraintNormalStress::getNormalStress(void) const
+double TaskFemConstraintPressure::getPressure(void) const
 {
+    Base::Quantity q = Base::Quantity(1.0, Base::Unit("MPa"));
     Base::Quantity value =  ui->if_normal_stress->getQuantity();
-//FIXME
-    return 10.0; //value.getValueAs(Units::Pressure("MPa"));
+    double val = value.getValueAs(q);
+    qDebug("Pressure");
+    qDebug("%f", val);
+    return val;
 }
 
-const std::string TaskFemConstraintNormalStress::getReferences() const
+const std::string TaskFemConstraintPressure::getReferences() const
 {
     int rows = ui->lw_references->model()->rowCount();
 
@@ -275,7 +278,7 @@ const std::string TaskFemConstraintNormalStress::getReferences() const
     return TaskFemConstraint::getReferences(items);
 }
 /*
-const std::string TaskFemConstraintNormalStress::getDirectionName(void) const
+const std::string TaskFemConstraintPressure::getDirectionName(void) const
 {
     std::string dir = ui->lineDirection->text().toStdString();
     if (dir.empty())
@@ -286,7 +289,7 @@ const std::string TaskFemConstraintNormalStress::getDirectionName(void) const
 }
 */
 /*
-const std::string TaskFemConstraintNormalStress::getDirectionObject(void) const
+const std::string TaskFemConstraintPressure::getDirectionObject(void) const
 {
     std::string dir = ui->lineDirection->text().toStdString();
     if (dir.empty())
@@ -296,17 +299,17 @@ const std::string TaskFemConstraintNormalStress::getDirectionObject(void) const
     return dir.substr(pos+1).c_str();
 }
 */
-bool TaskFemConstraintNormalStress::getReverse() const
+bool TaskFemConstraintPressure::getReverse() const
 {
     return ui->cb_reverse_direction->isChecked();
 }
 
-TaskFemConstraintNormalStress::~TaskFemConstraintNormalStress()
+TaskFemConstraintPressure::~TaskFemConstraintPressure()
 {
     delete ui;
 }
 
-void TaskFemConstraintNormalStress::changeEvent(QEvent *e)
+void TaskFemConstraintPressure::changeEvent(QEvent *e)
 {
     TaskBox::changeEvent(e);
     if (e->type() == QEvent::LanguageChange) {
@@ -321,18 +324,18 @@ void TaskFemConstraintNormalStress::changeEvent(QEvent *e)
 // TaskDialog
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-TaskDlgFemConstraintNormalStress::TaskDlgFemConstraintNormalStress(ViewProviderFemConstraintNormalStress *ConstraintView)
+TaskDlgFemConstraintPressure::TaskDlgFemConstraintPressure(ViewProviderFemConstraintPressure *ConstraintView)
 {
     this->ConstraintView = ConstraintView;
     assert(ConstraintView);
-    this->parameter = new TaskFemConstraintNormalStress(ConstraintView);;
+    this->parameter = new TaskFemConstraintPressure(ConstraintView);;
 
     Content.push_back(parameter);
 }
 
 //==== calls from the TaskView ===============================================================
 
-void TaskDlgFemConstraintNormalStress::open()
+void TaskDlgFemConstraintPressure::open()
 {
     // a transaction is already open at creation time of the panel
     if (!Gui::Command::hasPendingCommand()) {
@@ -341,17 +344,17 @@ void TaskDlgFemConstraintNormalStress::open()
     }
 }
 
-bool TaskDlgFemConstraintNormalStress::accept()
+bool TaskDlgFemConstraintPressure::accept()
 {
     std::string name = ConstraintView->getObject()->getNameInDocument();
-    const TaskFemConstraintNormalStress* parameterNormalStress = static_cast<const TaskFemConstraintNormalStress*>(parameter);
+    const TaskFemConstraintPressure* parameterPressure = static_cast<const TaskFemConstraintPressure*>(parameter);
 
     try {
         //Gui::Command::openCommand("FEM force constraint changed");
-        Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.NormalStress = %f",name.c_str(), parameterNormalStress->getNormalStress());
+        Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.Pressure = %f",name.c_str(), parameterPressure->getPressure());
 
-       /* std::string dirname = parameterNormalStress->getDirectionName().data();
-        std::string dirobj = parameterNormalStress->getDirectionObject().data();
+       /* std::string dirname = parameterPressure->getDirectionName().data();
+        std::string dirobj = parameterPressure->getDirectionObject().data();
 
         if (!dirname.empty()) {
             QString buf = QString::fromUtf8("(App.ActiveDocument.%1,[\"%2\"])");
@@ -362,7 +365,7 @@ bool TaskDlgFemConstraintNormalStress::accept()
             Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.Direction = None", name.c_str());
    //     }
 
-        Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.Reversed = %s", name.c_str(), parameterNormalStress->getReverse() ? "True" : "False");
+        Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.Reversed = %s", name.c_str(), parameterPressure->getReverse() ? "True" : "False");
     }
     catch (const Base::Exception& e) {
         QMessageBox::warning(parameter, tr("Input error"), QString::fromAscii(e.what()));
@@ -372,7 +375,7 @@ bool TaskDlgFemConstraintNormalStress::accept()
     return TaskDlgFemConstraint::accept();
 }
 
-bool TaskDlgFemConstraintNormalStress::reject()
+bool TaskDlgFemConstraintPressure::reject()
 {
     // roll back the changes
     Gui::Command::abortCommand();
@@ -382,4 +385,4 @@ bool TaskDlgFemConstraintNormalStress::reject()
     return true;
 }
 
-#include "moc_TaskFemConstraintNormalStress.cpp"
+#include "moc_TaskFemConstraintPressure.cpp"

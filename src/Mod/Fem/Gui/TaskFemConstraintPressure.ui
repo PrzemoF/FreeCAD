@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TaskFemConstraintNormalStress</class>
- <widget class="QWidget" name="TaskFemConstraintNormalStress">
+ <class>TaskFemConstraintPressure</class>
+ <widget class="QWidget" name="TaskFemConstraintPressure">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -25,7 +25,7 @@
     <widget class="QListWidget" name="lw_references"/>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="layoutNormalStress">
+    <layout class="QHBoxLayout" name="layoutPressure">
      <item>
       <widget class="QLabel" name="l_normal_stress">
        <property name="text">

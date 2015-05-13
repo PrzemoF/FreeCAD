@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 
-#ifndef FEM_CONSTRAINTNORMALSTRESS_H
-#define FEM_CONSTRAINTNORMALSTRESS_H
+#ifndef FEM_CONSTRAINTPRESSURE_H
+#define FEM_CONSTRAINTPRESSURE_H
 
 #include <App/DocumentObject.h>
 #include <App/PropertyLinks.h>
@@ -33,15 +33,15 @@
 namespace Fem
 {
 
-class AppFemExport ConstraintNormalStress : public Fem::Constraint
+class AppFemExport ConstraintPressure : public Fem::Constraint
 {
-    PROPERTY_HEADER(Fem::ConstraintNormalStress);
+    PROPERTY_HEADER(Fem::ConstraintPressure);
 
 public:
     /// Constructor
-    ConstraintNormalStress(void);
+    ConstraintPressure(void);
 
-    App::PropertyFloat NormalStress;
+    App::PropertyFloat Pressure;
     App::PropertyLinkSub Direction;
     App::PropertyBool Reversed;
     // Read-only (calculated values). These trigger changes in the ViewProvider
@@ -53,7 +53,7 @@ public:
 
     /// returns the type name of the ViewProvider
     const char* getViewProviderName(void) const {
-        return "FemGui::ViewProviderFemConstraintNormalStress";
+        return "FemGui::ViewProviderFemConstraintPressure";
     }
 
 protected:
@@ -66,4 +66,4 @@ private:
 } //namespace Fem
 
 
-#endif // FEM_CONSTRAINTNORMALSTRESS_H
+#endif // FEM_CONSTRAINTPRESSURE_H

@@ -32,35 +32,35 @@
 # include <Precision.hxx>
 #endif
 
-#include "ViewProviderFemConstraintNormalStress.h"
-#include <Mod/Fem/App/FemConstraintNormalStress.h>
-#include "TaskFemConstraintNormalStress.h"
+#include "ViewProviderFemConstraintPressure.h"
+#include <Mod/Fem/App/FemConstraintPressure.h>
+#include "TaskFemConstraintPressure.h"
 #include "Gui/Control.h"
 
 #include <Base/Console.h>
 
 using namespace FemGui;
 
-PROPERTY_SOURCE(FemGui::ViewProviderFemConstraintNormalStress, FemGui::ViewProviderFemConstraint)
+PROPERTY_SOURCE(FemGui::ViewProviderFemConstraintPressure, FemGui::ViewProviderFemConstraint)
 
 
-ViewProviderFemConstraintNormalStress::ViewProviderFemConstraintNormalStress()
+ViewProviderFemConstraintPressure::ViewProviderFemConstraintPressure()
 {
-    sPixmap = "Fem_ConstraintNormalStress";
+    sPixmap = "Fem_ConstraintPressure";
 }
 
-ViewProviderFemConstraintNormalStress::~ViewProviderFemConstraintNormalStress()
+ViewProviderFemConstraintPressure::~ViewProviderFemConstraintPressure()
 {
 }
 
-bool ViewProviderFemConstraintNormalStress::setEdit(int ModNum)
+bool ViewProviderFemConstraintPressure::setEdit(int ModNum)
 {
     if (ModNum == ViewProvider::Default ) {
         // When double-clicking on the item for this constraint the
         // object unsets and sets its edit mode without closing
         // the task panel
         Gui::TaskView::TaskDialog *dlg = Gui::Control().activeDialog();
-        TaskDlgFemConstraintNormalStress *constrDlg = qobject_cast<TaskDlgFemConstraintNormalStress *>(dlg);
+        TaskDlgFemConstraintPressure *constrDlg = qobject_cast<TaskDlgFemConstraintPressure *>(dlg);
         if (constrDlg && constrDlg->getConstraintView() != this)
             constrDlg = 0; // another constraint left open its task panel
         if (dlg && !constrDlg) {
@@ -83,7 +83,7 @@ bool ViewProviderFemConstraintNormalStress::setEdit(int ModNum)
                 // Ignore the request to open another dialog
                 return false;
             } else {
-                constraintDialog = new TaskFemConstraintNormalStress(this);
+                constraintDialog = new TaskFemConstraintPressure(this);
                 return true;
             }
         }
@@ -95,7 +95,7 @@ bool ViewProviderFemConstraintNormalStress::setEdit(int ModNum)
         if (constrDlg)
             Gui::Control().showDialog(constrDlg);
         else
-            Gui::Control().showDialog(new TaskDlgFemConstraintNormalStress(this));
+            Gui::Control().showDialog(new TaskDlgFemConstraintPressure(this));
 
         return true;
     }
@@ -108,10 +108,10 @@ bool ViewProviderFemConstraintNormalStress::setEdit(int ModNum)
 #define ARROWHEADRADIUS (ARROWLENGTH/3)
 #define USE_MULTIPLE_COPY
 
-void ViewProviderFemConstraintNormalStress::updateData(const App::Property* prop)
+void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
 {
     // Gets called whenever a property of the attached object changes
-    Fem::ConstraintNormalStress* pcConstraint = static_cast<Fem::ConstraintNormalStress*>(this->getObject());
+    Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(this->getObject());
 
 #ifdef USE_MULTIPLE_COPY
     if (pShapeSep->getNumChildren() == 0) {

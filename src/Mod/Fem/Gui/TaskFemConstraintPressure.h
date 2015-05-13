@@ -21,17 +21,17 @@
  ***************************************************************************/
 
 
-#ifndef GUI_TASKVIEW_TaskFemConstraintNormalStress_H
-#define GUI_TASKVIEW_TaskFemConstraintNormalStress_H
+#ifndef GUI_TASKVIEW_TaskFemConstraintPressure_H
+#define GUI_TASKVIEW_TaskFemConstraintPressure_H
 
 #include <Gui/TaskView/TaskView.h>
 #include <Gui/Selection.h>
 #include <Gui/TaskView/TaskDialog.h>
 
 #include "TaskFemConstraint.h"
-#include "ViewProviderFemConstraintNormalStress.h"
+#include "ViewProviderFemConstraintPressure.h"
 
-class Ui_TaskFemConstraintNormalStress;
+class Ui_TaskFemConstraintPressure;
 
 namespace App {
 class Property;
@@ -43,15 +43,15 @@ class ViewProvider;
 
 namespace FemGui {
 
-class TaskFemConstraintNormalStress : public TaskFemConstraint
+class TaskFemConstraintPressure : public TaskFemConstraint
 {
     Q_OBJECT
 
 public:
-    TaskFemConstraintNormalStress(ViewProviderFemConstraintNormalStress *ConstraintView,QWidget *parent = 0);
-    virtual ~TaskFemConstraintNormalStress();
+    TaskFemConstraintPressure(ViewProviderFemConstraintPressure *ConstraintView,QWidget *parent = 0);
+    virtual ~TaskFemConstraintPressure();
 
-    double getNormalStress(void) const;
+    double getPressure(void) const;
     virtual const std::string getReferences() const;
  //   const std::string getDirectionName(void) const;
  //   const std::string getDirectionObject(void) const;
@@ -59,7 +59,7 @@ public:
 
 private Q_SLOTS:
     void onReferenceDeleted(void);
-    void onNormalStressChanged(double);
+    void onPressureChanged(double);
 //    void onButtonDirection(const bool pressed = true);
     void onCheckReverse(bool);
 
@@ -71,16 +71,16 @@ private:
     void updateUI();
 
 private:
-    Ui_TaskFemConstraintNormalStress* ui;
+    Ui_TaskFemConstraintPressure* ui;
 };
 
 /// simulation dialog for the TaskView
-class TaskDlgFemConstraintNormalStress : public TaskDlgFemConstraint
+class TaskDlgFemConstraintPressure : public TaskDlgFemConstraint
 {
     Q_OBJECT
 
 public:
-    TaskDlgFemConstraintNormalStress(ViewProviderFemConstraintNormalStress *ConstraintView);
+    TaskDlgFemConstraintPressure(ViewProviderFemConstraintPressure *ConstraintView);
 
     /// is called by the framework if the dialog is accepted (Ok)
     virtual void open();
@@ -91,4 +91,4 @@ public:
 
 } //namespace FemGui
 
-#endif // GUI_TASKVIEW_TaskFemConstraintNormalStress_H
+#endif // GUI_TASKVIEW_TaskFemConstraintPressure_H

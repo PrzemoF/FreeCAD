@@ -33,35 +33,35 @@
 #include <Precision.hxx>
 #endif
 
-#include "FemConstraintNormalStress.h"
+#include "FemConstraintPressure.h"
 
 #include <Mod/Part/App/PartFeature.h>
 #include <Base/Console.h>
 
 using namespace Fem;
 
-PROPERTY_SOURCE(Fem::ConstraintNormalStress, Fem::Constraint);
+PROPERTY_SOURCE(Fem::ConstraintPressure, Fem::Constraint);
 
-ConstraintNormalStress::ConstraintNormalStress()
+ConstraintPressure::ConstraintPressure()
 {
-    ADD_PROPERTY(NormalStress,(0.0));
-    ADD_PROPERTY_TYPE(Direction,(0),"ConstraintNormalStress",(App::PropertyType)(App::Prop_None),
+    ADD_PROPERTY(Pressure,(0.0));
+    ADD_PROPERTY_TYPE(Direction,(0),"ConstraintPressure",(App::PropertyType)(App::Prop_None),
                       "Element giving direction of constraint");
     ADD_PROPERTY(Reversed,(0));
-    ADD_PROPERTY_TYPE(Points,(Base::Vector3d()),"ConstraintNormalStress",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
+    ADD_PROPERTY_TYPE(Points,(Base::Vector3d()),"ConstraintPressure",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
                       "Points where arrows are drawn");
-    ADD_PROPERTY_TYPE(DirectionVector,(Base::Vector3d(0,0,1)),"ConstraintNormalStress",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
+    ADD_PROPERTY_TYPE(DirectionVector,(Base::Vector3d(0,0,1)),"ConstraintPressure",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
                       "Direction of arrows");
     naturalDirectionVector = Base::Vector3d(0,0,0); // by default use the null vector to indication an invalid value
     Points.setValues(std::vector<Base::Vector3d>());
 }
 
-App::DocumentObjectExecReturn *ConstraintNormalStress::execute(void)
+App::DocumentObjectExecReturn *ConstraintPressure::execute(void)
 {
     return Constraint::execute();
 }
 
-void ConstraintNormalStress::onChanged(const App::Property* prop)
+void ConstraintPressure::onChanged(const App::Property* prop)
 {
     // Note: If we call this at the end, then the arrows are not oriented correctly initially
     // because the NormalDirection has not been calculated yet
