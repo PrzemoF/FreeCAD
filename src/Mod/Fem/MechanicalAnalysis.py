@@ -435,6 +435,14 @@ class _JobControlTaskPanel:
             if i.isDerivedFrom("Fem::ConstraintForce"):
                 ForceObjectDict['Object'] = i
                 self.ForceObjects.append(ForceObjectDict)
+
+        self.NormalStressObjects = []    # [{'Object':NormalStressObject, 'xxxxxxxx':value}, {}, ...]
+        for i in FemGui.getActiveAnalysis().Member:
+            NormalStressObjectDict = {}
+            if i.isDerivedFrom("Fem::ConstraintNormalStress"):
+                NormalStressObjectDict['Object'] = i
+                self.NormalStressObjects.append(NormalStressObjectDict)
+
         if not self.ForceObjects:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", "No force-constraint nodes defined in the Analysis")
             return False
