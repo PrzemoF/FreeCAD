@@ -3,6 +3,7 @@ import FreeCAD
 import os
 import time
 import sys
+import Part
 
 
 class inp_writer:
@@ -29,7 +30,7 @@ class inp_writer:
         self.write_step_begin(inpfile)
         self.write_constraints_fixed(inpfile)
         self.write_constraints_force(inpfile)
-        self.write_face_load(inpfile)
+        #self.write_face_load(inpfile)
         self.write_outputs_types(inpfile)
         self.write_step_end(inpfile)
         self.write_footer(inpfile)
@@ -156,11 +157,11 @@ class inp_writer:
 
     def write_constraints_force(self, f):
         f.write('\n***********************************************************\n')
-        f.write('** Node loads, see load node sets for how the value is calculated!\n')
+        f.write('** Node loads\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for fobj in self.force_objects:
+            frc_obj = fobj['Object']
             if 'NodeLoad' in fobj:
-                frc_obj = fobj['Object']
                 node_load = fobj['NodeLoad']
                 frc_obj_name = frc_obj.Name
                 vec = frc_obj.DirectionVector
@@ -172,6 +173,131 @@ class inp_writer:
                 f.write(frc_obj_name + ',1,' + v1 + '\n')
                 f.write(frc_obj_name + ',2,' + v2 + '\n')
                 f.write(frc_obj_name + ',3,' + v3 + '\n\n')
+
+
+            sum_ref_face_area = 0 
+            for o, elem in frc_obj.References:
+                elem_o = o.Shape.getElement(elem)
+                if elem_o.ShapeType == 'Face':
+                    sum_ref_face_area += elem_o.Area
+
+            for o, elem in frc_obj.References:
+                elem_o = o.Shape.getElement(elem)
+                if elem_o.ShapeType == 'Face':
+                    ref_face = elem_o
+                    print frc_obj.Name
+                    print '  AreaLoad (face load) on: ', o.Name, '.', elem
+                    print '  CLOAD is used'
+                    f.write('** ' + frc_obj.Name + '\n')
+                    f.write('*CLOAD\n')
+                    f.write('** node loads on: ' + o.Name + '.' + elem + '\n')
+
+                    force_per_sum_ref_face_area = frc_obj.Force / sum_ref_face_area
+                    vec = frc_obj.DirectionVector
+
+                    face_table = {} # { meshfaceID : ( nodeID, ... , nodeID ) }
+                    # we onle need the meshfaces, but there is no method which only returns the faceIDs
+                    vol_type = ''
+                    volume_faces = self.mesh_object.FemMesh.getVolumesByFace(ref_face)
+                    for mv,mf in volume_faces:
+                        face_table[mf] = self.mesh_object.FemMesh.getElementNodes(mf)
+                        if len(face_table[mf]) == 3:  # we just check the last face of the tabele!
+                            vol_type = 'C3D4'
+                        elif len(face_table[mf]) == 6:
+                            vol_type = 'C3D10'
+
+                    # for every node of every meshface calulate the appropriate node_areas
+                    node_area_table = []     #  [ (nodeID,Area), ... , (nodeID,Area) ]  some nodes will have more than one entries
+                    node_sumarea_table = {}  #  { nodeID : Area, ... , nodeID:Area }  AreaSum for each node, one entry for each node                        
+                    for mf in face_table:
+                        #print mf, ' --> ', face_table[mf]
+                        if vol_type == 'C3D4':
+                            P1 = self.mesh_object.FemMesh.Nodes[face_table[mf][0]]
+                            P2 = self.mesh_object.FemMesh.Nodes[face_table[mf][1]]
+                            P3 = self.mesh_object.FemMesh.Nodes[face_table[mf][2]]
+
+                            #get the Area and CenterOfMass
+                            L1 = Part.makeLine(P1,P2)
+                            L2 = Part.makeLine(P2,P3)
+                            L3 = Part.makeLine(P3,P1)
+                            W = Part.Wire([L1,L2,L3])
+                            F = Part.Face(W)
+                            A = F.Area
+                            PS = F.CenterOfMass
+
+                            #helperpoints
+                            PL1 = L1.CenterOfMass
+                            PL2 = L2.CenterOfMass
+                            PL3 = L3.CenterOfMass
+
+                            #cornerface1, Point face_table[ef][0]
+                            C1L1 = Part.makeLine(P1,PL1)
+                            C1L2 = Part.makeLine(PL1,PS)
+                            C1L3 = Part.makeLine(PS,PL3)
+                            C1L4 = Part.makeLine(PL3,P1)
+                            C1W = Part.Wire([C1L1,C1L2,C1L3,C1L4])
+                            C1F = Part.Face(C1W)
+                            C1A = C1F.Area
+
+                            #cornerface2, Point face_table[ef][1]
+                            C2L1 = Part.makeLine(P2,PL2)
+                            C2L2 = Part.makeLine(PL2,PS)
+                            C2L3 = Part.makeLine(PS,PL1)
+                            C2L4 = Part.makeLine(PL1,P2)
+                            C2W = Part.Wire([C2L1,C2L2,C2L3,C2L4])
+                            C2F = Part.Face(C2W)
+                            C2A = C2F.Area
+
+                            #cornerface3, Point face_table[ef][2]
+                            C3L1 = Part.makeLine(P3,PL3)
+                            C3L2 = Part.makeLine(PL3,PS)
+                            C3L3 = Part.makeLine(PS,PL2)
+                            C3L4 = Part.makeLine(PL2,P3)
+                            C3W = Part.Wire([C3L1,C3L2,C3L3,C3L4])
+                            C3F = Part.Face(C3W)
+                            C3A = C1F.Area
+
+                            #node_area_table
+                            node_area_table.append((face_table[mf][0], C1A))
+                            node_area_table.append((face_table[mf][1], C2A))
+                            node_area_table.append((face_table[mf][2], C3A))
+
+                        if vol_type == 'C3D10':
+                            print 'C3D10: Not implementet yet!'
+                            #import femtools
+                            #femtools.getNodeAreaTableC3D10(self.mesh_object, face_table)
+                            
+                            
+
+                    #node_sumarea_table
+                    for n, A in node_area_table:
+                        #print n, ' --> ', A
+                        if n in node_sumarea_table:
+                            node_sumarea_table[n] = node_sumarea_table[n] + A
+                        else: 
+                            node_sumarea_table[n] = A
+
+                    # debug: check the total sum of all node_sumarea_table == ref_face.Area
+                    sum_node_areas = 0
+                    for n in node_sumarea_table:
+                        #print n, ' --> ', node_sumarea_table[n] 
+                        sum_node_areas = sum_node_areas + node_sumarea_table[n]
+                    if 0.9999 < sum_node_areas / ref_face.Area < 1.0001:
+                        pass
+                    else:   
+                        print 'ERROR:  ', sum_node_areas, ' != ', ref_face.Area
+
+                    # write the CLOAD lines to file
+                    for n in sorted(node_sumarea_table):
+                        node_load = node_sumarea_table[n] * force_per_sum_ref_face_area
+                        v1 = "{:.13E}".format(vec.x * node_load)
+                        v2 = "{:.13E}".format(vec.y * node_load)
+                        v3 = "{:.13E}".format(vec.z * node_load)
+                        f.write(str(n) + ',1,' + v1 + '\n')
+                        f.write(str(n) + ',2,' + v2 + '\n')
+                        f.write(str(n) + ',3,' + v3 + '\n')
+                f.write('\n')
+            f.write('\n')
 
     def write_face_load(self, f):
         f.write('\n***********************************************************\n')
