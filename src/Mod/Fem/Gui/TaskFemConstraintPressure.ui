@@ -27,14 +27,14 @@
    <item>
     <layout class="QHBoxLayout" name="layoutPressure">
      <item>
-      <widget class="QLabel" name="l_normal_stress">
+      <widget class="QLabel" name="l_pressure">
        <property name="text">
         <string>Load </string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="Gui::InputField" name="if_normal_stress">
+      <widget class="Gui::InputField" name="if_pressure">
        <property name="text">
         <string>0 MPa</string>
        </property>

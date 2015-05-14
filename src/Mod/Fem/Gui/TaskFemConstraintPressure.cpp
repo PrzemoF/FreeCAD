@@ -77,7 +77,7 @@ TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPr
     ui->lw_references->addAction(action);
     ui->lw_references->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    connect(ui->if_normal_stress, SIGNAL(valueChanged(double)),
+    connect(ui->if_pressure, SIGNAL(valueChanged(double)),
             this, SLOT(onPressureChanged(double)));
     connect(ui->b_add_reference, SIGNAL(pressed()),
             this, SLOT(onButtonReference()));
@@ -89,7 +89,7 @@ TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPr
     this->groupLayout()->addWidget(proxy);
 
     // Temporarily prevent unnecessary feature recomputes
-    ui->if_normal_stress->blockSignals(true);
+    ui->if_pressure->blockSignals(true);
     ui->lw_references->blockSignals(true);
     ui->b_add_reference->blockSignals(true);
    // ui->buttonDirection->blockSignals(true);
@@ -107,9 +107,9 @@ TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPr
     bool reversed = pcConstraint->Reversed.getValue();
 
     // Fill data into dialog elements
-    ui->if_normal_stress->setMinimum(0);
-    ui->if_normal_stress->setMaximum(FLOAT_MAX);
-    ui->if_normal_stress->setValue(f);
+    ui->if_pressure->setMinimum(0);
+    ui->if_pressure->setMaximum(FLOAT_MAX);
+    ui->if_pressure->setValue(f);
     ui->lw_references->clear();
     for (std::size_t i = 0; i < Objects.size(); i++)
         ui->lw_references->addItem(makeRefText(Objects[i], SubElements[i]));
@@ -118,7 +118,7 @@ TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPr
    // ui->lineDirection->setText(dir.isEmpty() ? tr("") : dir);
     ui->cb_reverse_direction->setChecked(reversed);
 
-    ui->if_normal_stress->blockSignals(false);
+    ui->if_pressure->blockSignals(false);
     ui->lw_references->blockSignals(false);
     ui->b_add_reference->blockSignals(false);
 //    ui->buttonDirection->blockSignals(false);
@@ -142,7 +142,7 @@ void TaskFemConstraintPressure::updateUI()
     else if (ref.substr(pos+1, 4) == "Edge")
         ui->labelPressure->setText(tr("Line load"));
     else if (ref.substr(pos+1, 4) == "Face")*/
-        ui->l_normal_stress->setText(tr("Area load"));
+       // ui->l_pressure->setText(tr("Area load"));
 }
 
 void TaskFemConstraintPressure::onSelectionChanged(const Gui::SelectionChanges& msg)
@@ -200,20 +200,21 @@ void TaskFemConstraintPressure::onSelectionChanged(const Gui::SelectionChanges& 
 
             // Turn off reference selection mode
             onButtonReference(false);
-        } else if (selectionMode == seldir) {
+/*Direction selection */
+        } /*else if (selectionMode == seldir) {
             if (subName.substr(0,4) == "Face") {
                 BRepAdaptor_Surface surface(TopoDS::Face(ref));
                 if (surface.GetType() != GeomAbs_Plane) {
                     QMessageBox::warning(this, tr("Selection error"), tr("Only planar faces can be picked"));
                     return;
                 }
-            }/* else if (subName.substr(0,4) == "Edge") {
+            } else if (subName.substr(0,4) == "Edge") {
                 BRepAdaptor_Curve line(TopoDS::Edge(ref));
                 if (line.GetType() != GeomAbs_Line) {
                     QMessageBox::warning(this, tr("Selection error"), tr("Only linear edges can be picked"));
                     return;
                 }
-            }*/ else {
+            } else {
                 QMessageBox::warning(this, tr("Selection error"), tr("Only faces can be picked"));
                 return;
             }
@@ -222,7 +223,7 @@ void TaskFemConstraintPressure::onSelectionChanged(const Gui::SelectionChanges& 
 
             // Turn off direction selection mode
             //onButtonDirection(false);
-        }
+        }*/
 
         Gui::Selection().clearSelection();
         updateUI();
@@ -232,6 +233,7 @@ void TaskFemConstraintPressure::onSelectionChanged(const Gui::SelectionChanges& 
 void TaskFemConstraintPressure::onPressureChanged(double f)
 {
     Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(ConstraintView->getObject());
+	qDebug("Pressure changed to : %f", f);
     pcConstraint->Pressure.setValue(f);
 }
 
@@ -260,11 +262,13 @@ void TaskFemConstraintPressure::onCheckReverse(const bool pressed)
 
 double TaskFemConstraintPressure::getPressure(void) const
 {
-    Base::Quantity q = Base::Quantity(1.0, Base::Unit("MPa"));
-    Base::Quantity value =  ui->if_normal_stress->getQuantity();
-    double val = value.getValueAs(q);
+    Base::Quantity value =  ui->if_pressure->getQuantity();
+    double val = value.getValueAs(Base::Quantity::MegaPascal);
+    QString unit_string = value.getUnit().getString();
     qDebug("Pressure");
     qDebug("%f", val);
+    qDebug("Unit");
+    qDebug(unit_string.toUtf8());
     return val;
 }
 
@@ -313,9 +317,9 @@ void TaskFemConstraintPressure::changeEvent(QEvent *e)
 {
     TaskBox::changeEvent(e);
     if (e->type() == QEvent::LanguageChange) {
-        ui->if_normal_stress->blockSignals(true);
+        ui->if_pressure->blockSignals(true);
         ui->retranslateUi(proxy);
-        ui->if_normal_stress->blockSignals(false);
+        ui->if_pressure->blockSignals(false);
     }
 }
 
