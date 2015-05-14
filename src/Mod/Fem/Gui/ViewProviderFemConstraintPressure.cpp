@@ -106,6 +106,7 @@ bool ViewProviderFemConstraintPressure::setEdit(int ModNum)
 
 #define ARROWLENGTH 9
 #define ARROWHEADRADIUS (ARROWLENGTH/3)
+#define ARROWPROPORTIONS 0.5
 #define USE_MULTIPLE_COPY
 
 void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
@@ -119,7 +120,7 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
         SoMultipleCopy* cp = new SoMultipleCopy();
         cp->ref();
         cp->matrix.setNum(0);
-        cp->addChild((SoNode*)createArrow(ARROWLENGTH, ARROWHEADRADIUS));
+        cp->addChild((SoNode*)createArrow(ARROWLENGTH, ARROWHEADRADIUS, ARROWPROPORTIONS));
         pShapeSep->addChild(cp);
     }
 #endif
@@ -140,16 +141,16 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
         Base::Vector3d normal = pcConstraint->NormalDirection.getValue();
 
         // Get default direction (on first call to method)
-        Base::Vector3d forceDirection = pcConstraint->DirectionVector.getValue();
-        if (forceDirection.Length() < Precision::Confusion())
-            forceDirection = normal;
+        Base::Vector3d pressureDirection = pcConstraint->DirectionVector.getValue();
+        if (pressureDirection.Length() < Precision::Confusion())
+            pressureDirection = normal;
 
-        SbVec3f dir(forceDirection.x, forceDirection.y, forceDirection.z);
+        SbVec3f dir(pressureDirection.x, pressureDirection.y, pressureDirection.z);
         SbRotation rot(SbVec3f(0,1,0), dir);
 
         for (std::vector<Base::Vector3d>::const_iterator p = points.begin(); p != points.end(); p++) {
             SbVec3f base(p->x, p->y, p->z);
-            if (forceDirection.GetAngle(normal) < M_PI_2) // Move arrow so it doesn't disappear inside the solid
+            if (pressureDirection.GetAngle(normal) < M_PI_2) // Move arrow so it doesn't disappear inside the solid
                 base = base + dir * ARROWLENGTH;
 #ifdef USE_MULTIPLE_COPY
             SbMatrix m;
@@ -159,7 +160,7 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
 #else
             SoSeparator* sep = new SoSeparator();
             createPlacement(sep, base, rot);
-            createArrow(sep, ARROWLENGTH, ARROWHEADRADIUS);
+            createArrow(sep, ARROWLENGTH, ARROWHEADRADIUS, ARROWPROPORTIONS);
             pShapeSep->addChild(sep);
 #endif
         }
@@ -170,11 +171,11 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
     else if (strcmp(prop->getName(),"DirectionVector") == 0) { // Note: "Reversed" also triggers "DirectionVector"
         // Re-orient all arrows
         Base::Vector3d normal = pcConstraint->NormalDirection.getValue();
-        Base::Vector3d forceDirection = pcConstraint->DirectionVector.getValue();
-        if (forceDirection.Length() < Precision::Confusion())
-            forceDirection = normal;
+        Base::Vector3d pressureDirection = pcConstraint->DirectionVector.getValue();
+        if (pressureDirection.Length() < Precision::Confusion())
+            pressureDirection = normal;
 
-        SbVec3f dir(forceDirection.x, forceDirection.y, forceDirection.z);
+        SbVec3f dir(pressureDirection.x, pressureDirection.y, pressureDirection.z);
         SbRotation rot(SbVec3f(0,1,0), dir);
 
         const std::vector<Base::Vector3d>& points = pcConstraint->Points.getValues();
@@ -188,7 +189,7 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
 
         for (std::vector<Base::Vector3d>::const_iterator p = points.begin(); p != points.end(); p++) {
             SbVec3f base(p->x, p->y, p->z);
-            if (forceDirection.GetAngle(normal) < M_PI_2)
+            if (pressureDirection.GetAngle(normal) < M_PI_2)
                 base = base + dir * ARROWLENGTH;
 #ifdef USE_MULTIPLE_COPY
             SbMatrix m;

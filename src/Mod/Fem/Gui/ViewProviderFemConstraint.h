@@ -93,7 +93,7 @@ protected:
     static void updateCube(const SoNode* node, const int idx, const double width, const double length, const double height);
     static void createArrow(SoSeparator* sep, const double length, const double radius, const double prop = 1.0);
     static SoSeparator* createArrow(const double length, const double radius, const double prop = 1.0);
-    static void updateArrow(const SoNode* node, const int idx, const double length, const double radius, const double prop = 1.0);
+    static void updateArrow(const SoNode* node, const int idx, const double length, const double radius);
     static void createFixed(SoSeparator* sep, const double height, const double width, const bool gap = false);
     static SoSeparator* createFixed(const double height, const double width, const bool gap = false);
     static void updateFixed(const SoNode* node, const int idx, const double height, const double width, const bool gap = false);
