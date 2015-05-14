@@ -167,6 +167,7 @@ class inp_writer:
                 vec = frc_obj.DirectionVector
                 f.write('*CLOAD\n')
                 f.write('** force: ' + str(node_load) + ' N,  direction: ' + str(vec) + '\n')
+                print(' N,  direction: ' + str(vec) + '\n')
                 v1 = "{:.13E}".format(vec.x * node_load)
                 v2 = "{:.13E}".format(vec.y * node_load)
                 v3 = "{:.13E}".format(vec.z * node_load)
@@ -182,12 +183,13 @@ class inp_writer:
             prs_obj = fobj['Object']
             f.write('*DLOAD\n')
             for o, e in prs_obj.References:
+                rev = 1 if prs_obj.Reversed else -1
                 elem = o.Shape.getElement(e)
                 if elem.ShapeType == 'Face':
                     v = self.mesh_object.FemMesh.getccxVolumesByFace(elem)
                     f.write("** Load on face {}\n".format(e))
                     for i in v:
-                        f.write("{},P{},{}\n".format(i[0], i[1], prs_obj.Pressure))
+                        f.write("{},P{},{}\n".format(i[0], i[1], rev * prs_obj.Pressure))
 
     def write_outputs_types(self, f):
         f.write('\n***********************************************************\n')

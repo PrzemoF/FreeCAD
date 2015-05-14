@@ -100,10 +100,10 @@ TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPr
     double f = pcConstraint->Pressure.getValue();
     std::vector<App::DocumentObject*> Objects = pcConstraint->References.getValues();
     std::vector<std::string> SubElements = pcConstraint->References.getSubValues();
-    std::vector<std::string> dirStrings = pcConstraint->Direction.getSubValues();
-    QString dir;
-    if (!dirStrings.empty())
-        dir = makeRefText(pcConstraint->Direction.getValue(), dirStrings.front());
+    //std::vector<std::string> dirStrings = pcConstraint->Direction.getSubValues();
+    //QString dir;
+    //if (!dirStrings.empty())
+    //    dir = makeRefText(pcConstraint->Direction.getValue(), dirStrings.front());
     bool reversed = pcConstraint->Reversed.getValue();
 
     // Fill data into dialog elements
@@ -269,6 +269,10 @@ void TaskFemConstraintPressure::onButtonDirection(const bool pressed) {
 void TaskFemConstraintPressure::onCheckReverse(const bool pressed)
 {
     Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(ConstraintView->getObject());
+if (pressed)
+	qDebug("pressed = true");
+else
+	qDebug("pressed = false");
     pcConstraint->Reversed.setValue(pressed);
 }
 
