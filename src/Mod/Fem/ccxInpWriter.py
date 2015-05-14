@@ -255,7 +255,7 @@ class inp_writer:
                             C3L4 = Part.makeLine(PL2,P3)
                             C3W = Part.Wire([C3L1,C3L2,C3L3,C3L4])
                             C3F = Part.Face(C3W)
-                            C3A = C1F.Area
+                            C3A = C3F.Area
 
                             #node_area_table
                             node_area_table.append((face_table[mf][0], C1A))
