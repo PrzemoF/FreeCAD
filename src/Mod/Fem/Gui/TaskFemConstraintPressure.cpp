@@ -1,6 +1,7 @@
 /***************************************************************************
- *   Copyright (c) 2015 Przemo Firszt <przemo@firszt.eu>                   *
- *   Based on Force constraint                                             *
+ *   Copyright (c) 2015 FreeCAD Developers                                 *
+ *   Author: Przemo Firszt <przemo@firszt.eu>                              *
+ *   Based on Force constraint by Jan Rheinländer                          *
  *   This file is part of the FreeCAD CAx development system.              *
  *                                                                         *
  *   This library is free software; you can redistribute it and/or         *
@@ -175,19 +176,20 @@ void TaskFemConstraintPressure::onSelectionChanged(const Gui::SelectionChanges& 
             std::vector<std::string> SubElements = pcConstraint->References.getSubValues();
 
             // Ensure we don't have mixed reference types
-            if (SubElements.size() > 0) {
+           /* if (SubElements.size() > 0) {
                 if (subName.substr(0,4) != SubElements.front().substr(0,4)) {
                     QMessageBox::warning(this, tr("Selection error"), tr("Mixed shape types are not possible. Use a second constraint instead"));
                     return;
                 }
-            } else {
+            } else {*/
                 if ((subName.substr(0,4) != "Face")/* && (subName.substr(0,4) != "Edge") && (subName.substr(0,6) != "Vertex")*/) {
                     QMessageBox::warning(this, tr("Selection error"), tr("Only faces can be picked"));
                     return;
                 }
-            }
+           // }
 
             // Avoid duplicates
+            // FIXME - works for force but not for Pressure
             std::size_t pos = 0;
             for (; pos < Objects.size(); pos++)
                 if (obj == Objects[pos])
