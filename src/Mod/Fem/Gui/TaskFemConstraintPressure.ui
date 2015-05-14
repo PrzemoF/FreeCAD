@@ -29,14 +29,14 @@
      <item>
       <widget class="QLabel" name="l_pressure">
        <property name="text">
-        <string>Load </string>
+        <string>Pressure</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="Gui::InputField" name="if_pressure">
        <property name="text">
-        <string>0 MPa</string>
+        <string>1 MPa</string>
        </property>
        <property name="unit" stdset="0">
         <string notr="true"/>

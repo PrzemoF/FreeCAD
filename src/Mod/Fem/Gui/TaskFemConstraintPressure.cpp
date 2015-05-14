@@ -77,8 +77,8 @@ TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPr
     ui->lw_references->addAction(action);
     ui->lw_references->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    connect(ui->if_pressure, SIGNAL(valueChanged(double)),
-            this, SLOT(onPressureChanged(double)));
+    connect(ui->if_pressure, SIGNAL(valueChanged(Base::Quantity)),
+            this, SLOT(onPressureChanged(Base::Quantity)));
     connect(ui->b_add_reference, SIGNAL(pressed()),
             this, SLOT(onButtonReference()));
 //    connect(ui->buttonDirection, SIGNAL(pressed()),
@@ -109,7 +109,12 @@ TaskFemConstraintPressure::TaskFemConstraintPressure(ViewProviderFemConstraintPr
     // Fill data into dialog elements
     ui->if_pressure->setMinimum(0);
     ui->if_pressure->setMaximum(FLOAT_MAX);
-    ui->if_pressure->setValue(f);
+//FIXME - why it's defaulting to kPa??
+    qDebug("Setting pressure to f = %f in [kPa]", f);
+    Base::Quantity p = Base::Quantity(1000 * f, Base::Unit::Stress);
+    double val = p.getValueAs(Base::Quantity::MegaPascal);
+    qDebug("Setting pressure to val = %f in MPa", val);
+    ui->if_pressure->setValue(p);
     ui->lw_references->clear();
     for (std::size_t i = 0; i < Objects.size(); i++)
         ui->lw_references->addItem(makeRefText(Objects[i], SubElements[i]));
@@ -230,11 +235,18 @@ void TaskFemConstraintPressure::onSelectionChanged(const Gui::SelectionChanges& 
     }
 }
 
-void TaskFemConstraintPressure::onPressureChanged(double f)
+void TaskFemConstraintPressure::onPressureChanged(const Base::Quantity& f)
 {
     Fem::ConstraintPressure* pcConstraint = static_cast<Fem::ConstraintPressure*>(ConstraintView->getObject());
-	qDebug("Pressure changed to : %f", f);
-    pcConstraint->Pressure.setValue(f);
+	qDebug("onPressurechanged" );
+    double val = f.getValueAs(Base::Quantity::MegaPascal);
+    QString unit_string = f.getUnit().getString();
+    qDebug("Pressure");
+    qDebug("%f", val);
+    qDebug("Unit");
+    qDebug(unit_string.toUtf8());
+	qDebug("end onPressurechanged" );
+    pcConstraint->Pressure.setValue(val);
 }
 
 void TaskFemConstraintPressure::onReferenceDeleted() {
@@ -264,11 +276,13 @@ double TaskFemConstraintPressure::getPressure(void) const
 {
     Base::Quantity value =  ui->if_pressure->getQuantity();
     double val = value.getValueAs(Base::Quantity::MegaPascal);
-    QString unit_string = value.getUnit().getString();
+    QString unit_string = value.getUserString();
+    qDebug("getPressure");
     qDebug("Pressure");
     qDebug("%f", val);
     qDebug("Unit");
     qDebug(unit_string.toUtf8());
+    qDebug("end of getPressure");
     return val;
 }
 

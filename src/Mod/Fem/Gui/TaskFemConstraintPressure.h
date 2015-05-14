@@ -24,9 +24,12 @@
 #ifndef GUI_TASKVIEW_TaskFemConstraintPressure_H
 #define GUI_TASKVIEW_TaskFemConstraintPressure_H
 
+//#include "PreCompiled.h"
+
 #include <Gui/TaskView/TaskView.h>
 #include <Gui/Selection.h>
 #include <Gui/TaskView/TaskDialog.h>
+#include <Base/Quantity.h>
 
 #include "TaskFemConstraint.h"
 #include "ViewProviderFemConstraintPressure.h"
@@ -34,11 +37,11 @@
 class Ui_TaskFemConstraintPressure;
 
 namespace App {
-class Property;
+    class Property;
 }
 
 namespace Gui {
-class ViewProvider;
+    class ViewProvider;
 }
 
 namespace FemGui {
@@ -59,7 +62,7 @@ public:
 
 private Q_SLOTS:
     void onReferenceDeleted(void);
-    void onPressureChanged(double);
+    void onPressureChanged(const Base::Quantity & f);
 //    void onButtonDirection(const bool pressed = true);
     void onCheckReverse(bool);
 
