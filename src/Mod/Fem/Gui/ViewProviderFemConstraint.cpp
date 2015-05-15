@@ -348,8 +348,9 @@ void ViewProviderFemConstraint::updateCube(const SoNode* node, const int idx, co
 void ViewProviderFemConstraint::createArrow(SoSeparator* sep, const double length, const double radius, const double prop)
 {
     createCone(sep, radius, radius/2);
-    createPlacement(sep, SbVec3f(0, -radius/2-prop * ((length-radius)/2), 0), SbRotation());
-    createCylinder(sep, prop * (length-radius), radius/5);
+    //createPlacement(sep, SbVec3f(0, prop *(-radius/2-(length-radius)/2), 0), SbRotation());
+    createPlacement(sep, SbVec3f(0, 0, 0), SbRotation());
+    //createCylinder(sep, prop * (length-radius), radius/5);
 }
 
 SoSeparator* ViewProviderFemConstraint::createArrow(const double length, const double radius, const double prop)
@@ -363,8 +364,9 @@ void ViewProviderFemConstraint::updateArrow(const SoNode* node, const int idx, c
 {
     const SoSeparator* sep = static_cast<const SoSeparator*>(node);
     updateCone(sep, idx, radius, radius/2);
-    updatePlacement(sep, idx+CONE_CHILDREN, SbVec3f(0, -radius/2-(length-radius)/2, 0), SbRotation());
-    updateCylinder(sep, idx+CONE_CHILDREN+PLACEMENT_CHILDREN, length-radius, radius/5);
+    //updatePlacement(sep, idx+CONE_CHILDREN, SbVec3f(0, prop * (-radius/2-(length-radius)/2, 0)), SbRotation());
+    updatePlacement(sep, idx+CONE_CHILDREN, SbVec3f(0, 0, 0), SbRotation());
+    //updateCylinder(sep, idx+CONE_CHILDREN+PLACEMENT_CHILDREN, length-radius, radius/5);
 }
 
 #define FIXED_CHILDREN (CONE_CHILDREN + PLACEMENT_CHILDREN + CUBE_CHILDREN)

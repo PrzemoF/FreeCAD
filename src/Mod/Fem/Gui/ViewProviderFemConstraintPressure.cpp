@@ -47,8 +47,8 @@ PROPERTY_SOURCE(FemGui::ViewProviderFemConstraintPressure, FemGui::ViewProviderF
 ViewProviderFemConstraintPressure::ViewProviderFemConstraintPressure()
 {
     sPixmap = "Fem_ConstraintPressure";
-    ADD_PROPERTY(FaceColor,(0.0f,0.2f,1.0f));
-    ADD_PROPERTY(ShapeColor,(0.0f,0.2f,1.0f));
+    ADD_PROPERTY(FaceColor,(0.0f,0.2f,0.8f));
+    ADD_PROPERTY(ShapeColor,(0.0f,0.2f,0.8f));
 }
 
 ViewProviderFemConstraintPressure::~ViewProviderFemConstraintPressure()
@@ -153,7 +153,7 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
         for (std::vector<Base::Vector3d>::const_iterator p = points.begin(); p != points.end(); p++) {
             SbVec3f base(p->x, p->y, p->z);
             if (pressureDirection.GetAngle(normal) < M_PI_2) // Move arrow so it doesn't disappear inside the solid
-                base = base + dir * ARROWLENGTH;
+                base = base + dir * ARROWLENGTH * ARROWPROPORTIONS;
 #ifdef USE_MULTIPLE_COPY
             SbMatrix m;
             m.setTransform(base, rot, SbVec3f(1,1,1));
