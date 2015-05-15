@@ -106,9 +106,8 @@ bool ViewProviderFemConstraintPressure::setEdit(int ModNum)
     }
 }
 
-#define ARROWLENGTH 9
-#define ARROWHEADRADIUS (ARROWLENGTH/3)
-#define ARROWPROPORTIONS 0.5
+#define ARROWLENGTH 5
+#define ARROWHEADRADIUS 3
 #define USE_MULTIPLE_COPY
 
 void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
@@ -122,7 +121,7 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
         SoMultipleCopy* cp = new SoMultipleCopy();
         cp->ref();
         cp->matrix.setNum(0);
-        cp->addChild((SoNode*)createArrow(ARROWLENGTH, ARROWHEADRADIUS, ARROWPROPORTIONS));
+        cp->addChild((SoNode*)createArrow(ARROWLENGTH, ARROWHEADRADIUS));
         pShapeSep->addChild(cp);
     }
 #endif
@@ -153,7 +152,7 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
         for (std::vector<Base::Vector3d>::const_iterator p = points.begin(); p != points.end(); p++) {
             SbVec3f base(p->x, p->y, p->z);
             if (pressureDirection.GetAngle(normal) < M_PI_2) // Move arrow so it doesn't disappear inside the solid
-                base = base + dir * ARROWLENGTH * ARROWPROPORTIONS;
+                base = base + dir * ARROWLENGTH;
 #ifdef USE_MULTIPLE_COPY
             SbMatrix m;
             m.setTransform(base, rot, SbVec3f(1,1,1));
@@ -162,7 +161,7 @@ void ViewProviderFemConstraintPressure::updateData(const App::Property* prop)
 #else
             SoSeparator* sep = new SoSeparator();
             createPlacement(sep, base, rot);
-            createArrow(sep, ARROWLENGTH, ARROWHEADRADIUS, ARROWPROPORTIONS);
+            createArrow(sep, ARROWLENGTH, ARROWHEADRADIUS);
             pShapeSep->addChild(sep);
 #endif
         }
