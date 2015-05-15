@@ -47,6 +47,8 @@ PROPERTY_SOURCE(FemGui::ViewProviderFemConstraintPressure, FemGui::ViewProviderF
 ViewProviderFemConstraintPressure::ViewProviderFemConstraintPressure()
 {
     sPixmap = "Fem_ConstraintPressure";
+    ADD_PROPERTY(FaceColor,(0.0f,0.2f,1.0f));
+    ADD_PROPERTY(ShapeColor,(0.0f,0.2f,1.0f));
 }
 
 ViewProviderFemConstraintPressure::~ViewProviderFemConstraintPressure()
