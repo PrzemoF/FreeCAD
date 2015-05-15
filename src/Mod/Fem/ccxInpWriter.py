@@ -261,13 +261,102 @@ class inp_writer:
                             node_area_table.append((face_table[mf][0], C1A))
                             node_area_table.append((face_table[mf][1], C2A))
                             node_area_table.append((face_table[mf][2], C3A))
+                            print '  ', A, '  ', (C1A + C2A + C3A)
 
                         if vol_type == 'C3D10':
-                            print 'C3D10: Not implementet yet!'
-                            #import femtools
-                            #femtools.getNodeAreaTableC3D10(self.mesh_object, face_table)
+                            # workaraound FIXME
+                            # instead of the quadratic shape functions
+                            # linear lines are used to connect all nodes
+                            # the the corner nodes get to much, the middle nodes to less force
+                            P1 = self.mesh_object.FemMesh.Nodes[face_table[mf][0]]
+                            P2 = self.mesh_object.FemMesh.Nodes[face_table[mf][1]]
+                            P3 = self.mesh_object.FemMesh.Nodes[face_table[mf][2]]
+                            P4 = self.mesh_object.FemMesh.Nodes[face_table[mf][3]]
+                            P5 = self.mesh_object.FemMesh.Nodes[face_table[mf][4]]
+                            P6 = self.mesh_object.FemMesh.Nodes[face_table[mf][5]]
                             
-                            
+                            #get the Area and CenterOfMass
+                            L1 = Part.makeLine(P1,P4)
+                            L2 = Part.makeLine(P4,P2)
+                            L3 = Part.makeLine(P2,P5)
+                            L4 = Part.makeLine(P5,P3)
+                            L5 = Part.makeLine(P3,P6)
+                            L6 = Part.makeLine(P6,P1)
+                            W = Part.Wire([L1,L2,L3,L4,L5,L6])
+                            F = Part.Face(W)
+                            A = F.Area
+                            PS = F.CenterOfMass
+
+                            #helperpoints
+                            PL1 = L1.CenterOfMass
+                            PL2 = L2.CenterOfMass
+                            PL3 = L3.CenterOfMass
+                            PL4 = L4.CenterOfMass
+                            PL5 = L5.CenterOfMass
+                            PL6 = L6.CenterOfMass
+    
+                            #cornerface1, Point face_table[ef][0]
+                            C1L1 = Part.makeLine(P1,PL1)
+                            C1L2 = Part.makeLine(PL1,PS)
+                            C1L3 = Part.makeLine(PS,PL6)
+                            C1L4 = Part.makeLine(PL6,P1)
+                            C1W = Part.Wire([C1L1,C1L2,C1L3,C1L4])
+                            C1F = Part.Face(C1W)
+                            C1A = C1F.Area
+    
+                            #middlepointface4, Point face_table[ef][4]
+                            C4L1 = Part.makeLine(P4,PL2)
+                            C4L2 = Part.makeLine(PL2,PS)
+                            C4L3 = Part.makeLine(PS,PL1)
+                            C4L4 = Part.makeLine(PL1,P4)
+                            C4W = Part.Wire([C4L1,C4L2,C4L3,C4L4])
+                            C4F = Part.Face(C4W)
+                            C4A = C4F.Area
+
+                            #cornerface2, Point face_table[ef][1]
+                            C2L1 = Part.makeLine(P2,PL3)
+                            C2L2 = Part.makeLine(PL3,PS)
+                            C2L3 = Part.makeLine(PS,PL2)
+                            C2L4 = Part.makeLine(PL2,P2)
+                            C2W = Part.Wire([C2L1,C2L2,C2L3,C2L4])
+                            C2F = Part.Face(C2W)
+                            C2A = C2F.Area
+
+                            #middlepointface5, Point face_table[ef][5]
+                            C5L1 = Part.makeLine(P5,PL4)
+                            C5L2 = Part.makeLine(PL4,PS)
+                            C5L3 = Part.makeLine(PS,PL3)
+                            C5L4 = Part.makeLine(PL3,P5)
+                            C5W = Part.Wire([C5L1,C5L2,C5L3,C5L4])
+                            C5F = Part.Face(C5W)
+                            C5A = C5F.Area
+    
+                            #cornerface3, Point face_table[ef][2]
+                            C3L1 = Part.makeLine(P3,PL5)
+                            C3L2 = Part.makeLine(PL5,PS)
+                            C3L3 = Part.makeLine(PS,PL4)
+                            C3L4 = Part.makeLine(PL4,P3)
+                            C3W = Part.Wire([C3L1,C3L2,C3L3,C3L4])
+                            C3F = Part.Face(C3W)
+                            C3A = C3F.Area
+
+                            #middlepointface6, Point face_table[ef][6]
+                            C6L1 = Part.makeLine(P6,PL6)
+                            C6L2 = Part.makeLine(PL6,PS)
+                            C6L3 = Part.makeLine(PS,PL5)
+                            C6L4 = Part.makeLine(PL5,P6)
+                            C6W = Part.Wire([C6L1,C6L2,C6L3,C6L4])
+                            C6F = Part.Face(C6W)
+                            C6A = C6F.Area
+
+                            #node_area_table
+                            node_area_table.append((face_table[mf][0], C1A))
+                            node_area_table.append((face_table[mf][1], C2A))
+                            node_area_table.append((face_table[mf][2], C3A))
+                            node_area_table.append((face_table[mf][3], C4A))
+                            node_area_table.append((face_table[mf][4], C5A))
+                            node_area_table.append((face_table[mf][5], C6A))
+                            print '  ', A, '  ', (C1A + C2A + C3A + C4A + C5A + C6A)
 
                     #node_sumarea_table
                     for n, A in node_area_table:
