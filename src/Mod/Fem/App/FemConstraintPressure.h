@@ -46,6 +46,7 @@ public:
     App::PropertyBool Reversed;
     // Read-only (calculated values). These trigger changes in the ViewProvider
     App::PropertyVectorList Points;
+    App::PropertyVectorList Normals;
     App::PropertyVector DirectionVector;
 
     /// recalculate the object

@@ -50,10 +50,13 @@ ConstraintPressure::ConstraintPressure()
     ADD_PROPERTY(Reversed,(0));
     ADD_PROPERTY_TYPE(Points,(Base::Vector3d()),"ConstraintPressure",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
                       "Points where arrows are drawn");
-    ADD_PROPERTY_TYPE(DirectionVector,(Base::Vector3d(0,0,1)),"ConstraintPressure",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
-                      "Direction of arrows");
-    naturalDirectionVector = Base::Vector3d(0,0,0); // by default use the null vector to indication an invalid value
+    ADD_PROPERTY_TYPE(Normals,(Base::Vector3d()),"ConstraintPressure",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
+                                                                             "Normals where symbols are drawn");
+    //ADD_PROPERTY_TYPE(DirectionVector,(Base::Vector3d(0,0,1)),"ConstraintPressure",App::PropertyType(App::Prop_ReadOnly|App::Prop_Output),
+    //                  "Direction of arrows");
+    //naturalDirectionVector = Base::Vector3d(0,0,0); // by default use the null vector to indication an invalid value
     Points.setValues(std::vector<Base::Vector3d>());
+    Normals.setValues(std::vector<Base::Vector3d>());
 }
 
 App::DocumentObjectExecReturn *ConstraintPressure::execute(void)
@@ -71,8 +74,8 @@ void ConstraintPressure::onChanged(const App::Property* prop)
         std::vector<Base::Vector3d> points;
         std::vector<Base::Vector3d> normals;
         if (getPoints(points, normals)) {
-//FIXME
-            Points.setValues(points); // We don't use the normals because all arrows should have the same direction
+            Points.setValues(points);
+            Normals.setValues(normals);
         }
     } else if (prop == &Direction) {
         Base::Vector3d direction = getDirection(Direction);

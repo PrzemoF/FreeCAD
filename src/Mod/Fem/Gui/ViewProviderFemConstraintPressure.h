@@ -68,7 +68,7 @@ protected:
 
 private:
     /// Direction of the force
-    Base::Vector3f forceDirection;
+    //Base::Vector3f forceDirection;
 
 };
 
