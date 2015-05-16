@@ -48,7 +48,7 @@ ViewProviderFemConstraintPressure::ViewProviderFemConstraintPressure()
 {
     sPixmap = "Fem_ConstraintPressure";
     ADD_PROPERTY(FaceColor,(0.0f,0.2f,0.8f));
-    ADD_PROPERTY(ShapeColor,(0.0f,0.2f,0.8f));
+//    ADD_PROPERTY(ShapeColor,(0.0f,0.2f,0.8f));
 }
 
 ViewProviderFemConstraintPressure::~ViewProviderFemConstraintPressure()
