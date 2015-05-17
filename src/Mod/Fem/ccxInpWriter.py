@@ -174,8 +174,7 @@ class inp_writer:
                 f.write(frc_obj_name + ',2,' + v2 + '\n')
                 f.write(frc_obj_name + ',3,' + v3 + '\n\n')
 
-
-            sum_ref_face_area = 0 
+            sum_ref_face_area = 0
             for o, elem in frc_obj.References:
                 elem_o = o.Shape.getElement(elem)
                 if elem_o.ShapeType == 'Face':
@@ -195,7 +194,7 @@ class inp_writer:
                     force_per_sum_ref_face_area = frc_obj.Force / sum_ref_face_area
                     vec = frc_obj.DirectionVector
 
-                    face_table = {} # { meshfaceID : ( nodeID, ... , nodeID ) }
+                    face_table = {}  # { meshfaceID : ( nodeID, ... , nodeID ) }
                     # we onle need the meshfaces, but there is no method which only returns the faceIDs
                     vol_type = ''
                     volume_faces = self.mesh_object.FemMesh.getVolumesByFace(ref_face)
@@ -207,8 +206,8 @@ class inp_writer:
                             vol_type = 'C3D10'
 
                     # for every node of every meshface calulate the appropriate node_areas
-                    node_area_table = []     #  [ (nodeID,Area), ... , (nodeID,Area) ]  some nodes will have more than one entries
-                    node_sumarea_table = {}  #  { nodeID : Area, ... , nodeID:Area }  AreaSum for each node, one entry for each node                        
+                    node_area_table = []  # [ (nodeID,Area), ... , (nodeID,Area) ]  some nodes will have more than one entries
+                    node_sumarea_table = {}  # { nodeID : Area, ... , nodeID:Area }  AreaSum for each node, one entry for each node
                     for mf in face_table:
                         #print mf, ' --> ', face_table[mf]
                         if vol_type == 'C3D4':
@@ -274,7 +273,7 @@ class inp_writer:
                             P4 = self.mesh_object.FemMesh.Nodes[face_table[mf][3]]
                             P5 = self.mesh_object.FemMesh.Nodes[face_table[mf][4]]
                             P6 = self.mesh_object.FemMesh.Nodes[face_table[mf][5]]
-                            
+
                             #get the Area and CenterOfMass
                             L1 = Part.makeLine(P1,P4)
                             L2 = Part.makeLine(P4,P2)
@@ -294,7 +293,7 @@ class inp_writer:
                             PL4 = L4.CenterOfMass
                             PL5 = L5.CenterOfMass
                             PL6 = L6.CenterOfMass
-    
+
                             #cornerface1, Point face_table[ef][0]
                             C1L1 = Part.makeLine(P1,PL1)
                             C1L2 = Part.makeLine(PL1,PS)
@@ -303,7 +302,7 @@ class inp_writer:
                             C1W = Part.Wire([C1L1,C1L2,C1L3,C1L4])
                             C1F = Part.Face(C1W)
                             C1A = C1F.Area
-    
+
                             #middlepointface4, Point face_table[ef][4]
                             C4L1 = Part.makeLine(P4,PL2)
                             C4L2 = Part.makeLine(PL2,PS)
@@ -330,7 +329,7 @@ class inp_writer:
                             C5W = Part.Wire([C5L1,C5L2,C5L3,C5L4])
                             C5F = Part.Face(C5W)
                             C5A = C5F.Area
-    
+
                             #cornerface3, Point face_table[ef][2]
                             C3L1 = Part.makeLine(P3,PL5)
                             C3L2 = Part.makeLine(PL5,PS)
@@ -363,17 +362,17 @@ class inp_writer:
                         #print n, ' --> ', A
                         if n in node_sumarea_table:
                             node_sumarea_table[n] = node_sumarea_table[n] + A
-                        else: 
+                        else:
                             node_sumarea_table[n] = A
 
                     # debug: check the total sum of all node_sumarea_table == ref_face.Area
                     sum_node_areas = 0
                     for n in node_sumarea_table:
-                        #print n, ' --> ', node_sumarea_table[n] 
+                        #print n, ' --> ', node_sumarea_table[n]
                         sum_node_areas = sum_node_areas + node_sumarea_table[n]
                     if 0.9999 < sum_node_areas / ref_face.Area < 1.0001:
                         pass
-                    else:   
+                    else:
                         print 'ERROR:  ', sum_node_areas, ' != ', ref_face.Area
 
                     # write the CLOAD lines to file
