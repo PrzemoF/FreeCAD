@@ -379,12 +379,15 @@ class inp_writer:
                     # write the CLOAD lines to file
                     for n in sorted(node_sumarea_table):
                         node_load = node_sumarea_table[n] * force_per_sum_ref_face_area
-                        v1 = "{:.13E}".format(vec.x * node_load)
-                        v2 = "{:.13E}".format(vec.y * node_load)
-                        v3 = "{:.13E}".format(vec.z * node_load)
-                        f.write(str(n) + ',1,' + v1 + '\n')
-                        f.write(str(n) + ',2,' + v2 + '\n')
-                        f.write(str(n) + ',3,' + v3 + '\n')
+                        if (vec.x != 0.0):
+                            v1 = "{:.13E}".format(vec.x * node_load)
+                            f.write(str(n) + ',1,' + v1 + '\n')
+                        if (vec.y != 0.0):
+                            v2 = "{:.13E}".format(vec.y * node_load)
+                            f.write(str(n) + ',2,' + v2 + '\n')
+                        if (vec.z != 0.0):
+                            v3 = "{:.13E}".format(vec.z * node_load)
+                            f.write(str(n) + ',3,' + v3 + '\n')
                 f.write('\n')
             f.write('\n')
 
