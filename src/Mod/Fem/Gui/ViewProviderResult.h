@@ -37,6 +37,11 @@ class SoShapeHints;
 class SoSeparator;
 class SoMaterialBinding;
 
+namespace Gui {
+    class SoFCColorBar;
+    class View3DInventorViewer;
+}
+
 namespace FemGui
 {
 
@@ -63,6 +68,7 @@ public:
 protected:
     void onChanged(const App::Property* prop);
 
+    Gui::SoFCColorBar* pcColorBar;
     SoSeparator      * pcColorRoot;
 };
 

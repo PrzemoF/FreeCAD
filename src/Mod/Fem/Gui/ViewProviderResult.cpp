@@ -80,11 +80,17 @@ ViewProviderResult::ViewProviderResult()
     sPixmap = "Fem_Result";
     pcColorRoot = new SoSeparator();
     pcColorRoot->ref();
+    pcColorBar = new Gui::SoFCColorBar;
+    pcColorBar->Attach(this);
+    pcColorBar->ref();
+    pcColorBar->setRange( -0.1f, 0.1f, 3 );
 }
 
 ViewProviderResult::~ViewProviderResult()
 {
     pcColorRoot->unref();
+    pcColorBar->Detach(this);
+    pcColorBar->unref();
 
 }
 
@@ -133,9 +139,8 @@ qDebug("attach");
         pcColorBar->unref();
         pcColorBar = pcBar;
     }
-
-    pcColorRoot->addChild(pcColorBar);
 */
+    pcColorRoot->addChild(pcColorBar);
 }
 
 void ViewProviderResult::OnChange(Base::Subject<int> &rCaller,int rcReason)
