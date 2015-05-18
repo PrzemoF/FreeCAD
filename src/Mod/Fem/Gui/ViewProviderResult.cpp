@@ -28,6 +28,21 @@
 
 #endif
 
+#include <Inventor/actions/SoRayPickAction.h>
+#include <Inventor/SoPickedPoint.h>
+#include <Inventor/lists/SoPickedPointList.h> 
+#include <Inventor/details/SoFaceDetail.h>
+#include <Inventor/events/SoMouseButtonEvent.h>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoDrawStyle.h>
+#include <Inventor/nodes/SoIndexedFaceSet.h>
+#include <Inventor/nodes/SoPointSet.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoShapeHints.h>
+#include <Inventor/nodes/SoOrthographicCamera.h>
+#include <Inventor/nodes/SoMaterialBinding.h>
+#include <Inventor/errors/SoDebugError.h>
+
 #include "ViewProviderResult.h"
 #include <Gui/Command.h>
 #include <Gui/Document.h>
@@ -50,19 +65,27 @@ PROPERTY_SOURCE(FemGui::ViewProviderResult, Gui::ViewProviderDocumentObject)
 
 ViewProviderResult::ViewProviderResult()
 {
-  sPixmap = "Fem_Result";
-
+    sPixmap = "Fem_Result";
+    pcColorRoot = new SoSeparator();
+    pcColorRoot->ref();
 }
 
 ViewProviderResult::~ViewProviderResult()
 {
+    pcColorRoot->unref();
 
+}
+
+SoSeparator* ViewProviderInspection::getFrontRoot(void) const
+{
+    return pcColorRoot;
 }
 
 void ViewProviderResult::attach(App::DocumentObject *pcFeat)
 {
     // creats the standard viewing modes
     inherited::attach(pcFeat);
+qDebug("attach");
 
 /*    SoShapeHints * flathints = new SoShapeHints;
     flathints->vertexOrdering = SoShapeHints::COUNTERCLOCKWISE ;
@@ -104,11 +127,13 @@ void ViewProviderResult::attach(App::DocumentObject *pcFeat)
 
 void ViewProviderResult::OnChange(Base::Subject<int> &rCaller,int rcReason)
 {
+qDebug("OnChange");
     setActiveMode();
 }
 
 void ViewProviderResult::onChanged(const App::Property* prop)
 {
+qDebug("onChanged");
  /*   if (prop == &OutsideGrayed) {
         if (pcColorBar) {
             pcColorBar->setOutsideGrayed(OutsideGrayed.getValue());
@@ -119,9 +144,14 @@ void ViewProviderResult::onChanged(const App::Property* prop)
         pcPointStyle->pointSize = PointSize.getValue();
     }
     else {
-        inherited::onChanged(prop);
-    }
 */
+        inherited::onChanged(prop);
+/*    }
+*/
+}
+
+void ViewProviderResult::updateData(const App::Property* prop)
+{
 }
 
 // Python feature -----------------------------------------------------------------------

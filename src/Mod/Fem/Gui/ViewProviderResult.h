@@ -34,6 +34,7 @@ class SoDrawStyle;
 class SoIndexedFaceSet; 
 class SoIndexedLineSet; 
 class SoShapeHints;
+class SoSeparator;
 class SoMaterialBinding;
 
 namespace FemGui
@@ -57,9 +58,12 @@ public:
     virtual bool isShow(void) const{return true;}
     void attach(App::DocumentObject *pcFeat);
     void OnChange(Base::Subject<int> &rCaller,int rcReason);
+    void updateData(const App::Property*);
+    SoSeparator* getFrontRoot(void) const;
 protected:
     void onChanged(const App::Property* prop);
 
+    SoSeparator      * pcColorRoot;
 };
 
 typedef Gui::ViewProviderPythonFeatureT<ViewProviderResult> ViewProviderResultPython;
