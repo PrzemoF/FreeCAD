@@ -43,6 +43,18 @@
 #include <Inventor/nodes/SoMaterialBinding.h>
 #include <Inventor/errors/SoDebugError.h>
 
+#include <Base/Exception.h>
+#include <App/PropertyLinks.h>
+#include <App/GeoFeature.h>
+#include <Gui/Application.h>
+#include <Gui/Document.h>
+#include <Gui/Flag.h>
+#include <Gui/MainWindow.h>
+#include <Gui/SoFCColorBar.h>
+#include <Gui/SoFCSelection.h>
+#include <Gui/ViewProviderGeometryObject.h>
+#include <Gui/View3DInventorViewer.h>
+#include <Gui/Widgets.h>
 #include "ViewProviderResult.h"
 #include <Gui/Command.h>
 #include <Gui/Document.h>
@@ -76,8 +88,9 @@ ViewProviderResult::~ViewProviderResult()
 
 }
 
-SoSeparator* ViewProviderInspection::getFrontRoot(void) const
+SoSeparator* ViewProviderResult::getFrontRoot(void) const
 {
+qDebug("getFrontRoot");
     return pcColorRoot;
 }
 
