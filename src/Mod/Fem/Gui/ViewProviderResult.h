@@ -24,6 +24,7 @@
 #ifndef FEM_ViewProviderResult_H
 #define FEM_ViewProviderResult_H
 
+#include <Base/Observer.h>
 #include <Gui/ViewProviderGeometryObject.h>
 #include <Gui/ViewProviderBuilder.h>
 #include <Gui/ViewProviderPythonFeature.h>
@@ -38,10 +39,11 @@ class SoMaterialBinding;
 namespace FemGui
 {
 
+class FemGuiExport ViewProviderResult : public Gui::ViewProviderDocumentObject,
+                               public Base::Observer<int>{
 
+    typedef ViewProviderDocumentObject inherited;
 
-class FemGuiExport ViewProviderResult : public Gui::ViewProviderDocumentObject
-{
     PROPERTY_HEADER(FemGui::ViewProviderResult);
 
 public:
@@ -53,7 +55,10 @@ public:
 
     // shows solid in the tree
     virtual bool isShow(void) const{return true;}
+    void attach(App::DocumentObject *pcFeat);
+    void OnChange(Base::Subject<int> &rCaller,int rcReason);
 protected:
+    void onChanged(const App::Property* prop);
 
 };
 

@@ -59,7 +59,70 @@ ViewProviderResult::~ViewProviderResult()
 
 }
 
+void ViewProviderResult::attach(App::DocumentObject *pcFeat)
+{
+    // creats the standard viewing modes
+    inherited::attach(pcFeat);
 
+/*    SoShapeHints * flathints = new SoShapeHints;
+    flathints->vertexOrdering = SoShapeHints::COUNTERCLOCKWISE ;
+    flathints->shapeType = SoShapeHints::UNKNOWN_SHAPE_TYPE;
+
+    SoGroup* pcColorShadedRoot = new SoGroup();
+    pcColorShadedRoot->addChild(flathints);
+
+    // color shaded  ------------------------------------------
+    SoDrawStyle *pcFlatStyle = new SoDrawStyle();
+    pcFlatStyle->style = SoDrawStyle::FILLED;
+    pcColorShadedRoot->addChild(pcFlatStyle);
+
+    pcColorShadedRoot->addChild(pcColorMat);
+    pcColorShadedRoot->addChild(pcMatBinding);
+    pcColorShadedRoot->addChild(pcLinkRoot);
+
+    addDisplayMaskMode(pcColorShadedRoot, "ColorShaded");
+
+    // Check for an already existing color bar
+    Gui::SoFCColorBar* pcBar = ((Gui::SoFCColorBar*)findFrontRootOfType(Gui::SoFCColorBar::getClassTypeId()));
+    if (pcBar) {
+        float fMin = pcColorBar->getMinValue();
+        float fMax = pcColorBar->getMaxValue();
+    
+        // Attach to the foreign color bar and delete our own bar
+        pcBar->Attach(this);
+        pcBar->ref();
+        pcBar->setRange(fMin, fMax, 3);
+        pcBar->Notify(0);
+        pcColorBar->Detach(this);
+        pcColorBar->unref();
+        pcColorBar = pcBar;
+    }
+
+    pcColorRoot->addChild(pcColorBar);
+*/
+}
+
+void ViewProviderResult::OnChange(Base::Subject<int> &rCaller,int rcReason)
+{
+    setActiveMode();
+}
+
+void ViewProviderResult::onChanged(const App::Property* prop)
+{
+ /*   if (prop == &OutsideGrayed) {
+        if (pcColorBar) {
+            pcColorBar->setOutsideGrayed(OutsideGrayed.getValue());
+            pcColorBar->Notify(0);
+        }
+    }
+    else if ( prop == &PointSize ) {
+        pcPointStyle->pointSize = PointSize.getValue();
+    }
+    else {
+        inherited::onChanged(prop);
+    }
+*/
+}
 
 // Python feature -----------------------------------------------------------------------
 
