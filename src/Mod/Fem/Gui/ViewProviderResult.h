@@ -63,13 +63,17 @@ public:
     virtual bool isShow(void) const{return true;}
     void attach(App::DocumentObject *pcFeat);
     void OnChange(Base::Subject<int> &rCaller,int rcReason);
+    /// Update colorbar after recomputation of distances.
     void updateData(const App::Property*);
     SoSeparator* getFrontRoot(void) const;
+    virtual void hide(void);
+    virtual void show(void);
 protected:
     void onChanged(const App::Property* prop);
 
     Gui::SoFCColorBar* pcColorBar;
     SoSeparator      * pcColorRoot;
+    SoDrawStyle      * pcColorStyle;
 };
 
 typedef Gui::ViewProviderPythonFeatureT<ViewProviderResult> ViewProviderResultPython;

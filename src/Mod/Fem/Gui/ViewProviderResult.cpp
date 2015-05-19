@@ -80,6 +80,8 @@ ViewProviderResult::ViewProviderResult()
     sPixmap = "Fem_Result";
     pcColorRoot = new SoSeparator();
     pcColorRoot->ref();
+    pcColorStyle = new SoDrawStyle(); 
+    pcColorRoot->addChild(pcColorStyle);
     pcColorBar = new Gui::SoFCColorBar;
     pcColorBar->Attach(this);
     pcColorBar->ref();
@@ -123,7 +125,7 @@ qDebug("attach");
     pcColorShadedRoot->addChild(pcLinkRoot);
 
     addDisplayMaskMode(pcColorShadedRoot, "ColorShaded");
-
+*/
     // Check for an already existing color bar
     Gui::SoFCColorBar* pcBar = ((Gui::SoFCColorBar*)findFrontRootOfType(Gui::SoFCColorBar::getClassTypeId()));
     if (pcBar) {
@@ -139,8 +141,20 @@ qDebug("attach");
         pcColorBar->unref();
         pcColorBar = pcBar;
     }
-*/
+
     pcColorRoot->addChild(pcColorBar);
+}
+
+void ViewProviderResult::hide(void)
+{
+    inherited::hide();
+    pcColorStyle->style = SoDrawStyle::INVISIBLE;
+}
+
+void ViewProviderResult::show(void)
+{
+    inherited::show();
+    pcColorStyle->style = SoDrawStyle::FILLED;
 }
 
 void ViewProviderResult::OnChange(Base::Subject<int> &rCaller,int rcReason)
@@ -170,6 +184,21 @@ qDebug("onChanged");
 
 void ViewProviderResult::updateData(const App::Property* prop)
 {
+	qDebug("updateData");
+	if (prop->getTypeId() == App::PropertyString::getClassTypeId()) {
+		QString name = QString::fromStdString(prop->getName());
+		qDebug("updateData: name: ");
+		qDebug(name.toUtf8());
+		if (strcmp(prop->getName(), "DataType") == 0) {
+			std::string fem_dt = ((App::PropertyString*)prop)->getValue();
+			QString fem_data_type = QString::fromStdString(fem_dt);
+			qDebug("updateData: fem_data_type: ");
+			qDebug(fem_data_type.toUtf8());
+			/*this->search_radius = fSearchRadius;
+			  pcColorBar->setRange( -fSearchRadius, fSearchRadius, 4 );
+			  pcColorBar->Notify(0);*/
+		}
+	}
 }
 
 // Python feature -----------------------------------------------------------------------
