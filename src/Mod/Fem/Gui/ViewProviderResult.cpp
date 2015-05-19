@@ -44,7 +44,9 @@
 #include <Inventor/errors/SoDebugError.h>
 
 #include <Base/Exception.h>
+#include <Base/Quantity.h>
 #include <App/PropertyLinks.h>
+#include <App/PropertyUnits.h>
 #include <App/GeoFeature.h>
 #include <Gui/Application.h>
 #include <Gui/Document.h>
@@ -184,7 +186,6 @@ qDebug("onChanged");
 
 void ViewProviderResult::updateData(const App::Property* prop)
 {
-	qDebug("updateData");
 	if (prop->getTypeId() == App::PropertyString::getClassTypeId()) {
 		QString name = QString::fromStdString(prop->getName());
 		qDebug("updateData: name: ");
@@ -194,6 +195,24 @@ void ViewProviderResult::updateData(const App::Property* prop)
 			QString fem_data_type = QString::fromStdString(fem_dt);
 			qDebug("updateData: fem_data_type: ");
 			qDebug(fem_data_type.toUtf8());
+			/*this->search_radius = fSearchRadius;
+			  pcColorBar->setRange( -fSearchRadius, fSearchRadius, 4 );
+			  pcColorBar->Notify(0);*/
+		}
+	}
+	if (prop->getTypeId() == App::PropertyQuantity::getClassTypeId()) {
+		QString name = QString::fromStdString(prop->getName());
+		qDebug("updateData: unit: ");
+		qDebug(name.toUtf8());
+		if (strcmp(prop->getName(), "Unit") == 0) {
+			Base::Quantity fem_u = static_cast<const App::PropertyQuantity*>(prop)->getQuantityValue();
+			double fem_unit_value = fem_u.getValue();
+			qDebug("updateData: Unit_value: ");
+			qDebug("%f", fem_unit_value);
+			Base::Unit fem_unit = fem_u.getUnit();
+			QString fem_unit_string = fem_unit.getString();
+			qDebug("updateData: Unit: ");
+			qDebug(fem_unit_string.toUtf8());
 			/*this->search_radius = fSearchRadius;
 			  pcColorBar->setRange( -fSearchRadius, fSearchRadius, 4 );
 			  pcColorBar->Notify(0);*/
