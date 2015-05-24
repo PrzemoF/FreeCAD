@@ -186,38 +186,53 @@ qDebug("onChanged");
 
 void ViewProviderResult::updateData(const App::Property* prop)
 {
+	QString name = QString::fromStdString(prop->getName());
+	qDebug() << "updateData: prop name: " << name.toUtf8();
 	if (prop->getTypeId() == App::PropertyString::getClassTypeId()) {
-		QString name = QString::fromStdString(prop->getName());
-		qDebug("updateData: name: ");
-		qDebug(name.toUtf8());
 		if (strcmp(prop->getName(), "DataType") == 0) {
 			std::string fem_dt = ((App::PropertyString*)prop)->getValue();
 			QString fem_data_type = QString::fromStdString(fem_dt);
-			qDebug("updateData: fem_data_type: ");
-			qDebug(fem_data_type.toUtf8());
+			//qDebug() << "updateData: DataType: fem_data_type: " << fem_data_type.toUtf8();
+			if (strcmp(fem_dt.c_str(), "AnalysisStats") == 0) {
+				qDebug() << "updateData: DataType: fem_data_type: " << fem_data_type.toUtf8();
+			}
 			/*this->search_radius = fSearchRadius;
 			  pcColorBar->setRange( -fSearchRadius, fSearchRadius, 4 );
 			  pcColorBar->Notify(0);*/
 		}
 	}
-	if (prop->getTypeId() == App::PropertyQuantity::getClassTypeId()) {
-		QString name = QString::fromStdString(prop->getName());
-		qDebug("updateData: unit: ");
-		qDebug(name.toUtf8());
-		if (strcmp(prop->getName(), "Unit") == 0) {
-			Base::Quantity fem_u = static_cast<const App::PropertyQuantity*>(prop)->getQuantityValue();
-			double fem_unit_value = fem_u.getValue();
-			qDebug("updateData: Unit_value: ");
-			qDebug("%f", fem_unit_value);
-			Base::Unit fem_unit = fem_u.getUnit();
-			QString fem_unit_string = fem_unit.getString();
-			qDebug("updateData: Unit: ");
-			qDebug(fem_unit_string.toUtf8());
+	//if (prop->getTypeId() == App::PropertyQuantity::getClassTypeId()) {
+//		if (strcmp(prop->getName(), "Unit") == 0) {
+//			Base::Quantity fem_u = static_cast<const App::PropertyQuantity*>(prop)->getQuantityValue();
+//			double fem_unit_value = fem_u.getValue();
+			//qDebug("updateData: Unit_value: ");
+			//qDebug("%f", fem_unit_value);
+			//Base::Unit fem_unit = fem_u.getUnit();
+			//QString fem_unit_string = fem_unit.getString();
+			//qDebug("updateData: Unit: ");
+			//qDebug(fem_unit_string.toUtf8());
 			/*this->search_radius = fSearchRadius;
 			  pcColorBar->setRange( -fSearchRadius, fSearchRadius, 4 );
 			  pcColorBar->Notify(0);*/
-		}
-	}
+
+			 //   Fem::FemAnalysis* analyze = static_cast<Fem::FemAnalysis*>(getObject());
+			 //   std::vector<App::DocumentObject*> fem = analyze->Member.getValues();
+			/*qDebug("updateData1 ");
+			    std::vector<App::DocumentObject*> fem(static_cast<Fem::FemAnalysis*>(getObject())->Member.getValues());
+			qDebug("updateData2 ");
+			    for (std::vector<App::DocumentObject*>::iterator it = fem.begin(); it != fem.end(); ++it) {
+			qDebug("updateData3 ");
+				App::Property* prop = (*it)->getPropertyByName("AnalysisStats");
+				qDebug("updateData: before getName: ");
+				qDebug(prop->getName());
+				qDebug("updateData: after getName: ");
+			*/	//if (*it.Name() == obj) {
+				//    fem.erase(it);
+				//    analyze->Member.setValues(fem);
+			 //   }
+
+//		}
+//	}
 }
 
 // Python feature -----------------------------------------------------------------------
