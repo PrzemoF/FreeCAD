@@ -45,6 +45,8 @@
 
 #include <Base/Exception.h>
 #include <Base/Quantity.h>
+#include <App/Property.h>
+#include <App/PropertyContainer.h>
 #include <App/PropertyLinks.h>
 #include <App/PropertyUnits.h>
 #include <App/GeoFeature.h>
@@ -191,11 +193,29 @@ void ViewProviderResult::updateData(const App::Property* prop)
 	if (prop->getTypeId() == App::PropertyString::getClassTypeId()) {
 		if (strcmp(prop->getName(), "DataType") == 0) {
 			std::string fem_dt = ((App::PropertyString*)prop)->getValue();
+			qDebug() << "updateData1";
 			QString fem_data_type = QString::fromStdString(fem_dt);
 			//qDebug() << "updateData: DataType: fem_data_type: " << fem_data_type.toUtf8();
+			qDebug() << "updateData2";
 			if (strcmp(fem_dt.c_str(), "AnalysisStats") == 0) {
+				qDebug() << "updateData3";
 				qDebug() << "updateData: DataType: fem_data_type: " << fem_data_type.toUtf8();
+				qDebug() << "updateData4";
+				//			 const std::vector<float>& val = prop->getValues();
+				//			App::PropertyContainer *pc = prop->getContainer();
+				const std::vector<double>& val = static_cast<const App::PropertyFloatList*>(prop)->getValues();
+				qDebug() << "updateData5";
+				qDebug("updateData size: %i", val.size());
+//				qDebug("updateData[0]: %f", values[0]);
+//				qDebug("updateData[1]: %f", values[1]);
+//				qDebug("updateData[2]: %f", values[2]);
+				//for (std::vector<double>::const_iterator it = values.begin(); it != values.end(); ++it) {
+				//	qDebug("updateData: %d", *it);
+				//}
+				qDebug() << "updateData6";
 			}
+			//App::PropertyData pc_data =  pc->getPropertyData();
+	//qDebug() << "updateData: getPropertyName: " << prop->Property.toUtf8();
 			/*this->search_radius = fSearchRadius;
 			  pcColorBar->setRange( -fSearchRadius, fSearchRadius, 4 );
 			  pcColorBar->Notify(0);*/
