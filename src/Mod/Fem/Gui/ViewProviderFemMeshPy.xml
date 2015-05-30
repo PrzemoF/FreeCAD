@@ -20,6 +20,11 @@
         <UserDocu></UserDocu>
       </Documentation>
     </Methode>
+    <Methode Name="clearDisplacement">
+      <Documentation>
+        <UserDocu>Clear mesh displacement</UserDocu>
+      </Documentation>
+    </Methode>
       <Methode Name="setNodeColorByResult">
           <Documentation>
               <UserDocu></UserDocu>

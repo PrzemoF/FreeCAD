@@ -591,6 +591,11 @@ void ViewProviderFemMesh::setDisplacementByNodeIdHelper(const std::vector<Base::
 
 }
 
+void ViewProviderFemMesh::clearDisplacement(void)
+{
+    animateNodes(0.0);
+}
+
 void ViewProviderFemMesh::resetDisplacementByNodeId(void)
 {
     animateNodes(0.0);

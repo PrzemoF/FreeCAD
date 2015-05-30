@@ -35,6 +35,13 @@ PyObject* ViewProviderFemMeshPy::animate(PyObject * args)
     Py_Return;
 }
 
+PyObject* ViewProviderFemMeshPy::clearDisplacement(PyObject * args)
+{
+    this->getViewProviderFemMeshPtr()->clearDisplacement();
+
+    Py_Return;
+}
+
 App::Color calcColor(double value,double min, double max)
 {
     if (max < 0) max = 0;
