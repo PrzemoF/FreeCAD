@@ -114,10 +114,10 @@ public:
 	/// set the displacement for each node
     void setDisplacementByNodeId(const std::map<long,Base::Vector3d> &NodeDispMap);
     void setDisplacementByNodeId(const std::vector<long> &NodeIds,const std::vector<Base::Vector3d> &NodeDisps);
-    /// reset the view of the node displacement
-    void resetDisplacementByNodeId(void);
     /// clear the view of the node displacement without resetting displacement map
     void clearDisplacement(void);
+    /// reset the view of the node displacement
+    void resetDisplacement(void);
     /// reaply the node displacement with a certain factor and do a redraw
     void animateNodes(double factor);
 	/// set the color for each element

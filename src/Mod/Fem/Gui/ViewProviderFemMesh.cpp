@@ -362,7 +362,7 @@ void ViewProviderFemMesh::updateData(const App::Property* prop)
     if (prop->isDerivedFrom(Fem::PropertyFemMesh::getClassTypeId())) {
         ViewProviderFEMMeshBuilder builder;
         resetColorByNodeId();
-        resetDisplacementByNodeId();
+        resetDisplacement();
         builder.createMesh(prop, pcCoords, pcFaces, pcLines, vFaceElementIdx, vNodeElementIdx, onlyEdges, ShowInner.getValue());
     }
     Gui::ViewProviderGeometryObject::updateData(prop);
@@ -596,7 +596,7 @@ void ViewProviderFemMesh::clearDisplacement(void)
     animateNodes(0.0);
 }
 
-void ViewProviderFemMesh::resetDisplacementByNodeId(void)
+void ViewProviderFemMesh::resetDisplacement(void)
 {
     animateNodes(0.0);
     DisplacementVector.clear();
