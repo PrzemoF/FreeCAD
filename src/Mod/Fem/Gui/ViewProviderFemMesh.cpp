@@ -587,22 +587,22 @@ void ViewProviderFemMesh::setDisplacementByNodeIdHelper(const std::vector<Base::
     int i=0;
     for(std::vector<unsigned long>::const_iterator it=vNodeElementIdx.begin();it!=vNodeElementIdx.end();++it,i++)
         DisplacementVector[i] = DispVector[*it-startId];
-    animateNodes(1.0);
+    deformMeshByFactor(1.0);
 
 }
 
 void ViewProviderFemMesh::clearDisplacement(void)
 {
-    animateNodes(0.0);
+    deformMeshByFactor(0.0);
 }
 
 void ViewProviderFemMesh::resetDisplacement(void)
 {
-    animateNodes(0.0);
+    deformMeshByFactor(0.0);
     DisplacementVector.clear();
 }
 /// reaply the node displacement with a certain factor and do a redraw
-void ViewProviderFemMesh::animateNodes(double factor)
+void ViewProviderFemMesh::deformMeshByFactor(double factor)
 {
     if(DisplacementVector.size() == 0)
         return;

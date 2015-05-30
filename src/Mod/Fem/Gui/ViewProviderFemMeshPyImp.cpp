@@ -30,7 +30,7 @@ PyObject* ViewProviderFemMeshPy::animate(PyObject * args)
     if (!PyArg_ParseTuple(args, "d", &factor))
         return 0;
 
-    this->getViewProviderFemMeshPtr()->animateNodes(factor);
+    this->getViewProviderFemMeshPtr()->deformMeshByFactor(factor);
 
     Py_Return;
 }
