@@ -216,6 +216,7 @@ ViewProviderFemMesh::ViewProviderFemMesh()
     //PointMaterial.touch();
 
     DisplacementFactor = 0;
+qDebug("DisplacementFactor set to 0");
 }
 
 ViewProviderFemMesh::~ViewProviderFemMesh()
@@ -604,8 +605,11 @@ void ViewProviderFemMesh::resetDisplacement(void)
 /// reaply the node displacement with a certain factor and do a redraw
 void ViewProviderFemMesh::deformMeshByFactor(double factor)
 {
-    if(DisplacementVector.size() == 0)
+qDebug("deformMeshByFactor called with factor %f DF is %f ", factor, DisplacementFactor);
+    if(DisplacementVector.size() == 0) {
+qDebug("but DisplacementVector is empty");
         return;
+	}
 
     float x,y,z;
     // set the point coordinates
@@ -615,20 +619,25 @@ void ViewProviderFemMesh::deformMeshByFactor(double factor)
         verts[i].getValue(x,y,z);
         // undo old factor#
         Base::Vector3d oldDisp = DisplacementVector[i] * DisplacementFactor;
+qDebug("DV x,y,z %f, %f, %f", DisplacementVector[i].x,DisplacementVector[i].y,DisplacementVector[i].z);
+qDebug("1 x,y,z %f, %f, %f", x,y,z);
         x -= oldDisp.x;
         y -= oldDisp.y;
         z -= oldDisp.z;
+qDebug("2 x,y,z %f, %f, %f", x,y,z);
         // apply new factor
         Base::Vector3d newDisp = DisplacementVector[i] * factor;
         x += newDisp.x;
         y += newDisp.y;
         z += newDisp.z;
         // set the new value
+qDebug("3 x,y,z %f, %f, %f", x,y,z);
         verts[i].setValue(x,y,z);
     }
     pcCoords->point.finishEditing();
 
     DisplacementFactor = factor;
+qDebug("DisplacementFactor set to factor %f", DisplacementFactor);
 }
 
 void ViewProviderFemMesh::setColorByElementId(const std::map<long,App::Color> &ElementColorMap)

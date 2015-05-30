@@ -95,6 +95,7 @@ def readResult(frd_input):
             disp_z = float(line[37:49])
             disp[elem] = FreeCAD.Vector(disp_x, disp_y, disp_z)
             displacement.append((disp_x, disp_y, disp_z))
+            print disp_x, disp_y, disp_z
         if line[5:11] == "STRESS":
             stress_found = True
         #we found a displacement line in the frd file
