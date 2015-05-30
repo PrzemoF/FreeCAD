@@ -24,7 +24,7 @@ std::string ViewProviderFemMeshPy::representation(void) const
 
 
 
-PyObject* ViewProviderFemMeshPy::animate(PyObject * args)
+PyObject* ViewProviderFemMeshPy::deformMeshByFactor(PyObject * args)
 {
     double factor;
     if (!PyArg_ParseTuple(args, "d", &factor))
