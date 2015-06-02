@@ -126,6 +126,10 @@ class _MechanicalMaterialTaskPanel:
     '''The editmode TaskPanel for MechanicalMaterial objects'''
     def __init__(self, obj):
         self.obj = obj
+        print "obj"
+        print obj
+        print type(obj)
+        print "/obj"
 
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalMaterial.ui")
 
@@ -261,7 +265,7 @@ class _MechanicalMaterialTaskPanel:
 
         use_mat_from_custom_dir = self.fem_preferences.GetBool("UseMaterialsFromCustomDir", True)
         if use_mat_from_custom_dir:
-            custom_mat_dir = self.fem_preferences.GetString("CustomMaterialsDir","")
+            custom_mat_dir = self.fem_preferences.GetString("CustomMaterialsDir", "")
             self.add_mat_dir(custom_mat_dir, ":/icons/user.svg")
 
 
