@@ -126,6 +126,10 @@ class _MechanicalMaterialTaskPanel:
     '''The editmode TaskPanel for MechanicalMaterial objects'''
     def __init__(self, obj):
         self.obj = obj
+        print "obj"
+        print obj
+        print type(obj)
+        print "/obj"
 
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalMaterial.ui")
 
