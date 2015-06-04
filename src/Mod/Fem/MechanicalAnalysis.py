@@ -598,20 +598,20 @@ class _ResultControlTaskPanel:
     def vm_stress_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "Sabs"
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        (minm, maxm, avg) = (0.0, 0.0, 0.0)
+        (minm, avg, maxm) = (0.0, 0.0, 0.0)
         if self.StressObject:
             self.MeshObject.ViewObject.setNodeColorByResult(self.StressObject)
-            (minm, maxm, avg) = self.get_result_stats("Sabs")
+            (minm, avg, maxm) = self.get_result_stats("Sabs")
         self.set_result_stats("MPa", minm, avg, maxm)
         QtGui.qApp.restoreOverrideCursor()
 
     def select_displacement_type(self, disp_type):
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        (minm, maxm, avg) = (0.0, 0.0, 0.0)
+        (minm, avg, maxm) = (0.0, 0.0, 0.0)
         if self.DisplacementObject:
             match = {"Uabs": 0, "U1": 1, "U2": 2, "U3": 3}
             self.MeshObject.ViewObject.setNodeColorByResult(self.DisplacementObject, match[disp_type])
-            (minm, maxm, avg) = self.get_result_stats(disp_type)
+            (minm, avg, maxm) = self.get_result_stats(disp_type)
         self.set_result_stats("mm", minm, avg, maxm)
         QtGui.qApp.restoreOverrideCursor()
 
