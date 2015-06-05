@@ -238,11 +238,7 @@ class _ViewProviderFemAnalysis:
 
 
 class _JobControlTaskPanel:
-    '''The editmode TaskPanel for Material objects'''
     def __init__(self, object):
-        # the panel has a tree widget that contains categories
-        # for the subcomponents, such as additions, subtractions.
-        # the categories are shown only if they are not empty.
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalAnalysis.ui")
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -259,7 +255,6 @@ class _JobControlTaskPanel:
                 self.CalculixBinary = 'ccx'
 
         self.obj = object
-        #self.params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         self.Calculix = QtCore.QProcess()
         self.Timer = QtCore.QTimer()
         self.Timer.start(300)
