@@ -257,9 +257,6 @@ class _JobControlTaskPanel:
                 self.CalculixBinary = FreeCAD.getHomePath() + 'bin/ccx.exe'
             else:
                 self.CalculixBinary = 'ccx'
-        self.TempDir = FreeCAD.ActiveDocument.TransientDir.replace('\\', '/') + '/FemAnl_' + object.Uid[-4:]
-        if not os.path.isdir(self.TempDir):
-            os.mkdir(self.TempDir)
 
         self.obj = object
         #self.params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
@@ -387,7 +384,7 @@ class _JobControlTaskPanel:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             try:
                 import ccxInpWriter as iw
-                inp_writer = iw.inp_writer(self.TempDir, self.MeshObject, self.MaterialObjects,
+                inp_writer = iw.inp_writer(self.obj, self.MeshObject, self.MaterialObjects,
                                            self.FixedObjects, self.ForceObjects, self.PressureObjects)
                 self.base_name = inp_writer.write_calculix_input_file()
                 if self.base_name != "":
