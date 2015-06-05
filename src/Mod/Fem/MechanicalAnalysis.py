@@ -25,7 +25,6 @@ import FreeCAD
 import FemGui
 import os
 import sys
-import tempfile
 import time
 
 if FreeCAD.GuiUp:
@@ -144,6 +143,25 @@ class _CommandPurgeFemResults:
         return FreeCADGui.ActiveDocument is not None and results_present()
 
 
+class _CommandRunCalculiX:
+    def GetResources(self):
+        return {'Pixmap': 'Fem_Run_CalculiX',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_RunCalculiX", "Run CalculiX ccx"),
+                'Accel': "R, C",
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_RunCalculiX", "Write .inp file and run CalculiX ccx")}
+
+    def Activated(self):
+        purge_fem_results()
+        reset_mesh_color()
+        reset_mesh_deformation()
+    #call write_input_file_handler
+    #call runCalculix
+
+    def IsActive(self):
+        #FIXME - there has to be a better condition here
+        return FreeCADGui.ActiveDocument is not None
+
+
 class _CommandMechanicalShowResult:
     "the Fem JobControl command definition"
     def GetResources(self):
@@ -238,7 +256,7 @@ class _ViewProviderFemAnalysis:
 
 
 class _JobControlTaskPanel:
-    def __init__(self, object):
+    def __init__(self, analysis_object):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalAnalysis.ui")
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -256,7 +274,7 @@ class _JobControlTaskPanel:
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
 
-        self.obj = object
+        self.analysis_object = analysis_object
         self.Calculix = QtCore.QProcess()
         self.Timer = QtCore.QTimer()
         self.Timer.start(300)
@@ -383,7 +401,7 @@ class _JobControlTaskPanel:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             try:
                 import ccxInpWriter as iw
-                inp_writer = iw.inp_writer(self.obj, self.MeshObject, self.MaterialObjects,
+                inp_writer = iw.inp_writer(self.analysis_object, self.MeshObject, self.MaterialObjects,
                                            self.FixedObjects, self.ForceObjects, self.PressureObjects, self.working_dir)
                 self.base_name = inp_writer.write_calculix_input_file()
                 if self.base_name != "":
@@ -474,10 +492,10 @@ class _JobControlTaskPanel:
 
 class _ResultControlTaskPanel:
     '''The control for the displacement post-processing'''
-    def __init__(self, object):
+    def __init__(self): #, object):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/ShowDisplacement.ui")
 
-        self.obj = object
+        #self.obj = object
 
         #Connect Signals and Slots
         QtCore.QObject.connect(self.form.rb_none, QtCore.SIGNAL("toggled(bool)"), self.none_selected)
@@ -715,5 +733,6 @@ def prepare_analysis_objects():
 FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
 FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
 FreeCADGui.addCommand('Fem_MechanicalJobControl', _CommandMechanicalJobControl())
+FreeCADGui.addCommand('Fem_RunCalculiX', _CommandRunCalculiX())
 FreeCADGui.addCommand('Fem_PurgeResults', _CommandPurgeFemResults())
 FreeCADGui.addCommand('Fem_ShowResult', _CommandMechanicalShowResult())
