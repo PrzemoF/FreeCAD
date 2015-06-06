@@ -167,7 +167,7 @@ class _CommandMechanicalShowResult:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", "No result found in active Analysis")
             return
 
-        taskd = _ResultControlTaskPanel(FemGui.getActiveAnalysis())
+        taskd = _ResultControlTaskPanel()
         FreeCADGui.Control.showDialog(taskd)
 
     def IsActive(self):
@@ -461,10 +461,10 @@ class _JobControlTaskPanel:
 
 class _ResultControlTaskPanel:
     '''The control for the displacement post-processing'''
-    def __init__(self, object):
+    def __init__(self):  # , object):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/ShowDisplacement.ui")
 
-        self.obj = object
+        #self.obj = object
 
         #Connect Signals and Slots
         QtCore.QObject.connect(self.form.rb_none, QtCore.SIGNAL("toggled(bool)"), self.none_selected)
