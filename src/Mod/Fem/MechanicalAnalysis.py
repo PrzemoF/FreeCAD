@@ -411,9 +411,7 @@ class _JobControlTaskPanel:
         self.FixedObjects = fea.fixed_constraints
         self.ForceObjects = fea.force_constraints
         self.PressureObjects = fea.pressure_constraints
-
-        message = check_prerequisites(fea.fem_analysis, self.MeshObject, self.MaterialObjects,
-                                      self.FixedObjects, self.ForceObjects, self.PressureObjects)
+        message = fea.check_prerequisites()
         if message != "":
             QtGui.QMessageBox.critical(None, "Missing prerequisit(s)", message)
             return False
@@ -639,21 +637,6 @@ def results_present():
             results = True
     return results
 
-
-def check_prerequisites(analysis_obj, mesh_obj, material_obj,
-                        fixed_obj, force_obj, pressure_obj):
-    message = ""
-    if not analysis_obj:
-        message += "No active Analysis\n"
-    if not mesh_obj:
-        message += "No mesh object in the Analysis\n"
-    if not material_obj:
-        message += "No material object in the Analysis\n"
-    if not fixed_obj:
-        message += "No fixed-constraint nodes defined in the Analysis\n"
-    if not (force_obj or pressure_obj):
-        message += "No force-constraint or pressure-constraint defined in the Analysis\n"
-    return message
 
 FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
 FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
