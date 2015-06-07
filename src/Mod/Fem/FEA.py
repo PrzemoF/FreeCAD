@@ -96,3 +96,17 @@ class FEA:
         if not (self.force_constraints or self.pressure_constraints):
             message += "No force-constraint or pressure-constraint defined in the Analysis\n"
         return message
+
+    def write_inp_file(self, working_dir):
+        self.update_objects()
+        import ccxInpWriter as iw
+        import sys
+        self.base_name = ""
+        try:
+            inp_writer = iw.inp_writer(self.analysis, self.mesh, self.material,
+                                       self.fixed_constraints, self.force_constraints,
+                                       self.pressure_constraints, working_dir)
+            self.base_name = inp_writer.write_calculix_input_file()
+        except:
+            print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
+            raise
