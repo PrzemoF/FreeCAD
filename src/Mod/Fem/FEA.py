@@ -31,7 +31,8 @@ class FEA:
             self.fem_analysis = analysis_object
         else:
             self.fem_analysis = FemGui.getActiveAnalysis()
-        self.update_objects()
+        if self.fem_analysis:
+            self.update_objects()
 
     def purge_results(self):
         for m in self.fem_analysis.Member:
