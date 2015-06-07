@@ -25,7 +25,6 @@ import FreeCAD
 from FEA import FEA
 import FemGui
 import os
-import sys
 import time
 
 if FreeCAD.GuiUp:
@@ -143,6 +142,28 @@ class _CommandPurgeFemResults:
 
     def IsActive(self):
         return FreeCADGui.ActiveDocument is not None and results_present()
+
+
+class _CommandRunCalculiX:
+    def GetResources(self):
+        return {'Pixmap': 'Fem_Run_CalculiX',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_RunCalculiX", "Run CalculiX ccx"),
+                'Accel': "R, C",
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_RunCalculiX", "Write .inp file and run CalculiX ccx")}
+
+    def Activated(self):
+        fea = FEA()
+        fea.purge_results()
+        fea.reset_mesh_color()
+        fea.reset_mesh_deformation()
+        fea.write_inp_file(self.working_dir)
+        fea.setup_working_dir()
+        fea.setup_ccx()
+        fea.start_ccx()
+
+    def IsActive(self):
+        #FIXME - there has to be a better condition here
+        return FreeCADGui.ActiveDocument is not None
 
 
 class _CommandMechanicalShowResult:
@@ -347,10 +368,10 @@ class _JobControlTaskPanel:
         fea.purge_results()
         fea.reset_mesh_color()
         fea.reset_mesh_deformation()
-        if os.path.isfile(self.base_name + '.frd'):
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            ccxFrdReader.importFrd(self.base_name + '.frd', FemGui.getActiveAnalysis())
-            QApplication.restoreOverrideCursor()
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        fea.load_results()
+        QApplication.restoreOverrideCursor()
+        if fea.results_present:
             self.femConsoleMessage("Loading results done!", "#00AA00")
         else:
             self.femConsoleMessage("Loading results failed! Results file doesn\'t exist", "#FF0000")
@@ -405,6 +426,8 @@ class _JobControlTaskPanel:
         self.FixedObjects = fea.fixed_constraints
         self.ForceObjects = fea.force_constraints
         self.PressureObjects = fea.pressure_constraints
+        fea.setup_ccx()
+        fea.setup_working_dir()
         message = fea.check_prerequisites()
         if message != "":
             QtGui.QMessageBox.critical(None, "Missing prerequisit(s)", message)
@@ -433,19 +456,10 @@ class _JobControlTaskPanel:
     def runCalculix(self):
         print 'runCalculix'
         self.Start = time.time()
-
         self.femConsoleMessage("CalculiX binary: {}".format(self.CalculixBinary))
         self.femConsoleMessage("Run Calculix...")
-
-        # run Calculix
-        print 'run Calculix at: ', self.CalculixBinary, '  with: ', self.base_name
-        # change cwd because ccx may crash if directory has no write permission
-        # there is also a limit of the length of file names so jump to the document directory
-        self.cwd = QtCore.QDir.currentPath()
-        fi = QtCore.QFileInfo(self.base_name)
-        QtCore.QDir.setCurrent(fi.path())
-        self.Calculix.start(self.CalculixBinary, ['-i', fi.baseName()])
-
+        fea = FEA()
+        fea.start_ccx()
         QApplication.restoreOverrideCursor()
 
 
@@ -618,6 +632,7 @@ class _ResultControlTaskPanel:
     def reject(self):
         FreeCADGui.Control.closeDialog()
 
+
 # Helpers
 
 
@@ -635,5 +650,6 @@ def results_present():
 FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
 FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
 FreeCADGui.addCommand('Fem_MechanicalJobControl', _CommandMechanicalJobControl())
+FreeCADGui.addCommand('Fem_RunCalculiX', _CommandRunCalculiX())
 FreeCADGui.addCommand('Fem_PurgeResults', _CommandPurgeFemResults())
 FreeCADGui.addCommand('Fem_ShowResult', _CommandMechanicalShowResult())

@@ -23,6 +23,7 @@
 
 import FreeCAD
 import FemGui
+from PySide import QtCore
 
 
 class FEA:
@@ -33,6 +34,10 @@ class FEA:
             self.analysis = FemGui.getActiveAnalysis()
         if self.analysis:
             self.update_objects()
+        self.base_name = ""
+        self.results_present = False
+        self.ccx_binary = None
+        self.working_dir = None
 
     def purge_results(self):
         for m in self.analysis.Member:
@@ -40,6 +45,7 @@ class FEA:
                (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == 'VonMisesStress') or
                (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == 'AnalysisStats')):
                 FreeCAD.ActiveDocument.removeObject(m.Name)
+        self.results_present = False
 
     def reset_mesh_deformation(self):
         if self.mesh:
@@ -95,18 +101,96 @@ class FEA:
             message += "No fixed-constraint nodes defined in the Analysis\n"
         if not (self.force_constraints or self.pressure_constraints):
             message += "No force-constraint or pressure-constraint defined in the Analysis\n"
+        if not self.ccx_binary:
+            message += "CalculiX binary ccx is not set\n"
+        if not self.working_dir:
+            message += "CalculiX working dir not set\n"
+
         return message
 
-    def write_inp_file(self, working_dir):
+    def write_inp_file(self):
         self.update_objects()
         import ccxInpWriter as iw
         import sys
-        self.base_name = ""
         try:
             inp_writer = iw.inp_writer(self.analysis, self.mesh, self.material,
                                        self.fixed_constraints, self.force_constraints,
-                                       self.pressure_constraints, working_dir)
+                                       self.pressure_constraints)
             self.base_name = inp_writer.write_calculix_input_file()
         except:
             print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
             raise
+
+    def start_ccx(self):
+        # change cwd because ccx may crash if directory has no write permission
+        # there is also a limit of the length of file names so jump to the document directory
+        if self.base_name != "":
+            cwd = QtCore.QDir.currentPath()
+            f = QtCore.QFileInfo(self.base_name)
+            QtCore.QDir.setCurrent(f.path())
+            self.ccx_process.start(self.ccx_binary, ['-i', f.baseName()])
+            # Restore previous cwd
+            QtCore.QDir.setCurrent(cwd)
+
+    def setup_ccx(self, ccx_binary=None):
+        if ccx_binary != "":
+            self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+            ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
+            if ccx_binary:
+                self.ccx_binary = ccx_binary
+                print "Using ccx binary path from FEM preferences: {}".format(ccx_binary)
+            else:
+                from platform import system
+                if system() == 'Linux':
+                    self.ccx_binary = 'ccx'
+                elif system() == 'Windows':
+                    self.ccx_binary = FreeCAD.getHomePath() + 'bin/ccx.exe'
+                else:
+                    self.ccx_binary = 'ccx'
+        else:
+            self.ccx_binary = ccx_binary
+        self.ccx_process = QtCore.QProcess()
+        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("started()"), self.ccx_started)
+        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.ccx_state_changed)
+        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("error(QProcess::ProcessError)"), self.ccx_error)
+        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
+
+    def setup_working_dir(self, working_dir=None):
+        if working_dir is not None:
+            print "wd none"
+            self.working_dir = working_dir
+        else:
+            print "wd is not none"
+            self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+            self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
+
+    def ccx_started(self):
+        self.ccx_status = "started"
+        print "started to self.ccx_status = {}".format(self.ccx_status)
+
+    def ccx_state_changed(self, new_state):
+        if (new_state == QtCore.QProcess.ProcessState.Starting):
+                self.ccx_status = "starting"
+        elif (new_state == QtCore.QProcess.ProcessState.Running):
+                self.ccx_status = "running"
+        elif (new_state == QtCore.QProcess.ProcessState.NotRunning):
+                self.ccx_status = "not running"
+        print "changed to self.ccx_status = {}".format(self.ccx_status)
+
+    def ccx_error(self):
+        self.ccx_status = "error"
+        print "error self.ccx_status = {}".format(self.ccx_status)
+
+    def ccx_finished(self):
+        self.ccx_status = "finished"
+        print "finished self.ccx_status = {}".format(self.ccx_status)
+        self.load_results()
+
+    def load_results(self):
+        import ccxFrdReader
+        import os
+        if os.path.isfile(self.base_name + '.frd'):
+            ccxFrdReader.importFrd(self.base_name + '.frd', self.analysis)
+            self.results_present = True
+        else:
+            self.results_present = False
