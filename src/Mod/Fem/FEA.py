@@ -81,3 +81,18 @@ class FEA:
                 PressureObjectDict = {}
                 PressureObjectDict['Object'] = m
                 self.pressure_constraints.append(PressureObjectDict)
+
+    def check_prerequisites(self):
+        self.update_objects()
+        message = ""
+        if not self.fem_analysis:
+            message += "No active Analysis\n"
+        if not self.mesh:
+            message += "No mesh object in the Analysis\n"
+        if not self.material:
+            message += "No material object in the Analysis\n"
+        if not self.fixed_constraints:
+            message += "No fixed-constraint nodes defined in the Analysis\n"
+        if not (self.force_constraints or self.pressure_constraints):
+            message += "No force-constraint or pressure-constraint defined in the Analysis\n"
+        return message
