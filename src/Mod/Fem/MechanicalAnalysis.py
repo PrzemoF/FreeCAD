@@ -22,6 +22,7 @@
 
 import ccxFrdReader
 import FreeCAD
+from FEA import FEA
 import FemGui
 import os
 import sys
@@ -135,9 +136,10 @@ class _CommandPurgeFemResults:
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_PurgeResults", "Purge results from an analysis")}
 
     def Activated(self):
-        purge_fem_results()
-        reset_mesh_color()
-        reset_mesh_deformation()
+        fea = FEA()
+        fea.purge_results()
+        fea.reset_mesh_color()
+        fea.reset_mesh_deformation()
 
     def IsActive(self):
         return FreeCADGui.ActiveDocument is not None and results_present()
@@ -341,9 +343,10 @@ class _JobControlTaskPanel:
         print "Loading results...."
         self.femConsoleMessage("Loading result sets...")
         self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
-        purge_fem_results()
-        reset_mesh_color()
-        reset_mesh_deformation()
+        fea = FEA()
+        fea.purge_results()
+        fea.reset_mesh_color()
+        fea.reset_mesh_deformation()
         if os.path.isfile(self.base_name + '.frd'):
             QApplication.setOverrideCursor(Qt.WaitCursor)
             ccxFrdReader.importFrd(self.base_name + '.frd', FemGui.getActiveAnalysis())
@@ -541,7 +544,8 @@ class _ResultControlTaskPanel:
     def none_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "None"
         self.set_result_stats("mm", 0.0, 0.0, 0.0)
-        reset_mesh_color()
+        fea = FEA()
+        fea.reset_mesh_color()
 
     def abs_displacement_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "Uabs"
@@ -639,36 +643,6 @@ def results_present():
         elif o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'VonMisesStress':
             results = True
     return results
-
-
-def purge_fem_results(Analysis=None):
-    if Analysis is None:
-        analysis_members = FemGui.getActiveAnalysis().Member
-    else:
-        analysis_members = FemGui.Analysis().Member
-    for o in analysis_members:
-        if (o.isDerivedFrom('Fem::FemResultVector') or
-           (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'VonMisesStress') or
-           (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'AnalysisStats')):
-            FreeCAD.ActiveDocument.removeObject(o.Name)
-
-
-def reset_mesh_color(mesh=None):
-    if mesh is None:
-        for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemMeshObject"):
-                mesh = i
-    mesh.ViewObject.NodeColor = {}
-    mesh.ViewObject.ElementColor = {}
-    mesh.ViewObject.setNodeColorByResult()
-
-
-def reset_mesh_deformation(mesh=None):
-    if mesh is None:
-        for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemMeshObject"):
-                mesh = i
-    mesh.ViewObject.applyDisplacement(0.0)
 
 
 def prepare_analysis_objects():
