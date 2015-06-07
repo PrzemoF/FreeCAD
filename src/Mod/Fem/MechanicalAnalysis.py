@@ -405,20 +405,15 @@ class _JobControlTaskPanel:
         self.Start = time.time()
         self.femConsoleMessage("Check dependencies...")
         self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
-        active_analysis = FemGui.getActiveAnalysis()
-        self.MeshObject = None
-        # [{'Object':MaterialObject}, {}, ...]
-        self.MaterialObjects = []
-        # [{'Object':FixedObject, 'NodeSupports':bool}, {}, ...]
-        self.FixedObjects = []
-        # [{'Object':ForceObject, 'NodeLoad':value}, {}, ...
-        self.ForceObjects = []
-        # [{'Object':PressureObject, 'xxxxxxxx':value}, {}, ...]
-        self.PressureObjects = []
-        (self.MeshObject, self.MaterialObjects, self.FixedObjects, self.ForceObjects, self.PressureObjects) = prepare_analysis_objects()
+        fea = FEA()
+        self.MeshObject = fea.mesh
+        self.MaterialObjects = fea.material
+        self.FixedObjects = fea.fixed_constraints
+        self.ForceObjects = fea.force_constraints
+        self.PressureObjects = fea.pressure_constraints
 
-        message =  check_prerequisites(active_analysis, self.MeshObject, self.MaterialObjects,
-                                       self.FixedObjects, self.ForceObjects, self.PressureObjects)
+        message = check_prerequisites(fea.fem_analysis, self.MeshObject, self.MaterialObjects,
+                                      self.FixedObjects, self.ForceObjects, self.PressureObjects)
         if message != "":
             QtGui.QMessageBox.critical(None, "Missing prerequisit(s)", message)
             return False
@@ -643,35 +638,6 @@ def results_present():
         elif o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'VonMisesStress':
             results = True
     return results
-
-
-def prepare_analysis_objects():
-    MeshObject = None
-    MaterialObjects = []
-    FixedObjects = []
-    ForceObjects = []
-    PressureObjects = []
-
-    for i in FemGui.getActiveAnalysis().Member:
-        if i.isDerivedFrom("Fem::FemMeshObject"):
-            MeshObject = i
-        elif i.isDerivedFrom("App::MaterialObjectPython"):
-            MaterialObjectDict = {}
-            MaterialObjectDict['Object'] = i
-            MaterialObjects.append(MaterialObjectDict)
-        elif i.isDerivedFrom("Fem::ConstraintFixed"):
-            FixedObjectDict = {}
-            FixedObjectDict['Object'] = i
-            FixedObjects.append(FixedObjectDict)
-        elif i.isDerivedFrom("Fem::ConstraintForce"):
-            ForceObjectDict = {}
-            ForceObjectDict['Object'] = i
-            ForceObjects.append(ForceObjectDict)
-        elif i.isDerivedFrom("Fem::ConstraintPressure"):
-            PressureObjectDict = {}
-            PressureObjectDict['Object'] = i
-            PressureObjects.append(PressureObjectDict)
-    return (MeshObject, MaterialObjects, FixedObjects, ForceObjects, PressureObjects)
 
 
 def check_prerequisites(analysis_obj, mesh_obj, material_obj,
