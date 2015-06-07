@@ -28,14 +28,14 @@ import FemGui
 class FEA:
     def __init__(self, analysis_object=None):
         if analysis_object:
-            self.fem_analysis = analysis_object
+            self.analysis = analysis_object
         else:
-            self.fem_analysis = FemGui.getActiveAnalysis()
-        if self.fem_analysis:
+            self.analysis = FemGui.getActiveAnalysis()
+        if self.analysis:
             self.update_objects()
 
     def purge_results(self):
-        for m in self.fem_analysis.Member:
+        for m in self.analysis.Member:
             if (m.isDerivedFrom('Fem::FemResultVector') or
                (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == 'VonMisesStress') or
                (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == 'AnalysisStats')):
@@ -62,7 +62,7 @@ class FEA:
         self.force_constraints = []
         self.pressure_constraints = []
 
-        for m in self.fem_analysis.Member:
+        for m in self.analysis.Member:
             if m.isDerivedFrom("Fem::FemMeshObject"):
                 self.mesh = m
             elif m.isDerivedFrom("App::MaterialObjectPython"):
@@ -85,7 +85,7 @@ class FEA:
     def check_prerequisites(self):
         self.update_objects()
         message = ""
-        if not self.fem_analysis:
+        if not self.analysis:
             message += "No active Analysis\n"
         if not self.mesh:
             message += "No mesh object in the Analysis\n"
