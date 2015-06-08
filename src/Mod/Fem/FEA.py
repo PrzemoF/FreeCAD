@@ -36,8 +36,8 @@ class FEA:
             self.update_objects()
         self.base_name = ""
         self.results_present = False
-        self.ccx_binary = None
-        self.working_dir = None
+        self.setup_working_dir()
+        self.setup_ccx()
 
     def purge_results(self):
         for m in self.analysis.Member:
@@ -133,7 +133,7 @@ class FEA:
             QtCore.QDir.setCurrent(cwd)
 
     def setup_ccx(self, ccx_binary=None):
-        if ccx_binary != "":
+        if ccx_binary is None:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
             if ccx_binary:
@@ -156,13 +156,11 @@ class FEA:
         QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
 
     def setup_working_dir(self, working_dir=None):
-        if working_dir is not None:
-            print "wd none"
-            self.working_dir = working_dir
-        else:
-            print "wd is not none"
+        if working_dir is None:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
+        else:
+            self.working_dir = working_dir
 
     def ccx_started(self):
         self.ccx_status = "started"
