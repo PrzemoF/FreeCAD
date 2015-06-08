@@ -25,22 +25,23 @@ import FreeCAD
 import FemGui
 from PySide import QtCore
 
-## FEA - Finite Element Analysis 
+## FEA - Finite Element Analysis
 # FEA class handles actions related to FEM analysis like preparing .inp
 # file, running CalculiX, loading results, mesh colour/deformation operations
+
+
 class FEA:
+
     def __init__(self, analysis=None):
-        self.update_analysis(analysis)
-        if self.analysis:
-            self.update_objects()
-        else:
-            print "Analysis not set!"
+
+        self.set_analysis(analysis)
+        self.update_objects()
         self.base_name = ""
         self.results_present = False
         self.setup_working_dir()
         self.setup_ccx()
 
-    def update_analysis(self, analysis=None):
+    def set_analysis(self, analysis=None):
         if analysis:
             self.analysis = analysis
         else:
@@ -78,6 +79,9 @@ class FEA:
             self.mesh.ViewObject.setNodeColorByResult(obj, match[result_type])
 
     def update_objects(self):
+        if not self.analysis:
+            print "Analysis not set, cannot update objects"
+            return
         # [{"Object":material}, {}, ...]
         # [{"Object":fixed_constraints, "NodeSupports":bool}, {}, ...]
         # [{"Object":force_constraints, "NodeLoad":value}, {}, ...
