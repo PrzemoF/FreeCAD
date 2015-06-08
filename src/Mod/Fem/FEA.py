@@ -62,6 +62,19 @@ class FEA:
             self.mesh.ViewObject.ElementColor = {}
             self.mesh.ViewObject.setNodeColorByResult()
 
+    def set_result_type(self, result_type):
+        self.update_objects()
+        if result_type == "None":
+            self.reset_mesh_color()
+            return
+        if self.results_present:
+            match = {"Uabs": 0, "U1": 1, "U2": 2, "U3": 3, "Sabs": 0}
+            if result_type == "Sabs":
+                obj = self.vm_stress
+            else:
+                obj = self.displacement
+            self.mesh.ViewObject.setNodeColorByResult(obj, match[result_type])
+
     def update_objects(self):
         # [{'Object':material}, {}, ...]
         # [{'Object':fixed_constraints, 'NodeSupports':bool}, {}, ...]
@@ -72,6 +85,8 @@ class FEA:
         self.fixed_constraints = []
         self.force_constraints = []
         self.pressure_constraints = []
+        self.displacement = None
+        self.vm_stress = None
 
         for m in self.analysis.Member:
             if m.isDerivedFrom("Fem::FemMeshObject"):
@@ -92,6 +107,12 @@ class FEA:
                 PressureObjectDict = {}
                 PressureObjectDict['Object'] = m
                 self.pressure_constraints.append(PressureObjectDict)
+            elif m.isDerivedFrom("Fem::FemResultVector"):
+                if m.DataType == 'Displacement':
+                    self.displacement = m
+            elif m.isDerivedFrom("Fem::FemResultValue"):
+                if m.DataType == 'VonMisesStress':
+                    self.vm_stress = m
 
     def check_prerequisites(self):
         self.update_objects()
@@ -138,13 +159,11 @@ class FEA:
             QtCore.QDir.setCurrent(cwd)
 
     def setup_ccx(self, ccx_binary=None):
-        print "start_ccx"
         if ccx_binary is None:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
             if ccx_binary:
                 self.ccx_binary = ccx_binary
-                print "Using ccx binary path from FEM preferences: {}".format(ccx_binary)
             else:
                 from platform import system
                 if system() == 'Linux':
