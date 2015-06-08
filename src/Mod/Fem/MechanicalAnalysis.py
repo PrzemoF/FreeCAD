@@ -20,7 +20,6 @@
 #*                                                                         *
 #***************************************************************************
 
-import ccxFrdReader
 import FreeCAD
 from FEA import FEA
 import FemGui
@@ -158,9 +157,12 @@ class _CommandRunCalculiX:
         fea.reset_mesh_deformation()
         fea.write_inp_file()
         fea.start_ccx()
+        #FIXME non blocking solution required
+        if not fea.ccx_process.waitForFinished():
+            print "ERROR {}".format(fea.results_present)
 
     def IsActive(self):
-        #FIXME - there has to be a better condition here
+        #FIXME - there has to be a better condition here - active analysis required
         return FreeCADGui.ActiveDocument is not None
 
 
@@ -404,7 +406,7 @@ class _JobControlTaskPanel:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             self.base_name = ""
             fea = FEA()
-            fea.write_inp_file(self.working_dir)
+            fea.write_inp_file()
             if fea.base_name != "":
                 self.base_name = fea.base_name
                 self.femConsoleMessage("Write completed.")

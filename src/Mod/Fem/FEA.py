@@ -27,17 +27,22 @@ from PySide import QtCore
 
 
 class FEA:
-    def __init__(self, analysis_object=None):
-        if analysis_object:
-            self.analysis = analysis_object
-        else:
-            self.analysis = FemGui.getActiveAnalysis()
+    def __init__(self, analysis=None):
+        self.update_analysis(analysis)
         if self.analysis:
             self.update_objects()
+        else:
+            print "Analysis not set!"
         self.base_name = ""
         self.results_present = False
         self.setup_working_dir()
         self.setup_ccx()
+
+    def update_analysis(self, analysis=None):
+        if analysis:
+            self.analysis = analysis
+        else:
+            self.analysis = FemGui.getActiveAnalysis()
 
     def purge_results(self):
         for m in self.analysis.Member:
@@ -133,6 +138,7 @@ class FEA:
             QtCore.QDir.setCurrent(cwd)
 
     def setup_ccx(self, ccx_binary=None):
+        print "start_ccx"
         if ccx_binary is None:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -164,7 +170,6 @@ class FEA:
 
     def ccx_started(self):
         self.ccx_status = "started"
-        print "started to self.ccx_status = {}".format(self.ccx_status)
 
     def ccx_state_changed(self, new_state):
         if (new_state == QtCore.QProcess.ProcessState.Starting):
@@ -173,15 +178,13 @@ class FEA:
                 self.ccx_status = "running"
         elif (new_state == QtCore.QProcess.ProcessState.NotRunning):
                 self.ccx_status = "not running"
-        print "changed to self.ccx_status = {}".format(self.ccx_status)
 
-    def ccx_error(self):
+    def ccx_error(self, error):
+        #FIXME error hadling
         self.ccx_status = "error"
-        print "error self.ccx_status = {}".format(self.ccx_status)
 
-    def ccx_finished(self):
+    def ccx_finished(self, exit_code):
         self.ccx_status = "finished"
-        print "finished self.ccx_status = {}".format(self.ccx_status)
         self.load_results()
 
     def load_results(self):
