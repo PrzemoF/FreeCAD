@@ -220,3 +220,19 @@ class FEA:
             self.results_present = True
         else:
             self.results_present = False
+
+    ## returns minimum, average and maximum value for provided result type
+    #  @param self The python object self
+    #  @result_type Type of FEM result, allowed U1, U2, U3, Uabs, Sabs and None
+    def get_stats(self, result_type):
+        stats = (0.0, 0.0, 0.0)
+        for m in self.analysis.Member:
+            if m.isDerivedFrom("Fem::FemResultValue") and m.DataType == 'AnalysisStats':
+                match = {"U1": (m.Values[0], m.Values[1], m.Values[2]),
+                         "U2": (m.Values[3], m.Values[4], m.Values[5]),
+                         "U3": (m.Values[6], m.Values[7], m.Values[8]),
+                         "Uabs": (m.Values[9], m.Values[10], m.Values[11]),
+                         "Sabs": (m.Values[12], m.Values[13], m.Values[14]),
+                         "None": (0.0, 0.0, 0.0)}
+                stats = match[result_type]
+        return stats
