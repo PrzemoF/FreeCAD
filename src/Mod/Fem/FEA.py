@@ -25,7 +25,9 @@ import FreeCAD
 import FemGui
 from PySide import QtCore
 
-
+## FEA - Finite Element Analysis 
+# FEA class handles actions related to FEM analysis like preparing .inp
+# file, running CalculiX, loading results, mesh colour/deformation operations
 class FEA:
     def __init__(self, analysis=None):
         self.update_analysis(analysis)
@@ -46,9 +48,9 @@ class FEA:
 
     def purge_results(self):
         for m in self.analysis.Member:
-            if (m.isDerivedFrom('Fem::FemResultVector') or
-               (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == 'VonMisesStress') or
-               (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == 'AnalysisStats')):
+            if (m.isDerivedFrom("Fem::FemResultVector") or
+               (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == "VonMisesStress") or
+               (m.isDerivedFrom("Fem::FemResultValue") and m.DataType == "AnalysisStats")):
                 FreeCAD.ActiveDocument.removeObject(m.Name)
         self.results_present = False
 
@@ -76,10 +78,10 @@ class FEA:
             self.mesh.ViewObject.setNodeColorByResult(obj, match[result_type])
 
     def update_objects(self):
-        # [{'Object':material}, {}, ...]
-        # [{'Object':fixed_constraints, 'NodeSupports':bool}, {}, ...]
-        # [{'Object':force_constraints, 'NodeLoad':value}, {}, ...
-        # [{'Object':pressure_constraints, 'xxxxxxxx':value}, {}, ...]
+        # [{"Object":material}, {}, ...]
+        # [{"Object":fixed_constraints, "NodeSupports":bool}, {}, ...]
+        # [{"Object":force_constraints, "NodeLoad":value}, {}, ...
+        # [{"Object":pressure_constraints, "xxxxxxxx":value}, {}, ...]
         self.mesh = None
         self.material = []
         self.fixed_constraints = []
@@ -93,26 +95,26 @@ class FEA:
                 self.mesh = m
             elif m.isDerivedFrom("App::MaterialObjectPython"):
                 material_dict = {}
-                material_dict['Object'] = m
+                material_dict["Object"] = m
                 self.material.append(material_dict)
             elif m.isDerivedFrom("Fem::ConstraintFixed"):
                 fixed_constraint_dict = {}
-                fixed_constraint_dict['Object'] = m
+                fixed_constraint_dict["Object"] = m
                 self.fixed_constraints.append(fixed_constraint_dict)
             elif m.isDerivedFrom("Fem::ConstraintForce"):
                 force_constraint_dict = {}
-                force_constraint_dict['Object'] = m
+                force_constraint_dict["Object"] = m
                 self.force_constraints.append(force_constraint_dict)
             elif m.isDerivedFrom("Fem::ConstraintPressure"):
                 PressureObjectDict = {}
-                PressureObjectDict['Object'] = m
+                PressureObjectDict["Object"] = m
                 self.pressure_constraints.append(PressureObjectDict)
-            elif m.isDerivedFrom("Fem::FemResultVector"):
-                if m.DataType == 'Displacement':
+            elif m.isDerivedFrom("Fem::FemResultVector") and m.DataType == "Displacement":
                     self.displacement = m
-            elif m.isDerivedFrom("Fem::FemResultValue"):
-                if m.DataType == 'VonMisesStress':
+            elif m.isDerivedFrom("Fem::FemResultValue") and m.DataType == "VonMisesStress":
                     self.vm_stress = m
+            elif m.isDerivedFrom("Fem::FemResultValue") and m.DataType == "AnalysisStats":
+                    self.stats = m
 
     def check_prerequisites(self):
         self.update_objects()
@@ -136,13 +138,13 @@ class FEA:
 
     def write_inp_file(self):
         self.update_objects()
-        import ccxInpWriter as iw
+        import ccxInpWriter
         import sys
         try:
-            inp_writer = iw.inp_writer(self.analysis, self.mesh, self.material,
-                                       self.fixed_constraints, self.force_constraints,
-                                       self.pressure_constraints)
-            self.base_name = inp_writer.write_calculix_input_file()
+            iw = ccxInpWriter.inp_writer(self.analysis, self.mesh, self.material,
+                                         self.fixed_constraints, self.force_constraints,
+                                         self.pressure_constraints)
+            self.base_name = iw.write_calculix_input_file()
         except:
             print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
             raise
@@ -154,7 +156,7 @@ class FEA:
             cwd = QtCore.QDir.currentPath()
             f = QtCore.QFileInfo(self.base_name)
             QtCore.QDir.setCurrent(f.path())
-            self.ccx_process.start(self.ccx_binary, ['-i', f.baseName()])
+            self.ccx_process.start(self.ccx_binary, ["-i", f.baseName()])
             # Restore previous cwd
             QtCore.QDir.setCurrent(cwd)
 
@@ -166,12 +168,12 @@ class FEA:
                 self.ccx_binary = ccx_binary
             else:
                 from platform import system
-                if system() == 'Linux':
-                    self.ccx_binary = 'ccx'
-                elif system() == 'Windows':
-                    self.ccx_binary = FreeCAD.getHomePath() + 'bin/ccx.exe'
+                if system() == "Linux":
+                    self.ccx_binary = "ccx"
+                elif system() == "Windows":
+                    self.ccx_binary = FreeCAD.getHomePath() + "bin/ccx.exe"
                 else:
-                    self.ccx_binary = 'ccx'
+                    self.ccx_binary = "ccx"
         else:
             self.ccx_binary = ccx_binary
         self.ccx_process = QtCore.QProcess()
@@ -183,7 +185,7 @@ class FEA:
     def setup_working_dir(self, working_dir=None):
         if working_dir is None:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-            self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
+            self.working_dir = self.fem_prefs.GetString("WorkingDir", "/tmp")
         else:
             self.working_dir = working_dir
 
@@ -209,8 +211,8 @@ class FEA:
     def load_results(self):
         import ccxFrdReader
         import os
-        if os.path.isfile(self.base_name + '.frd'):
-            ccxFrdReader.importFrd(self.base_name + '.frd', self.analysis)
+        if os.path.isfile(self.base_name + ".frd"):
+            ccxFrdReader.importFrd(self.base_name + ".frd", self.analysis)
             self.results_present = True
         else:
             self.results_present = False
