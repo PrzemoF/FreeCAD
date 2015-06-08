@@ -156,9 +156,7 @@ class _CommandRunCalculiX:
         fea.purge_results()
         fea.reset_mesh_color()
         fea.reset_mesh_deformation()
-        fea.write_inp_file(self.working_dir)
-        fea.setup_working_dir()
-        fea.setup_ccx()
+        fea.write_inp_file()
         fea.start_ccx()
 
     def IsActive(self):
