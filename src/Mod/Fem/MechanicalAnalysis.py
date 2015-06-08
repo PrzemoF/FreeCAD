@@ -160,6 +160,9 @@ class _CommandRunCalculiX:
         #FIXME non blocking solution required
         if not fea.ccx_process.waitForFinished():
             print "ERROR {}".format(fea.results_present)
+        #FIXME is it safe to call restore_result_dialog like that?
+        taskd = _ResultControlTaskPanel()
+        taskd.restore_result_dialog()
 
     def IsActive(self):
         #FIXME - there has to be a better condition here - active analysis required
@@ -370,6 +373,9 @@ class _JobControlTaskPanel:
         fea.reset_mesh_deformation()
         QApplication.setOverrideCursor(Qt.WaitCursor)
         fea.load_results()
+        #FIXME is it safe to call restore_result_dialog like that?
+        taskd = _ResultControlTaskPanel()
+        taskd.restore_result_dialog()
         QApplication.restoreOverrideCursor()
         if fea.results_present:
             self.femConsoleMessage("Loading results done!", "#00AA00")
@@ -459,8 +465,16 @@ class _JobControlTaskPanel:
         self.femConsoleMessage("CalculiX binary: {}".format(self.CalculixBinary))
         self.femConsoleMessage("Run Calculix...")
         fea = FEA()
+        print fea.check_prerequisites()
         fea.start_ccx()
+        #FIXME non blocking solution required
+        if not fea.ccx_process.waitForFinished():
+            print "ERROR {}".format(fea.results_present)
         QApplication.restoreOverrideCursor()
+
+        #FIXME is it safe to call restore_result_dialog like that?
+        taskd = _ResultControlTaskPanel()
+        taskd.restore_result_dialog()
 
 
 class _ResultControlTaskPanel:
@@ -615,6 +629,7 @@ class _ResultControlTaskPanel:
         self.form.hsb_displacement_factor.setValue(value)
 
     def update(self):
+        print "update of _ResultControlTaskPanel called"
         self.MeshObject = None
         for i in FemGui.getActiveAnalysis().Member:
             if i.isDerivedFrom("Fem::FemMeshObject"):
