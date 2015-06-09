@@ -145,7 +145,7 @@ class _CommandPurgeFemResults:
 
 class _CommandQuickAnalysis:
     def GetResources(self):
-        return {'Pixmap': 'Fem_Run_CalculiX',
+        return {'Pixmap': 'Fem_QuickAnalysis',
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Run CalculiX ccx"),
                 'Accel': "R, C",
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Write .inp file and run CalculiX ccx")}
@@ -165,8 +165,7 @@ class _CommandQuickAnalysis:
         taskd.restore_result_dialog()
 
     def IsActive(self):
-        #FIXME - there has to be a better condition here - active analysis required
-        return FreeCADGui.ActiveDocument is not None
+        return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
 
 
 class _CommandMechanicalShowResult:
