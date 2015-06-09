@@ -1,6 +1,7 @@
 #***************************************************************************
 #*                                                                         *
-#*   Copyright (c) 2015 - Przemo Firszt <przemo@firszt.eu>                 *
+#*   Copyright (c) 2015 - FreeCAD Developers                               *
+#*   Przemo Firszt <przemo@firszt.eu>                                      *
 #*                                                                         *
 #*   This program is free software; you can redistribute it and/or modify  *
 #*   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -121,7 +122,6 @@ class FEA:
                     self.stats = m
 
     def check_prerequisites(self):
-        self.update_objects()
         message = ""
         if not self.analysis:
             message += "No active Analysis\n"
@@ -141,7 +141,6 @@ class FEA:
         return message
 
     def write_inp_file(self):
-        self.update_objects()
         import ccxInpWriter
         import sys
         try:
@@ -165,21 +164,18 @@ class FEA:
             QtCore.QDir.setCurrent(cwd)
 
     def setup_ccx(self, ccx_binary=None):
-        if ccx_binary is None:
+        if not ccx_binary:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
-            if ccx_binary:
-                self.ccx_binary = ccx_binary
+        if not ccx_binary:
+            from platform import system
+            if system() == "Linux":
+                ccx_binary = "ccx"
+            elif system() == "Windows":
+                ccx_binary = FreeCAD.getHomePath() + "bin/ccx.exe"
             else:
-                from platform import system
-                if system() == "Linux":
-                    self.ccx_binary = "ccx"
-                elif system() == "Windows":
-                    self.ccx_binary = FreeCAD.getHomePath() + "bin/ccx.exe"
-                else:
-                    self.ccx_binary = "ccx"
-        else:
-            self.ccx_binary = ccx_binary
+                ccx_binary = "ccx"
+        self.ccx_binary = ccx_binary
         self.ccx_process = QtCore.QProcess()
         QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("started()"), self.ccx_started)
         QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.ccx_state_changed)
@@ -220,6 +216,13 @@ class FEA:
             self.results_present = True
         else:
             self.results_present = False
+
+    def run_calcs(self):
+        if self.check_prerequisites():
+            return False
+        self.write_inp_file()
+        self.start_ccx()
+        return True
 
     ## returns minimum, average and maximum value for provided result type
     #  @param self The python object self

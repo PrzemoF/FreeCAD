@@ -143,12 +143,12 @@ class _CommandPurgeFemResults:
         return FreeCADGui.ActiveDocument is not None and results_present()
 
 
-class _CommandRunCalculiX:
+class _CommandQuickAnalysis:
     def GetResources(self):
         return {'Pixmap': 'Fem_Run_CalculiX',
-                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_RunCalculiX", "Run CalculiX ccx"),
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Run CalculiX ccx"),
                 'Accel': "R, C",
-                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_RunCalculiX", "Write .inp file and run CalculiX ccx")}
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Write .inp file and run CalculiX ccx")}
 
     def Activated(self):
         fea = FEA()
@@ -665,6 +665,6 @@ def results_present():
 FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
 FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
 FreeCADGui.addCommand('Fem_MechanicalJobControl', _CommandMechanicalJobControl())
-FreeCADGui.addCommand('Fem_RunCalculiX', _CommandRunCalculiX())
+FreeCADGui.addCommand('Fem_QuickAnalysis', _CommandQuickAnalysis())
 FreeCADGui.addCommand('Fem_PurgeResults', _CommandPurgeFemResults())
 FreeCADGui.addCommand('Fem_ShowResult', _CommandMechanicalShowResult())
