@@ -1,4 +1,3 @@
-import FemGui
 import FreeCAD
 import os
 import time
@@ -7,6 +6,7 @@ import sys
 
 class inp_writer:
     def __init__(self, analysis_obj, mesh_obj, mat_obj, fixed_obj, force_obj, pressure_obj, dir_name=None):
+        self.analysis_obj = analysis_obj
         self.dir_name = dir_name
         self.mesh_object = mesh_obj
         self.material_objects = mat_obj
@@ -357,7 +357,7 @@ class inp_writer:
         f.write('**   written by    --> FreeCAD ' + FcVersionInfo[0] + '.' + FcVersionInfo[1] + '.' + FcVersionInfo[2] + '\n')
         f.write('**   written on    --> ' + time.ctime() + '\n')
         f.write('**   file name     --> ' + os.path.basename(FreeCAD.ActiveDocument.FileName) + '\n')
-        f.write('**   analysis name --> ' + FemGui.getActiveAnalysis().Name + '\n')
+        f.write('**   analysis name --> ' + self.analysis_obj.Name + '\n')
         f.write('**\n')
         f.write('**\n')
         f.write('**   Units\n')
