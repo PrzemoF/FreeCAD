@@ -20,10 +20,13 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCAD
 from FEA import FEA
+import ccxFrdReader
+import FreeCAD
 import FemGui
 import os
+import sys
+import tempfile
 import time
 
 if FreeCAD.GuiUp:
@@ -126,23 +129,6 @@ class _CommandMechanicalJobControl:
         return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
 
 
-class _CommandPurgeFemResults:
-    def GetResources(self):
-        return {'Pixmap': 'Fem_Purge_Results',
-                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_PurgeResults", "Purge results"),
-                'Accel': "S, S",
-                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_PurgeResults", "Purge results from an analysis")}
-
-    def Activated(self):
-        fea = FEA()
-        fea.purge_results()
-        fea.reset_mesh_color()
-        fea.reset_mesh_deformation()
-
-    def IsActive(self):
-        return FreeCADGui.ActiveDocument is not None and results_present()
-
-
 class _CommandQuickAnalysis:
     def GetResources(self):
         return {'Pixmap': 'Fem_QuickAnalysis',
@@ -155,17 +141,38 @@ class _CommandQuickAnalysis:
         fea.purge_results()
         fea.reset_mesh_color()
         fea.reset_mesh_deformation()
+        message = fea.check_prerequisites()
+        if message:
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", message)
+            return
         fea.write_inp_file()
         fea.start_ccx()
         #FIXME non blocking solution required
         if not fea.ccx_process.waitForFinished():
-            print "ERROR {}".format(fea.results_present)
-        #FIXME is it safe to call restore_result_dialog like that?
-        taskd = _ResultControlTaskPanel()
-        taskd.restore_result_dialog()
+            print "ccx process finished with an error"
+        else:
+            #FIXME is it safe to call restore_result_dialog like that?
+            taskd = _ResultControlTaskPanel()
+            taskd.restore_result_dialog()
 
     def IsActive(self):
         return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
+
+
+class _CommandPurgeFemResults:
+    def GetResources(self):
+        return {'Pixmap': 'Fem_Purge_Results',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_PurgeResults", "Purge results"),
+                'Accel': "S, S",
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_PurgeResults", "Purge results from an analysis")}
+
+    def Activated(self):
+        purge_fem_results()
+        reset_mesh_color()
+        reset_mesh_deformation()
+
+    def IsActive(self):
+        return FreeCADGui.ActiveDocument is not None and results_present()
 
 
 class _CommandMechanicalShowResult:
@@ -262,7 +269,11 @@ class _ViewProviderFemAnalysis:
 
 
 class _JobControlTaskPanel:
-    def __init__(self, analysis_object):
+    '''The editmode TaskPanel for Material objects'''
+    def __init__(self, object):
+        # the panel has a tree widget that contains categories
+        # for the subcomponents, such as additions, subtractions.
+        # the categories are shown only if they are not empty.
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalAnalysis.ui")
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -277,10 +288,12 @@ class _JobControlTaskPanel:
                 self.CalculixBinary = FreeCAD.getHomePath() + 'bin/ccx.exe'
             else:
                 self.CalculixBinary = 'ccx'
-        self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-        self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
+        self.TempDir = FreeCAD.ActiveDocument.TransientDir.replace('\\', '/') + '/FemAnl_' + object.Uid[-4:]
+        if not os.path.isdir(self.TempDir):
+            os.mkdir(self.TempDir)
 
-        self.analysis_object = analysis_object
+        self.obj = object
+        #self.params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         self.Calculix = QtCore.QProcess()
         self.Timer = QtCore.QTimer()
         self.Timer.start(300)
@@ -288,7 +301,7 @@ class _JobControlTaskPanel:
         self.fem_console_message = ''
 
         #Connect Signals and Slots
-        QtCore.QObject.connect(self.form.tb_choose_working_dir, QtCore.SIGNAL("clicked()"), self.choose_working_dir)
+        QtCore.QObject.connect(self.form.toolButton_chooseOutputDir, QtCore.SIGNAL("clicked()"), self.chooseOutputDir)
         QtCore.QObject.connect(self.form.pushButton_write, QtCore.SIGNAL("clicked()"), self.write_input_file_handler)
         QtCore.QObject.connect(self.form.pushButton_edit, QtCore.SIGNAL("clicked()"), self.editCalculixInputFile)
         QtCore.QObject.connect(self.form.pushButton_generate, QtCore.SIGNAL("clicked()"), self.runCalculix)
@@ -366,17 +379,13 @@ class _JobControlTaskPanel:
         print "Loading results...."
         self.femConsoleMessage("Loading result sets...")
         self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
-        fea = FEA()
-        fea.purge_results()
-        fea.reset_mesh_color()
-        fea.reset_mesh_deformation()
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        fea.load_results()
-        #FIXME is it safe to call restore_result_dialog like that?
-        taskd = _ResultControlTaskPanel()
-        taskd.restore_result_dialog()
-        QApplication.restoreOverrideCursor()
-        if fea.results_present:
+        purge_fem_results()
+        reset_mesh_color()
+        reset_mesh_deformation()
+        if os.path.isfile(self.base_name + '.frd'):
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            ccxFrdReader.importFrd(self.base_name + '.frd', FemGui.getActiveAnalysis())
+            QApplication.restoreOverrideCursor()
             self.femConsoleMessage("Loading results done!", "#00AA00")
         else:
             self.femConsoleMessage("Loading results failed! Results file doesn\'t exist", "#FF0000")
@@ -387,7 +396,7 @@ class _JobControlTaskPanel:
 
     def update(self):
         'fills the widgets'
-        self.form.le_working_dir.setText(self.working_dir)
+        self.form.lineEdit_outputDir.setText(tempfile.gettempdir())
         return
 
     def accept(self):
@@ -396,46 +405,86 @@ class _JobControlTaskPanel:
     def reject(self):
         FreeCADGui.Control.closeDialog()
 
-    def choose_working_dir(self):
-        self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-        self.working_dir = QtGui.QFileDialog.getExistingDirectory(None,
-                                                                  'Choose CalculiX working directory',
-                                                                  self.fem_prefs.GetString("WorkingDir", '/tmp'))
-        if self.working_dir:
-            self.fem_prefs.SetString("WorkingDir", str(self.working_dir))
-            self.form.le_working_dir.setText(self.working_dir)
+    def chooseOutputDir(self):
+        print "chooseOutputDir"
+        dirname = QtGui.QFileDialog.getExistingDirectory(None, 'Choose material directory', self.params.GetString("JobDir", '/'))
+        if(dirname):
+            self.params.SetString("JobDir", str(dirname))
+            self.form.lineEdit_outputDir.setText(dirname)
 
     def write_input_file_handler(self):
         QApplication.restoreOverrideCursor()
-        if self.check_prerequisites_helper():
+        if self.check_prerequisites():
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            self.base_name = ""
-            fea = FEA()
-            fea.write_inp_file()
-            if fea.base_name != "":
-                self.base_name = fea.base_name
-                self.femConsoleMessage("Write completed.")
+            try:
+                import ccxInpWriter as iw
+                inp_writer = iw.inp_writer(self.TempDir, self.MeshObject, self.MaterialObjects,
+                                           self.FixedObjects, self.ForceObjects, self.PressureObjects)
+                self.base_name = inp_writer.write_calculix_input_file()
+                if self.base_name != "":
+                    self.femConsoleMessage("Write completed.")
+                else:
+                    self.femConsoleMessage("Write .inp file failed!", "#FF0000")
+            except:
+                print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
+                raise
+            finally:
+                QApplication.restoreOverrideCursor()
+            if self.base_name:
                 self.form.pushButton_edit.setEnabled(True)
                 self.form.pushButton_generate.setEnabled(True)
-            else:
-                self.femConsoleMessage("Write .inp file failed!", "#FF0000")
-            QApplication.restoreOverrideCursor()
 
-    def check_prerequisites_helper(self):
+    def check_prerequisites(self):
         self.Start = time.time()
         self.femConsoleMessage("Check dependencies...")
         self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
-        fea = FEA()
-        self.MeshObject = fea.mesh
-        self.MaterialObjects = fea.material
-        self.FixedObjects = fea.fixed_constraints
-        self.ForceObjects = fea.force_constraints
-        self.PressureObjects = fea.pressure_constraints
-        fea.setup_ccx()
-        fea.setup_working_dir()
-        message = fea.check_prerequisites()
-        if message != "":
-            QtGui.QMessageBox.critical(None, "Missing prerequisit(s)", message)
+        self.MeshObject = None
+        # [{'Object':MaterialObject}, {}, ...]
+        self.MaterialObjects = []
+        # [{'Object':FixedObject, 'NodeSupports':bool}, {}, ...]
+        self.FixedObjects = []
+        # [{'Object':ForceObject, 'NodeLoad':value}, {}, ...
+        self.ForceObjects = []
+        # [{'Object':PressureObject, 'xxxxxxxx':value}, {}, ...]
+        self.PressureObjects = []
+        if not FemGui.getActiveAnalysis():
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No active Analysis")
+            return False
+
+        for i in FemGui.getActiveAnalysis().Member:
+            if i.isDerivedFrom("Fem::FemMeshObject"):
+                self.MeshObject = i
+            elif i.isDerivedFrom("App::MaterialObjectPython"):
+                MaterialObjectDict = {}
+                MaterialObjectDict['Object'] = i
+                self.MaterialObjects.append(MaterialObjectDict)
+            elif i.isDerivedFrom("Fem::ConstraintFixed"):
+                FixedObjectDict = {}
+                FixedObjectDict['Object'] = i
+                self.FixedObjects.append(FixedObjectDict)
+            elif i.isDerivedFrom("Fem::ConstraintForce"):
+                ForceObjectDict = {}
+                ForceObjectDict['Object'] = i
+                self.ForceObjects.append(ForceObjectDict)
+            elif i.isDerivedFrom("Fem::ConstraintPressure"):
+                PressureObjectDict = {}
+                PressureObjectDict['Object'] = i
+                self.PressureObjects.append(PressureObjectDict)
+
+        if not self.MeshObject:
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No mesh object in the Analysis")
+            return False
+
+        if not self.MaterialObjects:
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No material object in the Analysis")
+            return False
+
+        if not self.FixedObjects:
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No fixed-constraint nodes defined in the Analysis")
+            return False
+
+        if not (self.ForceObjects or self.PressureObjects):
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No force-constraint or pressure-constraint defined in the Analysis")
             return False
         return True
 
@@ -461,27 +510,26 @@ class _JobControlTaskPanel:
     def runCalculix(self):
         print 'runCalculix'
         self.Start = time.time()
+
         self.femConsoleMessage("CalculiX binary: {}".format(self.CalculixBinary))
         self.femConsoleMessage("Run Calculix...")
-        fea = FEA()
-        print fea.check_prerequisites()
-        fea.start_ccx()
-        #FIXME non blocking solution required
-        if not fea.ccx_process.waitForFinished():
-            print "ERROR {}".format(fea.results_present)
-        QApplication.restoreOverrideCursor()
 
-        #FIXME is it safe to call restore_result_dialog like that?
-        taskd = _ResultControlTaskPanel()
-        taskd.restore_result_dialog()
+        # run Calculix
+        print 'run Calculix at: ', self.CalculixBinary, '  with: ', self.base_name
+        # change cwd because ccx may crash if directory has no write permission
+        # there is also a limit of the length of file names so jump to the document directory
+        self.cwd = QtCore.QDir.currentPath()
+        fi = QtCore.QFileInfo(self.base_name)
+        QtCore.QDir.setCurrent(fi.path())
+        self.Calculix.start(self.CalculixBinary, ['-i', fi.baseName()])
+
+        QApplication.restoreOverrideCursor()
 
 
 class _ResultControlTaskPanel:
     '''The control for the displacement post-processing'''
-    def __init__(self):  # , object):
+    def __init__(self):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/ShowDisplacement.ui")
-
-        #self.obj = object
 
         #Connect Signals and Slots
         QtCore.QObject.connect(self.form.rb_none, QtCore.SIGNAL("toggled(bool)"), self.none_selected)
@@ -558,8 +606,7 @@ class _ResultControlTaskPanel:
     def none_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "None"
         self.set_result_stats("mm", 0.0, 0.0, 0.0)
-        fea = FEA()
-        fea.reset_mesh_color()
+        reset_mesh_color()
 
     def abs_displacement_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "Uabs"
@@ -628,7 +675,6 @@ class _ResultControlTaskPanel:
         self.form.hsb_displacement_factor.setValue(value)
 
     def update(self):
-        print "update of _ResultControlTaskPanel called"
         self.MeshObject = None
         for i in FemGui.getActiveAnalysis().Member:
             if i.isDerivedFrom("Fem::FemMeshObject"):
@@ -646,7 +692,6 @@ class _ResultControlTaskPanel:
     def reject(self):
         FreeCADGui.Control.closeDialog()
 
-
 # Helpers
 
 
@@ -660,6 +705,35 @@ def results_present():
             results = True
     return results
 
+
+def purge_fem_results(Analysis=None):
+    if Analysis is None:
+        analysis_members = FemGui.getActiveAnalysis().Member
+    else:
+        analysis_members = FemGui.Analysis().Member
+    for o in analysis_members:
+        if (o.isDerivedFrom('Fem::FemResultVector') or
+           (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'VonMisesStress') or
+           (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'AnalysisStats')):
+            FreeCAD.ActiveDocument.removeObject(o.Name)
+
+
+def reset_mesh_color(mesh=None):
+    if mesh is None:
+        for i in FemGui.getActiveAnalysis().Member:
+            if i.isDerivedFrom("Fem::FemMeshObject"):
+                mesh = i
+    mesh.ViewObject.NodeColor = {}
+    mesh.ViewObject.ElementColor = {}
+    mesh.ViewObject.setNodeColorByResult()
+
+
+def reset_mesh_deformation(mesh=None):
+    if mesh is None:
+        for i in FemGui.getActiveAnalysis().Member:
+            if i.isDerivedFrom("Fem::FemMeshObject"):
+                mesh = i
+    mesh.ViewObject.applyDisplacement(0.0)
 
 FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
 FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())

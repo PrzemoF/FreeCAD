@@ -163,6 +163,13 @@ class FEA:
             # Restore previous cwd
             QtCore.QDir.setCurrent(cwd)
 
+    def setup_working_dir(self, working_dir=None):
+        if working_dir is None:
+            self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+            self.working_dir = self.fem_prefs.GetString("WorkingDir", "/tmp")
+        else:
+            self.working_dir = working_dir
+
     def setup_ccx(self, ccx_binary=None):
         if not ccx_binary:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
@@ -182,13 +189,6 @@ class FEA:
         QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("error(QProcess::ProcessError)"), self.ccx_error)
         QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
 
-    def setup_working_dir(self, working_dir=None):
-        if working_dir is None:
-            self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-            self.working_dir = self.fem_prefs.GetString("WorkingDir", "/tmp")
-        else:
-            self.working_dir = working_dir
-
     def ccx_started(self):
         self.ccx_status = "started"
 
@@ -203,10 +203,15 @@ class FEA:
     def ccx_error(self, error):
         #FIXME error hadling
         self.ccx_status = "error"
+        print "ccx_error {}".format(error)
 
     def ccx_finished(self, exit_code):
         self.ccx_status = "finished"
+        print "ccx_finished {}".format(exit_code)
         self.load_results()
+
+    def ccx_read_stdout(self):
+        return self.ccx_process.readAllStandardOutput()
 
     def load_results(self):
         import ccxFrdReader
