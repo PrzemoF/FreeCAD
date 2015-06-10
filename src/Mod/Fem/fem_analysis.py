@@ -24,6 +24,7 @@
 
 import FreeCAD
 import FemGui
+from multiprocessing import Process
 from PySide import QtCore
 
 ## fem_analysis - Finite Element Method Analysis
@@ -34,16 +35,23 @@ from PySide import QtCore
 # to use fem_analysis - currently there is significant functionality overlap
 
 
-class fem_analysis:
+class fem_analysis(Process):
 
     def __init__(self, analysis=None):
 
+        super(fem_analysis, self).__init__()
         self.set_analysis(analysis)
         self.update_objects()
         self.base_name = ""
         self.results_present = False
         self.setup_working_dir()
         self.setup_ccx()
+
+    def run(self):
+        print "starting multithread write_inp_file"
+        self.write_inp_file()
+        #self.start_ccx()
+        print "finished multithread write_inp_file"
 
     def set_analysis(self, analysis=None):
         if analysis:
@@ -147,13 +155,23 @@ class fem_analysis:
         import ccxInpWriter
         import sys
         try:
+            self.inp_status = "running"
+            print "inp running"
             iw = ccxInpWriter.inp_writer(self.analysis, self.mesh, self.material,
                                          self.fixed_constraints, self.force_constraints,
                                          self.pressure_constraints)
             self.base_name = iw.write_calculix_input_file()
+            print "inp succeded"
+            self.inp_status = "succeded"
         except:
+            self.inp_status = "failed"
+            print "inp failed"
             print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
             raise
+        finally:
+            self.inp_status = "finished"
+            print "iw_process finished"
+            print self.base_name
 
     def start_ccx(self):
         # change cwd because ccx may crash if directory has no write permission

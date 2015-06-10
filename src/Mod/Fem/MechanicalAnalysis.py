@@ -145,9 +145,8 @@ class _CommandQuickAnalysis:
         if message:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", message)
             return
-        self.fea.write_inp_file()
-        QtCore.QObject.connect(self.fea.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
-        self.fea.start_ccx()
+        #QtCore.QObject.connect(self.fea.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
+        self.fea.start()
 
     def ccx_finished(self, exit_code):
         #FIXME proprer mesh freshing as per FreeCAD.FEM_dialog settings required
