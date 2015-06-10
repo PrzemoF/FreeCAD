@@ -13,7 +13,7 @@ INSTALL(
         ccxFrdReader.py
         ccxInpWriter.py
         FemExample.py
-        FEA.py
+        fem_analysis.py
         MechanicalAnalysis.py
         MechanicalMaterial.py
         MechanicalMaterial.ui

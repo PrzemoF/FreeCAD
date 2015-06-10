@@ -71,7 +71,7 @@ SET(FemScripts_SRCS
     convert2TetGen.py
     ccxFrdReader.py
     ccxInpWriter.py
-    FEA.py
+    fem_analysis.py
     MechanicalAnalysis.ui
     MechanicalAnalysis.py
     MechanicalMaterial.ui

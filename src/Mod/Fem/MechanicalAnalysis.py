@@ -20,7 +20,7 @@
 #*                                                                         *
 #***************************************************************************
 
-from FEA import FEA
+from fem_analysis import fem_analysis
 import ccxFrdReader
 import FreeCAD
 import FemGui
@@ -137,7 +137,7 @@ class _CommandQuickAnalysis:
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Write .inp file and run CalculiX ccx")}
 
     def Activated(self):
-        fea = FEA()
+        fea = fem_analysis()
         fea.purge_results()
         fea.reset_mesh_color()
         fea.reset_mesh_deformation()
