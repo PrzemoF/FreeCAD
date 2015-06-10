@@ -137,23 +137,41 @@ class _CommandQuickAnalysis:
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Write .inp file and run CalculiX ccx")}
 
     def Activated(self):
-        fea = fem_analysis()
-        fea.purge_results()
-        fea.reset_mesh_color()
-        fea.reset_mesh_deformation()
-        message = fea.check_prerequisites()
+        self.fea = fem_analysis()
+        self.fea.purge_results()
+        self.fea.reset_mesh_color()
+        self.fea.reset_mesh_deformation()
+        message = self.fea.check_prerequisites()
         if message:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", message)
             return
-        fea.write_inp_file()
-        fea.start_ccx()
-        #FIXME non blocking solution required
-        if not fea.ccx_process.waitForFinished():
-            print "ccx process finished with an error"
-        else:
-            #FIXME is it safe to call restore_result_dialog like that?
-            taskd = _ResultControlTaskPanel()
-            taskd.restore_result_dialog()
+        self.fea.write_inp_file()
+        QtCore.QObject.connect(self.fea.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
+        self.fea.start_ccx()
+
+    def ccx_finished(self, exit_code):
+        #FIXME proprer mesh freshing as per FreeCAD.FEM_dialog settings required
+        # or confirmation that it's safe to call restore_result_dialog
+        ##taskd = _ResultControlTaskPanel()
+        ##taskd.restore_result_dialog()
+
+        rctp = _ResultControlTaskPanel()
+        rt = FreeCAD.FEM_dialog["results_type"]
+        if rt == "None":
+            rctp.none_selected(True)
+        elif rt == "Uabs":
+            rctp.abs_displacement_selected(True)
+        elif rt == "U1":
+            rctp.x_displacement_selected(True)
+        elif rt == "U2":
+            rctp.y_displacement_selected(True)
+        elif rt == "U3":
+            rctp.z_displacement_selected(True)
+        elif rt == "Sabs":
+            rctp.vm_stress_selected(True)
+
+        sd = FreeCAD.FEM_dialog["show_disp"]
+        rctp.show_displacement(sd)
 
     def IsActive(self):
         return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
