@@ -26,12 +26,15 @@ import FreeCAD
 import FemGui
 from PySide import QtCore
 
-## FEA - Finite Element Analysis
-# FEA class handles actions related to FEM analysis like preparing .inp
+## fem_analysis - Finite Element Method Analysis
+# fem_analysis class handles actions related to FEM analysis like preparing .inp
 # file, running CalculiX, loading results, mesh colour/deformation operations
+# It's a toolbox that can be used for easy scripting of FEM calculations
+# All non GUI related features of MechanicalAnalysis.py will be migrated
+# to use fem_analysis - currently there is significant functionality overlap
 
 
-class FEA:
+class fem_analysis:
 
     def __init__(self, analysis=None):
 
