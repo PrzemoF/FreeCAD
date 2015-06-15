@@ -7,8 +7,7 @@
 #include <App/DocumentObjectPy.h>
 
 #include "Mod/Fem/Gui/ViewProviderFemMesh.h"
-#include "Mod/Fem/App/FemResultVector.h"
-#include "Mod/Fem/App/FemResultValue.h"
+#include "Mod/Fem/App/FemResultObject.h"
 
 // inclusion of the generated files (generated out of ViewProviderFemMeshPy.xml)
 #include "ViewProviderFemMeshPy.h"
@@ -58,47 +57,61 @@ App::Color calcColor(double value,double min, double max)
 }
 
 
-PyObject* ViewProviderFemMeshPy::setNodeColorByResult(PyObject *args)
+PyObject* ViewProviderFemMeshPy::setNodeColorByStress(PyObject *args)
 {
-	// statistical values get collected and returned
-	double max = -1e12;
+    double max = -1e12;
     double min = +1e12;
-	double avg = 0;
-
+    double avg = 0;
     PyObject *object=0;
-    int type = 0;
-    if (PyArg_ParseTuple(args,"O!|i",&(App::DocumentObjectPy::Type), &object, &type)) {
+
+    if (PyArg_ParseTuple(args,"O!",&(App::DocumentObjectPy::Type), &object)) {
         App::DocumentObject* obj = static_cast<App::DocumentObjectPy*>(object)->getDocumentObjectPtr();
-        if (obj && obj->getTypeId().isDerivedFrom(Fem::FemResultValue::getClassTypeId())){
-            Fem::FemResultValue *result = static_cast<Fem::FemResultValue*>(obj);
+        if (obj && obj->getTypeId().isDerivedFrom(Fem::FemResultObject::getClassTypeId())){
+            Fem::FemResultObject *result = static_cast<Fem::FemResultObject*>(obj);
             const std::vector<long> & Ids = result->ElementNumbers.getValues() ;
-            const std::vector<double> & Vals = result->Values.getValues() ;
+            const std::vector<double> & Vals = result->StressValues.getValues() ;
             std::vector<App::Color> NodeColors(Vals.size());
-			for(std::vector<double>::const_iterator it= Vals.begin();it!=Vals.end();++it){
+            for(std::vector<double>::const_iterator it= Vals.begin();it!=Vals.end();++it){
                 if(*it > max)
                     max = *it;
                 if(*it < min)
                     min = *it;
-				avg += *it;
-			}
-			avg /= Vals.size();
+                avg += *it;
+            }
+            avg /= Vals.size();
 
             // fill up color vector
             long i=0;
             for(std::vector<double>::const_iterator it= Vals.begin();it!=Vals.end();++it,i++)
                 NodeColors[i] = calcColor(*it,0.0,max);    
-          
+
             // set the color to the view-provider 
             this->getViewProviderFemMeshPtr()->setColorByNodeId(Ids,NodeColors);
+        } else {
+            PyErr_SetString(Base::BaseExceptionFreeCADError, "Argument has to be a ResultObject!");
+            return 0;
+        }
+    }
+    Py_Return;
+}
 
+PyObject* ViewProviderFemMeshPy::setNodeColorByDisplacement(PyObject *args)
+{
+    double max = -1e12;
+    double min = +1e12;
+    double avg = 0;
+    PyObject *object=0;
+    int type = 0;
 
-        }else if (obj && obj->getTypeId().isDerivedFrom(Fem::FemResultVector::getClassTypeId())){
-            Fem::FemResultVector *result = static_cast<Fem::FemResultVector*>(obj);
+    if (PyArg_ParseTuple(args,"O!|i",&(App::DocumentObjectPy::Type), &object, &type)) {
+        App::DocumentObject* obj = static_cast<App::DocumentObjectPy*>(object)->getDocumentObjectPtr();
+        if (obj && obj->getTypeId().isDerivedFrom(Fem::FemResultObject::getClassTypeId())){
+            Fem::FemResultObject *result = static_cast<Fem::FemResultObject*>(obj);
             const std::vector<long> & Ids = result->ElementNumbers.getValues() ;
-            const std::vector<Base::Vector3d> & Vecs = result->Values.getValues() ;
+            const std::vector<Base::Vector3d> & Vecs = result->DisplacementVectors.getValues() ;
             std::vector<App::Color> NodeColors(Vecs.size());
 
-			for(std::vector<Base::Vector3d>::const_iterator it= Vecs.begin();it!=Vecs.end();++it){
+            for(std::vector<Base::Vector3d>::const_iterator it= Vecs.begin();it!=Vecs.end();++it){
                 double val;
                 if(type == 0)
                     val = it->Length();
@@ -115,9 +128,9 @@ PyObject* ViewProviderFemMeshPy::setNodeColorByResult(PyObject *args)
                     max = val;
                 if(val < min)
                     min = val;
-				avg += val;
+                avg += val;
             }
-			avg /= Vecs.size();
+            avg /= Vecs.size();
 
             // fill up color vector
             long i=0;
@@ -135,21 +148,12 @@ PyObject* ViewProviderFemMeshPy::setNodeColorByResult(PyObject *args)
 
             // set the color to the view-provider 
             this->getViewProviderFemMeshPtr()->setColorByNodeId(Ids,NodeColors);
-
-
-        }else{
-            PyErr_SetString(Base::BaseExceptionFreeCADError, "Argument has to be a ResultValue or ResultVector!");
+        } else {
+            PyErr_SetString(Base::BaseExceptionFreeCADError, "Argument has to be a ResultObject!");
             return 0;
         }
     }
-
-	Py::Tuple res(3);
-	res[0] = Py::Float(min);
-	res[1] = Py::Float(max);
-	res[2] = Py::Float(avg);
-
-	return Py::new_reference_to(res);
-
+    Py_Return;
 }
 
 PyObject* ViewProviderFemMeshPy::setNodeDisplacementByResult(PyObject *args)
@@ -157,23 +161,20 @@ PyObject* ViewProviderFemMeshPy::setNodeDisplacementByResult(PyObject *args)
     PyObject *object=0;
     if (PyArg_ParseTuple(args,"O!",&(App::DocumentObjectPy::Type), &object)) {
         App::DocumentObject* obj = static_cast<App::DocumentObjectPy*>(object)->getDocumentObjectPtr();
-        if (obj && obj->getTypeId().isDerivedFrom(Fem::FemResultVector::getClassTypeId())){
-            Fem::FemResultVector *result = static_cast<Fem::FemResultVector*>(obj);
+        if (obj && obj->getTypeId().isDerivedFrom(Fem::FemResultObject::getClassTypeId())){
+            Fem::FemResultObject *result = static_cast<Fem::FemResultObject*>(obj);
             const std::vector<long> & Ids = result->ElementNumbers.getValues() ;
-            const std::vector<Base::Vector3d> & Vecs = result->Values.getValues() ;
+            const std::vector<Base::Vector3d> & Vecs = result->DisplacementVectors.getValues() ;
             // set the displacement to the view-provider 
             this->getViewProviderFemMeshPtr()->setDisplacementByNodeId(Ids,Vecs);
-
-
-        }else{
-            PyErr_SetString(Base::BaseExceptionFreeCADError, "Argument has to be a ResultVector!");
+        } else {
+            PyErr_SetString(Base::BaseExceptionFreeCADError, "Argument has to be a ResultObject!");
             return 0;
         }
     }
-
     Py_Return;
-
 }
+
 Py::Dict ViewProviderFemMeshPy::getNodeColor(void) const
 {
     //return Py::List();

@@ -20,9 +20,14 @@
         <UserDocu></UserDocu>
       </Documentation>
     </Methode>
-      <Methode Name="setNodeColorByResult">
+      <Methode Name="setNodeColorByDisplacement">
           <Documentation>
-              <UserDocu></UserDocu>
+              <UserDocu>Sets mesh node colors using Displacement vectors from provided FEM result object. See MechanicalAnalysis.py for type details</UserDocu>
+          </Documentation>
+      </Methode>
+      <Methode Name="setNodeColorByStress">
+          <Documentation>
+              <UserDocu>Sets mesh node colors using Stress values from provided FEM result object</UserDocu>
           </Documentation>
       </Methode>
       <Methode Name="setNodeDisplacementByResult">
