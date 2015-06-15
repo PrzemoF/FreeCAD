@@ -50,6 +50,8 @@ public:
     App::PropertyIntegerList ElementNumbers;
     /// Link to the corosbonding mesh
     App::PropertyLink Mesh;
+    /// Stats of an analysis
+    App::PropertyFloatList Stats;
 
     /// returns the type name of the ViewProvider
     virtual const char* getViewProviderName(void) const {

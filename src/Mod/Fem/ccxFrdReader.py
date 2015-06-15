@@ -199,14 +199,13 @@ def importFrd(filename, Analysis=None):
         a_max = max(disp_abs)
         a_min = min(disp_abs)
         a_avg = sum(disp_abs) / l
-        stats = FreeCAD.ActiveDocument.addObject('Fem::FemResultValue', 'AnalysisStats')
-        stats.Values = [x_min, x_avg, x_max,
-                        y_min, y_avg, y_max,
-                        z_min, z_avg, z_max,
-                        a_min, a_avg, a_max,
-                        s_min, s_avg, s_max]
-        stats.DataType = 'AnalysisStats'
-        stats.ElementNumbers = len(stats.Values)
+        stats = FreeCAD.ActiveDocument.addObject('Fem::FemResultObject', 'Results')
+        stats.Stats = [x_min, x_avg, x_max,
+                       y_min, y_avg, y_max,
+                       z_min, z_avg, z_max,
+                       a_min, a_avg, a_max,
+                       s_min, s_avg, s_max]
+        stats.ElementNumbers = len(stats.Stats)
         AnalysisObject.Member = AnalysisObject.Member + [stats]
 
         if(FreeCAD.GuiUp):

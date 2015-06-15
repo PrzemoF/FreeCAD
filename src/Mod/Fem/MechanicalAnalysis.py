@@ -563,15 +563,14 @@ class _ResultControlTaskPanel:
         if analysis is None:
             analysis = FemGui.getActiveAnalysis()
         for i in analysis.Member:
-            if i.isDerivedFrom("Fem::FemResultValue"):
-                if i.DataType == 'AnalysisStats':
-                    match_table = {"U1": (i.Values[0], i.Values[1], i.Values[2]),
-                                   "U2": (i.Values[3], i.Values[4], i.Values[5]),
-                                   "U3": (i.Values[6], i.Values[7], i.Values[8]),
-                                   "Uabs": (i.Values[9], i.Values[10], i.Values[11]),
-                                   "Sabs": (i.Values[12], i.Values[13], i.Values[14]),
-                                   "None": (0.0, 0.0, 0.0)}
-                    return match_table[type_name]
+            if (i.isDerivedFrom("Fem::FemResultObject")) and ("Stats" in i.PropertiesList):
+                match_table = {"U1": (i.Stats[0], i.Stats[1], i.Stats[2]),
+                               "U2": (i.Stats[3], i.Stats[4], i.Stats[5]),
+                               "U3": (i.Stats[6], i.Stats[7], i.Stats[8]),
+                               "Uabs": (i.Stats[9], i.Stats[10], i.Stats[11]),
+                               "Sabs": (i.Stats[12], i.Stats[13], i.Stats[14]),
+                               "None": (0.0, 0.0, 0.0)}
+                return match_table[type_name]
         return (0.0, 0.0, 0.0)
 
     def none_selected(self, state):
@@ -685,7 +684,7 @@ def purge_fem_results(Analysis=None):
     for o in analysis_members:
         if (o.isDerivedFrom('Fem::FemResultVector') or
            (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'VonMisesStress') or
-           (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'AnalysisStats')):
+           o.isDerivedFrom("Fem::FemResultObject")):
             FreeCAD.ActiveDocument.removeObject(o.Name)
 
 
