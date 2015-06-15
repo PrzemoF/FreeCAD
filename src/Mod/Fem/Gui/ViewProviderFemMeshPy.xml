@@ -20,7 +20,12 @@
         <UserDocu></UserDocu>
       </Documentation>
     </Methode>
-      <Methode Name="setNodeColorByResult">
+      <Methode Name="setNodeColorByDisplacement">
+          <Documentation>
+              <UserDocu></UserDocu>
+          </Documentation>
+      </Methode>
+      <Methode Name="setNodeColorByStress">
           <Documentation>
               <UserDocu></UserDocu>
           </Documentation>

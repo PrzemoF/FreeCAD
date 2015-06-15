@@ -43,15 +43,17 @@ public:
     virtual ~FemResultObject();
 
     /// Data type specifier of the data stored in this object
-    App::PropertyString DataType;
+    //App::PropertyString DataType;
     /// Unit and factor of the values
-    App::PropertyQuantity Unit;
+    //App::PropertyQuantity Unit;
     /// List of element numbers in this result object
     App::PropertyIntegerList ElementNumbers;
     /// Link to the corosbonding mesh
     App::PropertyLink Mesh;
     /// Stats of an analysis
     App::PropertyFloatList Stats;
+    App::PropertyVectorList DisplacementVectors;
+    App::PropertyFloatList StressValues;
 
     /// returns the type name of the ViewProvider
     virtual const char* getViewProviderName(void) const {
