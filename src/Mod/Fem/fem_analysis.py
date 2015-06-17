@@ -158,11 +158,22 @@ class fem_analysis:
     def start_ccx(self):
         # change cwd because ccx may crash if directory has no write permission
         # there is also a limit of the length of file names so jump to the document directory
+        import subprocess
         if self.base_name != "":
             cwd = QtCore.QDir.currentPath()
             f = QtCore.QFileInfo(self.base_name)
             QtCore.QDir.setCurrent(f.path())
-            self.ccx_process.start(self.ccx_binary, ["-i", f.baseName()])
+            print f.baseName()
+            print f.path()
+            #self.ccx_process.start(self.ccx_binary, ["-i", f.baseName()])
+            p = subprocess.Popen([self.ccx_binary, "-i ", f.baseName()],
+                                 shell=False,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+
+            self.ccx_stdout, self.ccx_stderr = p.communicate()
+
+            #self.ccx_process.start(self.ccx_binary, ["-i", f.baseName()])
             # Restore previous cwd
             QtCore.QDir.setCurrent(cwd)
 
@@ -174,6 +185,7 @@ class fem_analysis:
             self.working_dir = working_dir
 
     def setup_ccx(self, ccx_binary=None):
+        import threading
         if not ccx_binary:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -186,32 +198,35 @@ class fem_analysis:
             else:
                 ccx_binary = "ccx"
         self.ccx_binary = ccx_binary
-        self.ccx_process = QtCore.QProcess()
-        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("started()"), self.ccx_started)
-        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.ccx_state_changed)
-        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("error(QProcess::ProcessError)"), self.ccx_error)
-        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
+#http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
+        self.ccx_thread = threading.Thread(target=self.execute_calcs)
+#        self.ccx_thread.daemon = True
+#        self.ccx_process = QtCore.QProcess()
+#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("started()"), self.ccx_started)
+#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.ccx_state_changed)
+#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("error(QProcess::ProcessError)"), self.ccx_error)
+#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
 
-    def ccx_started(self):
-        self.ccx_status = "started"
+#    def ccx_started(self):
+#        self.ccx_status = "started"
 
-    def ccx_state_changed(self, new_state):
-        if (new_state == QtCore.QProcess.ProcessState.Starting):
-                self.ccx_status = "starting"
-        elif (new_state == QtCore.QProcess.ProcessState.Running):
-                self.ccx_status = "running"
-        elif (new_state == QtCore.QProcess.ProcessState.NotRunning):
-                self.ccx_status = "not running"
+#    def ccx_state_changed(self, new_state):
+#        if (new_state == QtCore.QProcess.ProcessState.Starting):
+#                self.ccx_status = "starting"
+#        elif (new_state == QtCore.QProcess.ProcessState.Running):
+#                self.ccx_status = "running"
+#        elif (new_state == QtCore.QProcess.ProcessState.NotRunning):
+#                self.ccx_status = "not running"
 
-    def ccx_error(self, error):
-        #FIXME error hadling
-        self.ccx_status = "error"
-        print "ccx_error {}".format(error)
+#    def ccx_error(self, error):
+#        #FIXME error hadling
+#        self.ccx_status = "error"
+#        print "ccx_error {}".format(error)
 
-    def ccx_finished(self, exit_code):
-        self.ccx_status = "finished"
-        print "ccx_finished {}".format(exit_code)
-        self.load_results()
+#    def ccx_finished(self, exit_code):
+#        self.ccx_status = "finished"
+#        print "ccx_finished {}".format(exit_code)
+#        self.load_results()
 
     def ccx_read_stdout(self):
         return self.ccx_process.readAllStandardOutput()
@@ -225,12 +240,24 @@ class fem_analysis:
         else:
             self.results_present = False
 
-    def run_calcs(self):
+    def execute_calcs(self):
+        print "execute_calcs 1"
         if self.check_prerequisites():
+            print "execute_calcs 2"
             return False
+        print "execute_calcs 3"
         self.write_inp_file()
+        print "execute_calcs 4"
         self.start_ccx()
+        print "execute_calcs 5"
+        self.load_results()
+        print "execute_calcs 6"
+        self.ccx_thread = None
         return True
+
+    def run(self):
+        print "starting thread"
+        self.ccx_thread.start()
 
     ## returns minimum, average and maximum value for provided result type
     #  @param self The python object self
