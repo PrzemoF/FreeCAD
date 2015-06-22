@@ -185,7 +185,7 @@ class fem_analysis:
             self.working_dir = working_dir
 
     def setup_ccx(self, ccx_binary=None):
-        import threading
+        #import threading
         if not ccx_binary:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -199,7 +199,7 @@ class fem_analysis:
                 ccx_binary = "ccx"
         self.ccx_binary = ccx_binary
 #http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
-        self.ccx_thread = threading.Thread(target=self.execute_calcs)
+#        self.ccx_thread = threading.Thread(target=self.execute_calcs)
 #        self.ccx_thread.daemon = True
 #        self.ccx_process = QtCore.QProcess()
 #        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("started()"), self.ccx_started)
@@ -242,9 +242,9 @@ class fem_analysis:
 
     def execute_calcs(self):
         print "execute_calcs 1"
-        if self.check_prerequisites():
-            print "execute_calcs 2"
-            return False
+        #if self.check_prerequisites():
+        #    print "execute_calcs 2"
+        #    return False
         print "execute_calcs 3"
         self.write_inp_file()
         print "execute_calcs 4"
@@ -252,12 +252,12 @@ class fem_analysis:
         print "execute_calcs 5"
         self.load_results()
         print "execute_calcs 6"
-        self.ccx_thread = None
+        #self.ccx_thread = None
         return True
 
-    def run(self):
-        print "starting thread"
-        self.ccx_thread.start()
+#    def run(self):
+#        print "starting thread"
+#        self.ccx_thread.start()
 
     ## returns minimum, average and maximum value for provided result type
     #  @param self The python object self

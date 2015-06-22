@@ -20,8 +20,12 @@ class inp_writer:
         self.base_name = self.dir_name + '/' + self.mesh_object.Name
         self.file_name = self.base_name + '.inp'
         print 'CalculiX .inp file will be written to: ', self.file_name
+        from FreeCAD import Base
+        self.progress_bar = Base.ProgressIndicator()
+        self.progress_bar.start("Writing .inp file...", 11)
 
     def write_calculix_input_file(self):
+        import time
         print 'write_calculix_input_file'
         self.mesh_object.FemMesh.writeABAQUS(self.file_name)
 
@@ -29,17 +33,40 @@ class inp_writer:
         inpfile = open(self.file_name, 'a')
         inpfile.write('\n\n')
         self.write_material_element_sets(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_fixed_node_sets(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_load_node_sets(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_materials(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_step_begin(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_constraints_fixed(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_constraints_force(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_face_load(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_outputs_types(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_step_end(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         self.write_footer(inpfile)
+        self.progress_bar.next()
+        time.sleep(1)
         inpfile.close()
+        self.progress_bar.stop()
         return self.base_name
 
     def write_material_element_sets(self, f):

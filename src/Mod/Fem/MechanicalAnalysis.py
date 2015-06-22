@@ -145,9 +145,10 @@ class _CommandQuickAnalysis:
         if message:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", message)
             return
-        self.fea.write_inp_file()
-        QtCore.QObject.connect(self.fea.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
-        self.fea.start_ccx()
+        #self.fea.write_inp_file()
+        #QtCore.QObject.connect(self.fea.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
+        #self.fea.start_ccx()
+        self.fea.execute_calcs()
 
     def ccx_finished(self, exit_code):
         #FIXME proprer mesh freshing as per FreeCAD.FEM_dialog settings required
@@ -319,7 +320,7 @@ class _JobControlTaskPanel:
         self.fem_console_message = ''
 
         #Connect Signals and Slots
-        QtCore.QObject.connect(self.form.toolButton_chooseOutputDir, QtCore.SIGNAL("clicked()"), self.chooseOutputDir)
+        QtCore.QObject.connect(self.form.tb_choose_working_dir, QtCore.SIGNAL("clicked()"), self.chooseOutputDir)
         QtCore.QObject.connect(self.form.pushButton_write, QtCore.SIGNAL("clicked()"), self.write_input_file_handler)
         QtCore.QObject.connect(self.form.pushButton_edit, QtCore.SIGNAL("clicked()"), self.editCalculixInputFile)
         QtCore.QObject.connect(self.form.pushButton_generate, QtCore.SIGNAL("clicked()"), self.runCalculix)
