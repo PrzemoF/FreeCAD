@@ -137,7 +137,13 @@ class _CommandQuickAnalysis:
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Write .inp file and run CalculiX ccx")}
 
     def Activated(self):
+        def load_results():
+            print "ccx finished"
+            self.fea.load_results()
+            self.show_results_on_mesh()
+
         self.fea = fem_analysis()
+        self.fea.set_analysis()
         self.fea.purge_results()
         self.fea.reset_mesh_color()
         self.fea.reset_mesh_deformation()
@@ -145,12 +151,10 @@ class _CommandQuickAnalysis:
         if message:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", message)
             return
-        #self.fea.write_inp_file()
-        #QtCore.QObject.connect(self.fea.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
-        #self.fea.start_ccx()
-        self.fea.execute_calcs()
+        self.fea.finished.connect(load_results)
+        QtCore.QThreadPool.globalInstance().start(self.fea)
 
-    def ccx_finished(self, exit_code):
+    def show_results_on_mesh(self):
         #FIXME proprer mesh freshing as per FreeCAD.FEM_dialog settings required
         # or confirmation that it's safe to call restore_result_dialog
         ##taskd = _ResultControlTaskPanel()

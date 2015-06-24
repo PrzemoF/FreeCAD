@@ -34,22 +34,25 @@ from PySide import QtCore
 # to use fem_analysis - currently there is significant functionality overlap
 
 
-class fem_analysis:
+class fem_analysis(QtCore.QRunnable, QtCore.QObject):
 
-    def __init__(self, analysis=None):
+    #ccx_finished = QtCore.Signal()
+    finished = QtCore.Signal()
 
-        self.set_analysis(analysis)
-        self.update_objects()
-        self.base_name = ""
-        self.results_present = False
-        self.setup_working_dir()
-        self.setup_ccx()
+    def __init__(self):
+        QtCore.QRunnable.__init__(self)
+        QtCore.QObject.__init__(self)
 
     def set_analysis(self, analysis=None):
         if analysis:
             self.analysis = analysis
         else:
             self.analysis = FemGui.getActiveAnalysis()
+        self.update_objects()
+        self.base_name = ""
+        self.results_present = False
+        self.setup_working_dir()
+        self.setup_ccx()
 
     def purge_results(self):
         for m in self.analysis.Member:
@@ -198,35 +201,6 @@ class fem_analysis:
             else:
                 ccx_binary = "ccx"
         self.ccx_binary = ccx_binary
-#http://stackoverflow.com/questions/984941/python-subprocess-popen-from-a-thread
-#        self.ccx_thread = threading.Thread(target=self.execute_calcs)
-#        self.ccx_thread.daemon = True
-#        self.ccx_process = QtCore.QProcess()
-#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("started()"), self.ccx_started)
-#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.ccx_state_changed)
-#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("error(QProcess::ProcessError)"), self.ccx_error)
-#        QtCore.QObject.connect(self.ccx_process, QtCore.SIGNAL("finished(int)"), self.ccx_finished)
-
-#    def ccx_started(self):
-#        self.ccx_status = "started"
-
-#    def ccx_state_changed(self, new_state):
-#        if (new_state == QtCore.QProcess.ProcessState.Starting):
-#                self.ccx_status = "starting"
-#        elif (new_state == QtCore.QProcess.ProcessState.Running):
-#                self.ccx_status = "running"
-#        elif (new_state == QtCore.QProcess.ProcessState.NotRunning):
-#                self.ccx_status = "not running"
-
-#    def ccx_error(self, error):
-#        #FIXME error hadling
-#        self.ccx_status = "error"
-#        print "ccx_error {}".format(error)
-
-#    def ccx_finished(self, exit_code):
-#        self.ccx_status = "finished"
-#        print "ccx_finished {}".format(exit_code)
-#        self.load_results()
 
     def ccx_read_stdout(self):
         return self.ccx_process.readAllStandardOutput()
@@ -240,24 +214,18 @@ class fem_analysis:
         else:
             self.results_present = False
 
-    def execute_calcs(self):
-        print "execute_calcs 1"
-        #if self.check_prerequisites():
-        #    print "execute_calcs 2"
-        #    return False
+    def run(self):
+        print "starting thread"
+        if self.check_prerequisites():
+            print "execute_calcs 2"
+            return False
         print "execute_calcs 3"
         self.write_inp_file()
         print "execute_calcs 4"
         self.start_ccx()
         print "execute_calcs 5"
-        self.load_results()
-        print "execute_calcs 6"
-        #self.ccx_thread = None
-        return True
-
-#    def run(self):
-#        print "starting thread"
-#        self.ccx_thread.start()
+        #self.ccx_finished.emit()
+        self.finished.emit()
 
     ## returns minimum, average and maximum value for provided result type
     #  @param self The python object self
