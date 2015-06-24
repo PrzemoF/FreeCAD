@@ -13,6 +13,7 @@ class inp_writer:
         self.fixed_objects = fixed_obj
         self.force_objects = force_obj
         self.pressure_objects = pressure_obj
+        self.progress_bar_len = len(fixed_obj) + 2 * len(mat_obj) + len(force_obj) + len(pressure_obj)
         if not dir_name:
             self.dir_name = FreeCAD.ActiveDocument.TransientDir.replace('\\', '/') + '/FemAnl_' + analysis_obj.Uid[-4:]
         if not os.path.isdir(self.dir_name):
@@ -20,39 +21,28 @@ class inp_writer:
         self.base_name = self.dir_name + '/' + self.mesh_object.Name
         self.file_name = self.base_name + '.inp'
         print 'CalculiX .inp file will be written to: ', self.file_name
-        from FreeCAD import Base
-        self.progress_bar = Base.ProgressIndicator()
-        self.progress_bar.start("Writing .inp file...", 11)
 
     def write_calculix_input_file(self):
         print 'write_calculix_input_file'
+        from FreeCAD import Base
+        self.progress_bar = Base.ProgressIndicator()
+        self.progress_bar.start("Writing .inp file...", self.progress_bar_len)
         self.mesh_object.FemMesh.writeABAQUS(self.file_name)
 
         # reopen file with "append" and add the analysis definition
         inpfile = open(self.file_name, 'a')
         inpfile.write('\n\n')
         self.write_material_element_sets(inpfile)
-        self.progress_bar.next()
         self.write_fixed_node_sets(inpfile)
-        self.progress_bar.next()
         self.write_load_node_sets(inpfile)
-        self.progress_bar.next()
         self.write_materials(inpfile)
-        self.progress_bar.next()
         self.write_step_begin(inpfile)
-        self.progress_bar.next()
         self.write_constraints_fixed(inpfile)
-        self.progress_bar.next()
         self.write_constraints_force(inpfile)
-        self.progress_bar.next()
         self.write_face_load(inpfile)
-        self.progress_bar.next()
         self.write_outputs_types(inpfile)
-        self.progress_bar.next()
         self.write_step_end(inpfile)
-        self.progress_bar.next()
         self.write_footer(inpfile)
-        self.progress_bar.next()
         inpfile.close()
         self.progress_bar.stop()
         return self.base_name
@@ -62,6 +52,7 @@ class inp_writer:
         f.write('** Element sets for materials\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for m in self.material_objects:
+            self.progress_bar.next()
             mat_obj = m['Object']
             mat_obj_name = mat_obj.Name
             mat_name = mat_obj.Material['Name'][:80]
@@ -79,6 +70,7 @@ class inp_writer:
         f.write('** Node set for fixed constraint\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for fobj in self.fixed_objects:
+            self.progress_bar.next()
             fix_obj = fobj['Object']
             print fix_obj.Name
             f.write('*NSET,NSET=' + fix_obj.Name + '\n')
@@ -102,6 +94,7 @@ class inp_writer:
         f.write('** Node sets for loads\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for fobj in self.force_objects:
+            self.progress_bar.next()
             frc_obj = fobj['Object']
             print frc_obj.Name
             f.write('*NSET,NSET=' + frc_obj.Name + '\n')
@@ -137,6 +130,7 @@ class inp_writer:
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         f.write('** Young\'s modulus unit is MPa = N/mm2\n')
         for m in self.material_objects:
+            self.progress_bar.next()
             mat_obj = m['Object']
             # get material properties
             YM = FreeCAD.Units.Quantity(mat_obj.Material['YoungsModulus'])
@@ -169,6 +163,7 @@ class inp_writer:
         f.write('** Constaints\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for fixed_object in self.fixed_objects:
+            self.progress_bar.next()
             fix_obj_name = fixed_object['Object'].Name
             f.write('*BOUNDARY\n')
             f.write(fix_obj_name + ',1\n')
@@ -187,6 +182,7 @@ class inp_writer:
         f.write('** Node loads\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for fobj in self.force_objects:
+            self.progress_bar.next()
             frc_obj = fobj['Object']
             if 'NodeLoad' in fobj:
                 node_load = fobj['NodeLoad']
@@ -333,6 +329,7 @@ class inp_writer:
         f.write('** Element + CalculiX face + load in [MPa]\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for fobj in self.pressure_objects:
+            self.progress_bar.next()
             prs_obj = fobj['Object']
             f.write('*DLOAD\n')
             for o, e in prs_obj.References:

@@ -37,7 +37,7 @@ from PySide import QtCore
 class fem_analysis(QtCore.QRunnable, QtCore.QObject):
 
     #ccx_finished = QtCore.Signal()
-    finished = QtCore.Signal()
+    finished = QtCore.Signal(int)
 
     def __init__(self):
         QtCore.QRunnable.__init__(self)
@@ -159,26 +159,18 @@ class fem_analysis(QtCore.QRunnable, QtCore.QObject):
             raise
 
     def start_ccx(self):
-        # change cwd because ccx may crash if directory has no write permission
-        # there is also a limit of the length of file names so jump to the document directory
         import subprocess
         if self.base_name != "":
+            # change cwd because ccx may crash if directory has no write permission
+            # there is also a limit of the length of file names so jump to the document directory
             cwd = QtCore.QDir.currentPath()
             f = QtCore.QFileInfo(self.base_name)
             QtCore.QDir.setCurrent(f.path())
-            print f.baseName()
-            print f.path()
-            #self.ccx_process.start(self.ccx_binary, ["-i", f.baseName()])
-            p = subprocess.Popen([self.ccx_binary, "-i ", f.baseName()],
-                                 shell=False,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
-
+            p = subprocess.Popen([self.ccx_binary, "-i ", f.baseName()], shell=False)
             self.ccx_stdout, self.ccx_stderr = p.communicate()
-
-            #self.ccx_process.start(self.ccx_binary, ["-i", f.baseName()])
-            # Restore previous cwd
             QtCore.QDir.setCurrent(cwd)
+            return p.returncode
+        return -1
 
     def setup_working_dir(self, working_dir=None):
         if working_dir is None:
@@ -188,7 +180,6 @@ class fem_analysis(QtCore.QRunnable, QtCore.QObject):
             self.working_dir = working_dir
 
     def setup_ccx(self, ccx_binary=None):
-        #import threading
         if not ccx_binary:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -202,9 +193,6 @@ class fem_analysis(QtCore.QRunnable, QtCore.QObject):
                 ccx_binary = "ccx"
         self.ccx_binary = ccx_binary
 
-    def ccx_read_stdout(self):
-        return self.ccx_process.readAllStandardOutput()
-
     def load_results(self):
         import ccxFrdReader
         import os
@@ -215,17 +203,17 @@ class fem_analysis(QtCore.QRunnable, QtCore.QObject):
             self.results_present = False
 
     def run(self):
-        print "starting thread"
-        if self.check_prerequisites():
-            print "execute_calcs 2"
-            return False
-        print "execute_calcs 3"
-        self.write_inp_file()
-        print "execute_calcs 4"
-        self.start_ccx()
-        print "execute_calcs 5"
-        #self.ccx_finished.emit()
-        self.finished.emit()
+        message = self.check_prerequisites()
+        if not message:
+            self.write_inp_file()
+            from FreeCAD import Base
+            progress_bar = Base.ProgressIndicator()
+            progress_bar.start("Running CalculiX ccx...", 0)
+            ret_code = self.start_ccx()
+            self.finished.emit(ret_code)
+            progress_bar.stop()
+        else:
+            print "Running analysis failed! " + message
 
     ## returns minimum, average and maximum value for provided result type
     #  @param self The python object self

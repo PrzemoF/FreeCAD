@@ -137,10 +137,13 @@ class _CommandQuickAnalysis:
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_QuickAnalysis", "Write .inp file and run CalculiX ccx")}
 
     def Activated(self):
-        def load_results():
-            print "ccx finished"
-            self.fea.load_results()
-            self.show_results_on_mesh()
+        def load_results(ret_code):
+            if ret_code == 0:
+                print "ccx finished {}".format(ret_code)
+                self.fea.load_results()
+                self.show_results_on_mesh()
+            else:
+                print "ccx finished with erro {}".format(ret_code)
 
         self.fea = fem_analysis()
         self.fea.set_analysis()
