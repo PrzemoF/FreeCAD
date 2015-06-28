@@ -246,6 +246,7 @@ class _MechanicalMaterialTaskPanel:
             self.form.cb_materials.addItem(QtGui.QIcon.fromTheme(icon, QtGui.QIcon(fallback_icon)), mat[0], mat[1])
 
     def import_materials(self):
+        QtGui.QIcon.setThemeName("MyFreeCAD")
         self.materials = {}
         self.pathList = []
         self.form.cb_materials.clear()
@@ -253,17 +254,17 @@ class _MechanicalMaterialTaskPanel:
         use_built_in_materials = self.fem_preferences.GetBool("UseBuiltInMaterials", True)
         if use_built_in_materials:
             system_mat_dir = FreeCAD.getResourceDir() + "/Mod/Material/StandardMaterial"
-            self.add_mat_dir(system_mat_dir, "applications-system", ":/icons/freecad.svg")
+            self.add_mat_dir(system_mat_dir, "standard-material", ":/icons/freecad.svg")
 
         use_mat_from_config_dir = self.fem_preferences.GetBool("UseMaterialsFromConfigDir", True)
         if use_mat_from_config_dir:
             user_mat_dirname = FreeCAD.getUserAppDataDir() + "Materials"
-            self.add_mat_dir(user_mat_dirname, "preferences-system", ":/icons/preferences-general.svg")
+            self.add_mat_dir(user_mat_dirname, "config-dir-material", ":/icons/preferences-general.svg")
 
         use_mat_from_custom_dir = self.fem_preferences.GetBool("UseMaterialsFromCustomDir", True)
         if use_mat_from_custom_dir:
             custom_mat_dir = self.fem_preferences.GetString("CustomMaterialsDir", "")
-            self.add_mat_dir(custom_mat_dir, "user-info", ":/icons/user.svg")
+            self.add_mat_dir(custom_mat_dir, "custom-dir-material", ":/icons/user.svg")
 
 
 FreeCADGui.addCommand('Fem_MechanicalMaterial', _CommandMechanicalMaterial())
