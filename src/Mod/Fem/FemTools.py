@@ -135,14 +135,19 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
 
     def start_ccx(self):
         import subprocess
+        import os
         if self.base_name != "":
+            ont_backup = os.environ.get('OMP_NUM_THREADS')
+            _env = os.environ.copy()
+            _env['OMP_NUM_THREADS'] = '8'
             # change cwd because ccx may crash if directory has no write permission
             # there is also a limit of the length of file names so jump to the document directory
             cwd = QtCore.QDir.currentPath()
             f = QtCore.QFileInfo(self.base_name)
             QtCore.QDir.setCurrent(f.path())
-            p = subprocess.Popen([self.ccx_binary, "-i ", f.baseName()], shell=False)
+            p = subprocess.Popen([self.ccx_binary, "-i ", f.baseName()], shell=False, env=_env)
             self.ccx_stdout, self.ccx_stderr = p.communicate()
+            _env['OMP_NUM_THREADS'] = ont_backup
             QtCore.QDir.setCurrent(cwd)
             return p.returncode
         return -1
