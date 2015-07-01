@@ -4,6 +4,8 @@ import os
 import time
 import sys
 
+from pathos.multiprocessing import ProcessingPool
+
 
 class inp_writer:
     def __init__(self, analysis_obj, mesh_obj, mat_obj, fixed_obj, force_obj, pressure_obj, dir_name=None):
@@ -317,17 +319,18 @@ class inp_writer:
         f.write('\n***********************************************************\n')
         f.write('** Element + CalculiX face + load in [MPa]\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
-        for fobj in self.pressure_objects:
-            prs_obj = fobj['Object']
-            f.write('*DLOAD\n')
-            for o, e in prs_obj.References:
-                rev = -1 if prs_obj.Reversed else 1
-                elem = o.Shape.getElement(e)
-                if elem.ShapeType == 'Face':
-                    v = self.mesh_object.FemMesh.getccxVolumesByFace(elem)
-                    f.write("** Load on face {}\n".format(e))
-                    for i in v:
-                        f.write("{},P{},{}\n".format(i[0], i[1], rev * prs_obj.Pressure))
+        multi(self.mesh_object, self.pressure_objects)
+#        for fobj in self.pressure_objects:
+#            prs_obj = fobj['Object']
+#            f.write('*DLOAD\n')
+#            for o, e in prs_obj.References:
+#                rev = -1 if prs_obj.Reversed else 1
+#                elem = o.Shape.getElement(e)
+#                if elem.ShapeType == 'Face':
+#                    v = self.mesh_object.FemMesh.getccxVolumesByFace(elem)
+#                    f.write("** Load on face {}\n".format(e))
+#                    for i in v:
+#                        f.write("{},P{},{}\n".format(i[0], i[1], rev * prs_obj.Pressure))
 
     def write_outputs_types(self, f):
         f.write('\n***********************************************************\n')
@@ -366,3 +369,22 @@ class inp_writer:
         f.write("**   Materials (Young's modulus) --> N/mm2 = MPa\n")
         f.write('**   Loads (nodal loads)         --> N\n')
         f.write('**\n')
+
+
+def multi(mesh_object, pressure_objects):
+    def worker(fobj):
+        prs_obj = fobj['Object']
+        #f.write('*DLOAD\n')
+        for o, e in prs_obj.References:
+            rev = -1 if prs_obj.Reversed else 1
+            elem = o.Shape.getElement(e)
+            if elem.ShapeType == 'Face':
+                v = mesh_object.FemMesh.getccxVolumesByFace(elem)
+                #f.write("** Load on face {}\n".format(e))
+                for i in v:
+                    #f.write("{},P{},{}\n".format(i[0], i[1], rev * prs_obj.Pressure))
+                    print ("{},P{},{}\n".format(i[0], i[1], rev * prs_obj.Pressure))
+
+    pool = ProcessingPool(nodes=(4))
+    #print pressure_objects
+    pool.map(worker, pressure_objects)
