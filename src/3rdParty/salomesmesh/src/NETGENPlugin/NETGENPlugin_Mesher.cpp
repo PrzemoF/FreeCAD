@@ -62,12 +62,8 @@ namespace nglib {
 #include <meshing.hpp>
 //#include <ngexception.hpp>
 namespace netgen {
-#ifdef NETGEN_V5
   DLL_HEADER extern int OCCGenerateMesh (OCCGeometry&, Mesh*&, MeshingParameters&, int, int);
   DLL_HEADER extern MeshingParameters mparam;
-#else
-  DLL_HEADER extern int OCCGenerateMesh (OCCGeometry&, Mesh*&, int, int, char*);
-#endif
 }
 
 using namespace std;
@@ -584,16 +580,10 @@ bool NETGENPlugin_Mesher::Compute()
       }
     }
     // let netgen create ngMesh and calculate element size on not meshed shapes
-#ifndef NETGEN_V5
     char *optstr = 0;
-#endif
     int startWith = netgen::MESHCONST_ANALYSE;
     int endWith   = netgen::MESHCONST_ANALYSE;
-#ifdef NETGEN_V5
     err = netgen::OCCGenerateMesh(occgeo, ngMesh,mparams, startWith, endWith);
-#else
-    err = netgen::OCCGenerateMesh(occgeo, ngMesh, startWith, endWith, optstr);
-#endif
     if (err) comment << "Error in netgen::OCCGenerateMesh() at MESHCONST_ANALYSE step";
 
     // fill ngMesh with nodes and elements of computed submeshes
@@ -606,11 +596,7 @@ bool NETGENPlugin_Mesher::Compute()
     if (!err)
     {
       startWith = endWith = netgen::MESHCONST_MESHEDGES;
-#ifdef NETGEN_V5
       err = netgen::OCCGenerateMesh(occgeo, ngMesh,mparams, startWith, endWith);
-#else
-      err = netgen::OCCGenerateMesh(occgeo, ngMesh, startWith, endWith, optstr);
-#endif
       if (err) comment << "Error in netgen::OCCGenerateMesh() at 1D mesh generation";
     }
     // ---------------------
@@ -645,11 +631,7 @@ bool NETGENPlugin_Mesher::Compute()
       // let netgen compute 2D mesh
       startWith = netgen::MESHCONST_MESHSURFACE;
       endWith = _optimize ? netgen::MESHCONST_OPTSURFACE : netgen::MESHCONST_MESHSURFACE;
-#ifdef NETGEN_V5
       err = netgen::OCCGenerateMesh(occgeo, ngMesh,mparams, startWith, endWith);
-#else
-      err = netgen::OCCGenerateMesh(occgeo, ngMesh, startWith, endWith, optstr);
-#endif
       if (err) comment << "Error in netgen::OCCGenerateMesh() at surface mesh generation";
     }
     // ---------------------
@@ -684,20 +666,12 @@ bool NETGENPlugin_Mesher::Compute()
 // 	ngMesh->SetMaxHDomain (maxhdom);
         ngMesh->SetGlobalH (mparams.maxh);
         mparams.grading = 0.4;
-#ifdef NETGEN_V5
         ngMesh->CalcLocalH(mparams.grading);
-#else
-        ngMesh->CalcLocalH();
-#endif
       }
       // let netgen compute 3D mesh
       startWith = netgen::MESHCONST_MESHVOLUME;
       endWith = _optimize ? netgen::MESHCONST_OPTVOLUME : netgen::MESHCONST_MESHVOLUME;
-#ifdef NETGEN_V5
       err = netgen::OCCGenerateMesh(occgeo, ngMesh,mparams, startWith, endWith);
-#else
-      err = netgen::OCCGenerateMesh(occgeo, ngMesh, startWith, endWith, optstr);
-#endif
       if (err) comment << "Error in netgen::OCCGenerateMesh()";
     }
     if (!err && mparams.secondorder > 0)
