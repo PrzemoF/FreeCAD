@@ -8,7 +8,7 @@
 # See also: http://git.salome-platform.org/gitweb/?p=NETGENPLUGIN_SRC.git;a=summary
 
 # nglib
-FIND_PATH(NGLIB_INCLUDE_DIR nglib.h /usr/include)
+FIND_PATH(NGLIB_INCLUDE_DIR nglib.h /usr/include/*)
 FIND_LIBRARY(NGLIB_LIBRARIES nglib /usr/lib /usr/local/lib)
 
 # netgen headers
@@ -19,14 +19,18 @@ if(NOT NETGENDATA)
     SET(NETGENDATA /usr/share/netgen/libsrc)
 endif()
 
-FIND_PATH(NETGEN_DIR_csg csg.hpp PATHS ${NETGENDATA}/csg)
-FIND_PATH(NETGEN_DIR_gen array.hpp PATHS ${NETGENDATA}/general)
-FIND_PATH(NETGEN_DIR_geom2d geom2dmesh.hpp PATHS ${NETGENDATA}/geom2d)
-FIND_PATH(NETGEN_DIR_gprim gprim.hpp PATHS ${NETGENDATA}/gprim)
-FIND_PATH(NETGEN_DIR_la linalg.hpp PATHS ${NETGENDATA}/linalg)
-FIND_PATH(NETGEN_DIR_mesh meshing.hpp PATHS ${NETGENDATA}/meshing)
-FIND_PATH(NETGEN_DIR_occ occgeom.hpp PATHS ${NETGENDATA}/occ)
-FIND_PATH(NETGEN_DIR_stlgeom stlgeom.hpp PATHS ${NETGENDATA}/stlgeom)
+if(NOT NETGENDATA_FEDORA)
+    SET(NETGENDATA_FEDORA /usr/include/netgen-mesher/private)
+endif()
+
+FIND_PATH(NETGEN_DIR_csg csg.hpp PATHS ${NETGENDATA}/csg ${NETGENDATA_FEDORA}/csg)
+FIND_PATH(NETGEN_DIR_gen array.hpp PATHS ${NETGENDATA}/general ${NETGENDATA_FEDORA}/general)
+FIND_PATH(NETGEN_DIR_geom2d geom2dmesh.hpp PATHS ${NETGENDATA}/geom2d ${NETGENDATA_FEDORA}/geom2d)
+FIND_PATH(NETGEN_DIR_gprim gprim.hpp PATHS ${NETGENDATA}/gprim ${NETGENDATA_FEDORA}/gprim)
+FIND_PATH(NETGEN_DIR_la linalg.hpp PATHS ${NETGENDATA}/linalg ${NETGENDATA_FEDORA}/linalg)
+FIND_PATH(NETGEN_DIR_mesh meshing.hpp PATHS ${NETGENDATA}/meshing ${NETGENDATA_FEDORA}/meshing)
+FIND_PATH(NETGEN_DIR_occ occgeom.hpp PATHS ${NETGENDATA}/occ ${NETGENDATA_FEDORA}/occ)
+FIND_PATH(NETGEN_DIR_stlgeom stlgeom.hpp PATHS ${NETGENDATA}/stlgeom ${NETGENDATA_FEDORA}/stlgeom)
 
 SET(NETGEN_INCLUDE_DIRS ${NETGEN_INCLUDE_DIRS} ${NETGEN_DIR_csg})
 SET(NETGEN_INCLUDE_DIRS ${NETGEN_INCLUDE_DIRS} ${NETGEN_DIR_gen})
