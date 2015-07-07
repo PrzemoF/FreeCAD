@@ -25,8 +25,10 @@ endif()
 
 find_package(PkgConfig)
 pkg_check_modules(NETGEN netgen-mesher)
-IF (${NETGEN_VERSION} VERSION_GREATER 5.0)
-	add_definitions(-DNETGEN_V5)
+IF (${NETGEN_FOUND})
+    IF (${NETGEN_VERSION} VERSION_GREATER 5.0)
+        add_definitions(-DNETGEN_V5)
+    ENDIF()
 ENDIF()
 
 FIND_PATH(NETGEN_DIR_csg csg.hpp PATHS ${NETGENDATA}/csg ${NETGENDATA_FEDORA}/csg)
