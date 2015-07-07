@@ -23,6 +23,12 @@ if(NOT NETGENDATA_FEDORA)
     SET(NETGENDATA_FEDORA /usr/include/netgen-mesher/private)
 endif()
 
+find_package(PkgConfig)
+pkg_check_modules(NETGEN netgen-mesher)
+IF (${NETGEN_VERSION} VERSION_GREATER 5.0)
+	add_definitions(-DNETGEN_V5)
+ENDIF()
+
 FIND_PATH(NETGEN_DIR_csg csg.hpp PATHS ${NETGENDATA}/csg ${NETGENDATA_FEDORA}/csg)
 FIND_PATH(NETGEN_DIR_gen array.hpp PATHS ${NETGENDATA}/general ${NETGENDATA_FEDORA}/general)
 FIND_PATH(NETGEN_DIR_geom2d geom2dmesh.hpp PATHS ${NETGENDATA}/geom2d ${NETGENDATA_FEDORA}/geom2d)
