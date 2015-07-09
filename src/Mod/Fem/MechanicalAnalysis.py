@@ -69,6 +69,8 @@ class _CommandNewMechanicalAnalysis:
             if(sel[0].isDerivedFrom("Part::Feature")):
                 FreeCADGui.doCommand("App.activeDocument().addObject('Fem::FemMeshShapeNetgenObject', '" + sel[0].Name + "_Mesh')")
                 FreeCADGui.doCommand("App.activeDocument().ActiveObject.Shape = App.activeDocument()." + sel[0].Name)
+                FreeCADGui.doCommand("App.activeDocument().ActiveObject.ViewObject.Transparency = 50")
+                FreeCADGui.doCommand("App.activeDocument().ActiveObject.ViewObject.Selectable = False")
                 FreeCADGui.doCommand("FemGui.getActiveAnalysis().Member = FemGui.getActiveAnalysis().Member + [App.activeDocument().ActiveObject]")
                 #FreeCADGui.doCommand("Gui.activeDocument().hide('" + sel[0].Name + "')")
                 #FreeCADGui.doCommand("App.activeDocument().ActiveObject.touch()")

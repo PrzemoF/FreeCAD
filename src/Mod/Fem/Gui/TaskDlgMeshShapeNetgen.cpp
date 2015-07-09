@@ -109,12 +109,6 @@ bool TaskDlgMeshShapeNetgen::accept()
             }
         }
 
-        // hide the input object
-        App::DocumentObject* obj = FemMeshShapeNetgenObject->Shape.getValue();
-        if (obj) {
-            Gui::Application::Instance->hideViewProvider(obj);
-        }
-
         //FemSetNodesObject->Label.setValue(name->name);
         Gui::Command::doCommand(Gui::Command::Gui,"Gui.activeDocument().resetEdit()");
         Gui::Command::commitCommand();
