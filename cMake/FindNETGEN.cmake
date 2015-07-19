@@ -75,8 +75,8 @@ foreach( _dir    csg general geom2d gprim linalg meshing occ stlgeom )
 endforeach ( )
 
 # Some needed libraris for tests
-find_library( NETGEN_LIBRARY_mesh mesh PATHS ${NGLIB_LIBRARY_DIRS})
-find_library( NETGEN_LIBRARY_occ  occ  PATHS ${NGLIB_LIBRARY_DIRS})
+find_library( NETGEN_LIBRARY_mesh NAMES mesh ngmesh PATHS ${NGLIB_LIBRARY_DIRS})
+find_library( NETGEN_LIBRARY_occ  NAMES occ  ngocc PATHS ${NGLIB_LIBRARY_DIRS})
 mark_as_advanced( NETGEN_LIBRARY_mesh NETGEN_LIBRARY_occ)
 
 cmake_push_check_state()
