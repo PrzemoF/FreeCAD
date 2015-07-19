@@ -9,7 +9,7 @@ if (BUILD_SMESH)
 endif(BUILD_SMESH)
 
 if(BUILD_FEM_NETGEN)
-    add_definitions(-DHAVE_NETGEN)
+    add_definitions(-DHAVE_NETGEN ${NETGEN_DEFINITIONS})
 endif(BUILD_FEM_NETGEN)
 
 include_directories(

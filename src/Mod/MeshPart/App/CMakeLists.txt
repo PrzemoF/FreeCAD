@@ -9,7 +9,7 @@ if (BUILD_SMESH)
 endif(BUILD_SMESH)
 
 if(BUILD_FEM_NETGEN)
-    add_definitions(-DHAVE_NETGEN)
+    add_definitions(-DHAVE_NETGEN ${NETGEN_DEFINITIONS})
 endif(BUILD_FEM_NETGEN)
 
 include_directories(
@@ -25,24 +25,16 @@ include_directories(
 
 link_directories(${OCC_LIBRARY_DIR})
 
+set(MeshPart_LIBS
+    Part
+    Mesh
+    StdMeshers
+    SMESH
+    SMDS
+)
 
 if(BUILD_FEM_NETGEN)
-    set(MeshPart_LIBS
-        Part
-        Mesh
-        StdMeshers
-        NETGENPlugin
-        SMESH
-        SMDS
-    )
-else(BUILD_FEM_NETGEN)
-    set(MeshPart_LIBS
-        Part
-        Mesh
-        StdMeshers
-        SMESH
-        SMDS
-    )
+    list(APPEND MeshPart_LIBS NETGENPlugin)
 endif(BUILD_FEM_NETGEN)
 
 

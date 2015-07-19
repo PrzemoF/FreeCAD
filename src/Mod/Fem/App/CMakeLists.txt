@@ -5,7 +5,7 @@ else(MSVC)
 endif(MSVC)
 
 if(BUILD_FEM_NETGEN)
-    add_definitions(-DFCWithNetgen)
+    add_definitions(-DFCWithNetgen ${NETGEN_DEFINITIONS})
 endif(BUILD_FEM_NETGEN)
 
 
@@ -27,24 +27,17 @@ include_directories(
 link_directories(${OCC_LIBRARY_DIR})
 
 
+set(Fem_LIBS
+    Part
+    FreeCADApp
+    StdMeshers
+    SMESH
+    SMDS
+    SMESHDS
+)
 if(BUILD_FEM_NETGEN)
-    set(Fem_LIBS
-        Part
-        FreeCADApp
-        StdMeshers
+    list(APPEND Fem_LIBS
         NETGENPlugin
-        SMESH
-        SMDS
-        SMESHDS
-    )
-else(BUILD_FEM_NETGEN)
-    set(Fem_LIBS
-        Part
-        FreeCADApp
-        StdMeshers
-        SMESH
-        SMDS
-        SMESHDS
     )
 endif(BUILD_FEM_NETGEN)
 

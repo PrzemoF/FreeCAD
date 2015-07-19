@@ -38,45 +38,32 @@ include_directories(
 link_directories(${OCC_LIBRARY_DIR})
 
 if(MSVC)
+    set(SMESH_LIBS
+        debug     MSVCRTD.LIB
+        debug     MSVCPRTD.LIB
+        optimized MSVCRT.LIB
+        optimized MSVCPRT.LIB
+        Rpcrt4.lib
+        ${OCC_LIBRARIES}
+        ${OCC_DEBUG_LIBRARIES}
+        ${OCC_OCAF_DEBUG_LIBRARIES}
+        ${OCC_OCAF_LIBRARIES}
+    )
 	if(BUILD_FEM_NETGEN)
-		set(SMESH_LIBS
-			debug     MSVCRTD.LIB
-			debug     MSVCPRTD.LIB
-			optimized MSVCRT.LIB
-			optimized MSVCPRT.LIB
-			Rpcrt4.lib
+        list(APPEND SMESH_LIBS
 			${NGLIB_LIBRARIES}
 			${NGLIB_DEBUG_LIBRARIES}
-			${OCC_LIBRARIES}
-			${OCC_DEBUG_LIBRARIES}
-			${OCC_OCAF_DEBUG_LIBRARIES}
-			${OCC_OCAF_LIBRARIES}
-		)
-	else(BUILD_FEM_NETGEN)
-		set(SMESH_LIBS
-			debug     MSVCRTD.LIB
-			debug     MSVCPRTD.LIB
-			optimized MSVCRT.LIB
-			optimized MSVCPRT.LIB
-			Rpcrt4.lib
-			${OCC_LIBRARIES}
-			${OCC_DEBUG_LIBRARIES}
-			${OCC_OCAF_DEBUG_LIBRARIES}
-			${OCC_OCAF_LIBRARIES}
 		)
 	endif(BUILD_FEM_NETGEN)
 	
 else(MSVC)
+    set(SMESH_LIBS
+        ${OCC_LIBRARIES}
+        ${OCC_OCAF_LIBRARIES}
+    )
     if(BUILD_FEM_NETGEN)
-        set(SMESH_LIBS
-            ${NGLIB_LIBRARIES}
-            ${OCC_LIBRARIES}
-            ${OCC_OCAF_LIBRARIES}
-        )
-    else(BUILD_FEM_NETGEN)
-        set(SMESH_LIBS
-            ${OCC_LIBRARIES}
-            ${OCC_OCAF_LIBRARIES}
+        list(APPEND SMESH_LIBS
+			${NGLIB_LIBRARIES}
         )
     endif(BUILD_FEM_NETGEN)
 endif(MSVC)
@@ -236,7 +223,7 @@ endif(WIN32)
 #ENDIF(WIN32)
 #IF(MINGW)
 #  SET_TARGET_PROPERTIES(DriverUNV PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-#ENDIF(MINGW)
+#ENDIF(MINGW
 
 ###########
 # SMESHDS #
@@ -364,9 +351,20 @@ ADD_LIBRARY(NETGENPlugin SHARED ${NETGENPlugin_source_files})
 TARGET_LINK_LIBRARIES(NETGENPlugin SMDS SMESHDS SMESH StdMeshers  ${SMESH_LIBS} )
 
 SET_BIN_DIR(NETGENPlugin NETGENPlugin)
+
+foreach( _define ${NETGEN_DEFINITIONS} )
+    set( NETGENPlugin_definitions "${NETGENPlugin_definitions} ${_define}" )
+endforeach( )
+
+if(NETGEN_VERSION_5)
+    set(NETGENPlugin_definitions "${NETGENPlugin_definitions} -DNETGEN_V5")
+endif(NETGEN_VERSION_5)
+
 if(WIN32)
-    set_target_properties(NETGENPlugin PROPERTIES COMPILE_FLAGS "-DNETGENPLUGIN_EXPORTS -DNO_PARALLEL_THREADS -DOCCGEOMETRY -DNETGEN_V5")
+    set(NETGENPlugin_definitions "${NETGENPlugin_definitions} -DNETGENPLUGIN_EXPORTS")
 endif(WIN32)
+
+set_target_properties(NETGENPlugin PROPERTIES COMPILE_FLAGS "${NETGENPlugin_definitions}")
 
 endif (BUILD_FEM_NETGEN)
 
