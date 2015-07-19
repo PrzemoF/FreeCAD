@@ -649,7 +649,14 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 # -------------------------------- Netgen --------------------------------
 
     if (BUILD_FEM_NETGEN)
-        find_package(NETGEN)
+        find_package(NETGEN REQUIRED)
+        if( NOT NETGEN_INCLUDE_DIRS )
+            message( FATAL_ERROR
+                "Couldn't find netgen private headers needed to build netgen plugin" )
+        elseif( NOT NETGEN_WITH_OCC )
+            message( FATAL_ERROR
+                "Found netgen library seems to be compiled without opencascade support.")
+        endif( )
     endif(BUILD_FEM_NETGEN)
 
 # -------------------------------- OpenCV --------------------------------
