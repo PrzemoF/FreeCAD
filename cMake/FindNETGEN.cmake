@@ -140,7 +140,7 @@ set( CMAKE_REQUIRED_DEFINITIONS ${NETGEN_DEFINITIONS} -DOCCGEOMETRY )
 
 check_cxx_source_compiles (
     "#include <occgeom.hpp>
-    int main() { netgen::EntityVisualizationCode foo; }"
+    int main() { netgen::OCCGeometry foo; }"
     NETGEN_WITH_OCC
 )
 
