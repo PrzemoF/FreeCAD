@@ -153,4 +153,4 @@ endif( )
 cmake_pop_check_state( )
 
 set( NETGEN_DEFINITIONS ${NETGEN_DEFINITIONS} CACHE
-    "Additional difinitions switches required to build against private headers" INTERNAL )
+    "Additional definitions switches required to build against private headers" INTERNAL )
