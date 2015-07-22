@@ -1,4 +1,8 @@
 language: c++
 
+branches:
+  only:
+    - travis_ci
+
 before_install:
 	- echo "It's just a test"
