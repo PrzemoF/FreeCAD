@@ -1,4 +1,4 @@
-language: c++
+language: cpp
 
 branches:
   only:
@@ -6,3 +6,6 @@ branches:
 
 before_install:
 	- echo "It's just a test"
+
+install:
+	- mkdir build && cd build && cmake ../
