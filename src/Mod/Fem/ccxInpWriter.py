@@ -46,8 +46,7 @@ class inp_writer:
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for m in self.material_objects:
             mat_obj = m['Object']
-            mat_obj_name = mat_obj.Name
-            mat_name = mat_obj.Material['Name'][:80]
+            mat_obj_name = mat_obj.Name[:80]
 
             f.write('*ELSET,ELSET=' + mat_obj_name + '\n')
             if len(self.material_objects) == 1:
