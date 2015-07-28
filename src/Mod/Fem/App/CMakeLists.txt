@@ -73,6 +73,9 @@ SET(FemScripts_SRCS
     ccxInpWriter.py
     TestFem.py
     FemTools.py
+    mesh_points.csv
+    mesh_volumes.csv
+    inp_standard.inp
     MechanicalAnalysis.ui
     MechanicalAnalysis.py
     MechanicalMaterial.ui
