@@ -47,23 +47,24 @@ class FemTest(unittest.TestCase):
         analysis = MechanicalAnalysis.makeMechanicalAnalysis('MechanicalAnalysis')
         self.failUnless(analysis, "FemTest of new analysis failed")
 
+    def create_new_mesh(self):
+        self.mesh = Fem.FemMesh()
+        import csv
+        with open('Mod/Fem/mesh_points.csv', 'r') as points_file:
+            reader = csv.reader(points_file)
+            for p in reader:
+                self.mesh.addNode(float(p[0]), float(p[1]), float(p[2]), int(p[3]))
+
+        with open('Mod/Fem/mesh_volumes.csv', 'r') as volumes_file:
+            reader = csv.reader(volumes_file)
+            for _v in reader:
+                v = [int(x) for x in _v]
+                self.mesh.addVolume([v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]], v[10])
+
     def test_new_mesh(self):
         FreeCAD.Console.PrintMessage('\nChecking FEM new mesh...\n')
-        mesh = Fem.FemMesh()
-
-        mesh.addNode(0, 1, 0)
-        mesh.addNode(0, 0, 1)
-        mesh.addNode(1, 0, 0)
-        mesh.addNode(0, 0, 0)
-        mesh.addNode(0, 0.5, 0.5)
-        mesh.addNode(0.5, 0.03, .5)
-        mesh.addNode(0.5, 0.5, 0.03)
-        mesh.addNode(0, 0.5, 0)
-        mesh.addNode(0.03, 0, 0.5)
-        mesh.addNode(0.5, 0, 0)
-
-        mesh.addVolume([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        self.failUnless(mesh, "FemTest of new mesh failed")
+        self.create_new_mesh()
+        self.failUnless(self.mesh, "FemTest of new mesh failed")
 
     def create_box(self):
         self.box = self.active_doc.addObject("Part::Box", "Box")
