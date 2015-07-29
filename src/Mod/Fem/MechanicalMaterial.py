@@ -177,7 +177,7 @@ class _MechanicalMaterialTaskPanel:
         old_density = Units.Quantity(self.obj.Material['Density'])
         if old_density != value:
             material = self.obj.Material
-            material['Density'] = unicode(value) + " kg/m^3"
+            material['Density'] = unicode(value) + " kg/mm^3"
             self.obj.Material = material
 
     def pr_changed(self, value):
@@ -221,6 +221,8 @@ class _MechanicalMaterialTaskPanel:
             print ' YM = ', matmap['YoungsModulus']
         if 'PoissonRatio' in matmap:
             print ' PR = ', matmap['PoissonRatio']
+        if 'Density' in matmap:
+            print ' RO = ', matmap['Density']
 
     def set_mat_params_in_combo_box(self, matmap):
         if 'YoungsModulus' in matmap:
