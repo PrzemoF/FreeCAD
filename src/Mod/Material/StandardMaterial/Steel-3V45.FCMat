@@ -3,7 +3,7 @@
 ; information about the content of this card can be found here:
 ; http://www.freecadweb.org/wiki/index.php?title=Material
 
-[General]
+[FCMat]
 Vendor=
 Name=3V45
 NameDE=Cm45
@@ -14,28 +14,15 @@ KindOfMaterialDE=Vergütungsstahl
 SpecificPrice=
 Father=Metal
 ProductURL=
-; Specific Weight - kg/m³
 SpecificWeight=7800
 Description=
-DescriptionDE=kleine Vergütungsdurchmesser, verschleißfest; Wellen, Kubelwellen Zahnräder
-
-[Mechanical]
-;Ultimate Tensile Strength - Rm - N/mm²
 UltimateTensileStrength=700
-; Yield Strength - Re - N/mm²
 YieldStrength=500
 CompressiveStrength=
-; Youngs Modulus - E-Modul - N/mm²
 YoungsModulus=210000 MPa
-; ModulusOfShare - G-Modul - N/mm²
 ModulusOfShare=81000
 Elasticity=
 FractureToughness=
-; Ultimate Strain - Bruchdehnung - %
 UltimateStrain=14
-; Thermal Expansion Coefficient - Ausdehnungskoeffizient - 1/K
 ThermalExpansionCoefficient=1,10E-05
-
-[FEM]
-; Poisson Ratio - Querkontraktionszahl
 PoissonRatio=0.3
