@@ -4,13 +4,14 @@
 ; http://www.freecadweb.org/wiki/index.php?title=Material
 
 [FCMat]
-Name=ABS
-Father=Thermoplast
+Name = ABS
+
 Description: This is a blend ABS material card. The values are at the low end of the spectrum. If you need a more precise material definition use the more specialised ABS-blend cards.
-SpecificWeight=3.5e-06
-Vendor:
-ProductURL=http://en.wikipedia.org/wiki/Acrylonitrile_butadiene_styrene
-SpecificPrice= 3
-YoungsModulus=2320 MPa
-UltimateTensileStrength= 38 MPa
+Father = Thermoplast
 PoissonRatio = 0.35
+ProductURL = http://en.wikipedia.org/wiki/Acrylonitrile_butadiene_styrene
+SpecificPrice = 3
+SpecificWeight = 3.5e-06
+UltimateTensileStrength = 38 MPa
+Vendor:
+YoungsModulus = 2320 MPa

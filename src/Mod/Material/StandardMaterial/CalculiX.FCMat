@@ -4,7 +4,8 @@
 ; General name, need to be the same as the file name
 
 [FCMat]
-Name=CalculiX
-Father=Metal
-YoungsModulus=210000 MPa
+Name = CalculiX
+
+Father = Metal
 PoissonRatio = 0.3
+YoungsModulus = 210000 MPa
