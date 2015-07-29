@@ -12,3 +12,12 @@ help us to add new Materials, review existing ones or add additional vlaues. A g
 defininitons are text-books or the www.matweb.com database.
 
 2013 Juergen Riegel 
+
+Edit:
+This is work in progress. Please verify material properties before use.
+
+Please use provided TEMPLATE.FCMat file to create a new material and put Name as the first field.
+The rest of the fields should be sorted.
+
+Comment for developers:
+Probably field Vendor should be removed - it's not used.

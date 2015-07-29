@@ -5,13 +5,14 @@
 
 [FCMat]
 Name = None
-Father = None
+
+Density=0 kg/m^3
 Description: This is a not defined material
-SpecificWeight = 0.0
-Vendor:
+Father = None
+PoissonRatio = 0.0
 ProductURL =
 SpecificPrice = 0.0
-YoungsModulus=0 MPa
-UltimateTensileStrength= 0 MPa
-Density=0 kg/m^3
-PoissonRatio = 0.0
+SpecificWeight = 0.0
+UltimateTensileStrength = 0 MPa
+Vendor:
+YoungsModulus = 0 MPa

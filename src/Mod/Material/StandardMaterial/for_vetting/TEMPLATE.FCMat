@@ -6,11 +6,12 @@
 [FCMat]
 ; General name, need to be the same as the file name
 Name=*****
-; Father of the material, i.e. for PLA is Thermoplast, for Steel is Metal
-Father=*****
 
 ; More elaborate description of this material card:
 Description=******
+
+; Father of the material, i.e. for PLA is Thermoplast, for Steel is Metal
+Father=*****
 
 ; Specific weight in [kg/mm^3], i.e 1.27e-06
 SpecificWeight=***** 
