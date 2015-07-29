@@ -3,7 +3,7 @@
 ; information about the content of this card can be found here:
 ; http://www.freecadweb.org/wiki/index.php?title=Material
 
-[General]
+[FCMat]
 Vendor=
 Name=36NiCrMo16
 NameDE=36NiCrMo16
@@ -14,28 +14,16 @@ KindOfMaterialDE=Vergütungsstahl
 SpecificPrice=
 Father=Metal
 ProductURL=
-; Specific Weight - kg/m³
 SpecificWeight=7800
 Description=
 DescriptionDE=höchste Beanspruchung, Wellen, Zahnräder
-
-[Mechanical]
-;Ultimate Tensile Strength - Rm - N/mm²
 UltimateTensileStrength=1250
-; Yield Strength - Re - N/mm²
 YieldStrength=1050
 CompressiveStrength=
-; Youngs Modulus - E-Modul - N/mm²
 YoungsModulus=210000 MPa
-; ModulusOfShare - G-Modul - N/mm²
 ModulusOfShare=81000
 Elasticity=
 FractureToughness=
-; Ultimate Strain - Bruchdehnung - %
 UltimateStrain=9
-; Thermal Expansion Coefficient - Ausdehnungskoeffizient - 1/K
 ThermalExpansionCoefficient=1,10E-05
-
-[FEM]
-; Poisson Ratio - Querkontraktionszahl
 PoissonRatio=0.3

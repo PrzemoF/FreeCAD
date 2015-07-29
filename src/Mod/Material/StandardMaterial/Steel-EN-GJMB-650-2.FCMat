@@ -3,7 +3,7 @@
 ; information about the content of this card can be found here:
 ; http://www.freecadweb.org/wiki/index.php?title=Material
 
-[General]
+[FCMat]
 Vendor=
 Name=EN-GJMB-650-2
 NameDE=GTS 65-02
@@ -14,28 +14,16 @@ KindOfMaterialDE=Guss
 SpecificPrice=
 Father=Metal
 ProductURL=
-; Specific Weight - kg/m³
 SpecificWeight=7200
 Description=
 DescriptionDE=Gabelköpfe
-
-[Mechanical]
-;Ultimate Tensile Strength - Rm - N/mm²
 UltimateTensileStrength=650
-; Yield Strength - Re - N/mm²
 YieldStrength=430
 CompressiveStrength=
-; Youngs Modulus - E-Modul - N/mm²
 YoungsModulus=175000 MPa
-; ModulusOfShare - G-Modul - N/mm²
 ModulusOfShare=67000
 Elasticity=
 FractureToughness=
-; Ultimate Strain - Bruchdehnung - %
 UltimateStrain=2
-; Thermal Expansion Coefficient - Ausdehnungskoeffizient - 1/K
 ThermalExpansionCoefficient=1,00E-05
-
-[FEM]
-; Poisson Ratio - Querkontraktionszahl
 PoissonRatio=0.3

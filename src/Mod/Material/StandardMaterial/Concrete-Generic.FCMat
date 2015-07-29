@@ -2,9 +2,8 @@
 ; (c) 2013 Yorik van Havre (CC-BY 3.0)
 ; file produced by FreeCAD 0.14 2756 (Git)
 ; information about the content of this card can be found here:
-; http://www.freecadweb.org/wiki/index.php?title=Material
 
-[General]
+[FCMat]
 Vendor=
 Name=Concrete
 SpecificPrice=
@@ -12,19 +11,13 @@ Father=Aggregate
 ProductURL=http://en.wikipedia.org/wiki/Concrete
 SpecificWeight=2400
 Description=A standard C-25 construction concrete
-
-[Mechanical]
 UltimateTensileStrength=
 CompressiveStrength=25 MPa
 YoungsModulus=32000 MPa
 Elasticity=
 FractureToughness=
 Density=2000 kg/m^3
-
-[FEM]
 PoissonRatio=0.17
-
-[Architectural]
 StandardCode=Masterformat 03 33 13
 EnvironmentalEfficiencyClass=
 FireResistanceClass=
@@ -35,8 +28,6 @@ SoundTransmissionClass=
 UnitsPerQuantity=
 ThermalConductivity=
 Model=
-
-[Rendering]
 TextureScaling=
 FragmentShader=
 AmbientColor=
@@ -47,11 +38,8 @@ SpecularColor=
 Transparency=
 VertexShader=
 TexturePath=
-
-[Vector rendering]
 ViewLinewidth=
 ViewFillPattern=
 SectionLinewidth=
 SectionFillPattern=
 ViewColor=
-
