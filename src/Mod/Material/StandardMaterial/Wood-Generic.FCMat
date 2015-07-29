@@ -3,7 +3,7 @@
 ; information about the content of this card can be found here:
 ; http://www.freecadweb.org/wiki/index.php?title=Material
 
-[General]
+[FCMat]
 Vendor=
 Name=Wood
 SpecificPrice=
@@ -11,19 +11,13 @@ Father=Aggregate
 ProductURL=http://en.wikipedia.org/wiki/Wood
 SpecificWeight=500
 Description=A standard construction wood
-
-[Mechanical]
 UltimateTensileStrength=
 CompressiveStrength=
 YoungsModulus=12000 MPa
 Elasticity=
 FractureToughness=
 Density=0.7 kg/m^3
-
-[FEM]
 PoissonRatio=0.05
-
-[Architectural]
 StandardCode=
 EnvironmentalEfficiencyClass=
 FireResistanceClass=
@@ -34,8 +28,6 @@ SoundTransmissionClass=
 UnitsPerQuantity=
 ThermalConductivity=
 Model=
-
-[Rendering]
 TextureScaling=
 FragmentShader=
 AmbientColor=
@@ -46,11 +38,8 @@ SpecularColor=
 Transparency=
 VertexShader=
 TexturePath=
-
-[Vector rendering]
 ViewLinewidth=
 ViewFillPattern=
 SectionLinewidth=
 SectionFillPattern=
 ViewColor=
-

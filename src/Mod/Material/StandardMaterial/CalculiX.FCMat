@@ -2,14 +2,10 @@
 
 [General]
 ; General name, need to be the same as the file name
-Name=CalculiX
-; Father of steel is metal
-Father=Metal
 
-[Mechanical]
-; youngs modulus (or E-Module) 
+[FCMat]
+Name=CalculiX
+Father=Metal
 YoungsModulus=210000 MPa
 Density=1000 kg/m^3
-
-[FEM]
 PoissonRatio = 0.3
