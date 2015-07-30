@@ -66,6 +66,7 @@ IF(SPNAV_FOUND)
     set(FreeCADGui_LIBS
         ${FreeCADGui_LIBS}
         ${SPNAV_LIBRARIES}
+	X11
     )
 ENDIF(SPNAV_FOUND)
 
