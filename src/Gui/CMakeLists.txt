@@ -63,10 +63,18 @@ IF(SPNAV_FOUND)
     include_directories(
         ${SPNAV_INCLUDE_DIR}
     )
-    set(FreeCADGui_LIBS
-        ${FreeCADGui_LIBS}
-        ${SPNAV_LIBRARIES}
-    )
+    if(WIN32)
+        set(FreeCADGui_LIBS
+            ${FreeCADGui_LIBS}
+            ${SPNAV_LIBRARIES}
+        )
+    else(WIN32)
+        set(FreeCADGui_LIBS
+            ${FreeCADGui_LIBS}
+            ${SPNAV_LIBRARIES}
+            X11
+        )
+    endif(WIN32)
 ENDIF(SPNAV_FOUND)
 
 IF(OCULUS_FOUND)
