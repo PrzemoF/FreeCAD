@@ -67,6 +67,18 @@ IF(SPNAV_FOUND)
         ${FreeCADGui_LIBS}
         ${SPNAV_LIBRARIES}
     )
+    if((NOT WIN32) AND (NOT APPLE))
+        set(FreeCADGui_LIBS
+            ${FreeCADGui_LIBS}
+            ${SPNAV_LIBRARIES}
+            X11
+        )
+    else((NOT WIN32i) AND (NOT APPLE))
+        set(FreeCADGui_LIBS
+            ${FreeCADGui_LIBS}
+            ${SPNAV_LIBRARIES}
+        )
+    endif((NOT WIN32i) AND (NOT APPLE))
 ENDIF(SPNAV_FOUND)
 
 IF(OCULUS_FOUND)
