@@ -83,6 +83,7 @@ class FemTest(unittest.TestCase):
         mat['Name'] = "Test Material"
         mat['YoungsModulus'] = "20000 MPa"
         mat['PoissonRatio'] = "0.36"
+        mat['Density'] = "1000 kg/m^3"
         self.new_material_object.Material = mat
 
     def create_fixed_constraint(self):
