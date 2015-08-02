@@ -1,0 +1,25 @@
+; 1C22 - 1.0402 - EN 10083-1
+; (c) 2014 M. Münch - GNU Lesser General Public License (LGPL)
+; information about the content of this card can be found here:
+; http://www.freecadweb.org/wiki/index.php?title=Material
+
+[FCMat]
+Name=1C22
+NameDE=C22
+
+Description = Case hardened alloy steel
+DescriptionPL = Stal stopowa do nawęglania
+DescriptionDE = kleiner Vergütungsdurchmesser, gut schweißbar
+Father = Metal
+KindOfMaterial = Heat-treatable steel
+KindOfMaterialDE = Vergütungsstahl
+MaterialNumber = 1.0402
+ModulusOfShare = 81000
+Norm = EN 10083-1
+PoissonRatio = 0.3
+SpecificWeight = 7800
+ThermalExpansionCoefficient = 1.10E-05
+UltimateStrain = 27
+UltimateTensileStrength = 400
+YieldStrength = 230
+YoungsModulus = 210000 MPa
