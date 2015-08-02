@@ -1,0 +1,23 @@
+; 17CrNiMo6 - 1.6587 - EN 10084
+; (c) 2014 M. Münch - GNU Lesser General Public License (LGPL)
+; information about the content of this card can be found here:
+; http://www.freecadweb.org/wiki/index.php?title=Material
+
+[FCMat]
+Name = 17CrNiMo6
+NameDE = 17CrNiMo6
+
+DescriptionDE = höchste Beanspruchung, Wellen, Zahnräder
+Father = Metal
+KindOfMaterial = Case-hardened steel
+KindOfMaterialDE = Einsatzstahl
+MaterialNumber = 1.6587
+ModulusOfShare = 81000
+Norm = EN 10084
+PoissonRatio = 0.3
+SpecificWeight = 7800
+ThermalExpansionCoefficient = 1.10E-05
+UltimateStrain = 8
+UltimateTensileStrength = 1150
+YieldStrength = 830
+YoungsModulus = 210000 MPa
