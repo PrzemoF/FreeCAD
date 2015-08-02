@@ -1,0 +1,24 @@
+; 15CrNi6 - 1.5919 - EN 10084
+; (c) 2014 M. Münch - GNU Lesser General Public License (LGPL)
+; information about the content of this card can be found here:
+; http://www.freecadweb.org/wiki/index.php?title=Material
+
+[FCMat]
+Name = 15CrNi6
+
+Description = High-strength carbon steel
+DescriptionDE = höchste Beanspruchung, Achsen, Wellen, Ritzel, Nocken, Kegelräder
+DescriptionPL = Wysokowytrzymała stal węglowa
+Father = Metal
+KindOfMaterial = Case-hardened steel
+KindOfMaterialDE = Einsatzstahl
+MaterialNumber = 1.5919
+ModulusOfShare = 81000
+Norm = EN 10084
+PoissonRatio = 0.3
+SpecificWeight = 7800
+ThermalExpansionCoefficient = 1.10E-05
+UltimateStrain = 9
+UltimateTensileStrength = 1000
+YieldStrength = 680
+YoungsModulus = 210000 MPa
