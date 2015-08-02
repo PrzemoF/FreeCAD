@@ -22,12 +22,14 @@
 
 
 #include "PreCompiled.h"
+#ifndef _PreComp_
+# include <QSplitter>
+#endif
 
 /// Here the FreeCAD includes sorted by Base,App,Gui......
 
 #include "CombiView.h"
 #include "BitmapFactory.h"
-#include "iisTaskPanel/include/iisTaskPanel"
 #include "PropertyView.h"
 #include "ProjectView.h"
 #include "Application.h"

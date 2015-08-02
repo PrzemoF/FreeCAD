@@ -91,13 +91,13 @@
 #include "Tree.h"
 #include "PropertyView.h"
 #include "SelectionView.h"
-#include "TaskPanelView.h"
 #include "MenuManager.h"
 //#include "ToolBox.h"
 #include "HelpView.h"
 #include "ReportView.h"
 #include "CombiView.h"
 #include "PythonConsole.h"
+#include "TaskView/TaskView.h"
 
 #include "DlgTipOfTheDayImp.h"
 #include "DlgUndoRedo.h"
@@ -285,16 +285,19 @@ MainWindow::MainWindow(QWidget * parent, Qt::WFlags f)
 
     // clears the action label
     d->actionTimer = new QTimer( this );
+    d->actionTimer->setObjectName(QString::fromAscii("actionTimer"));
     connect(d->actionTimer, SIGNAL(timeout()), d->actionLabel, SLOT(clear()));
 
     // update gui timer
     d->activityTimer = new QTimer(this);
+    d->activityTimer->setObjectName(QString::fromAscii("activityTimer"));
     connect(d->activityTimer, SIGNAL(timeout()),this, SLOT(updateActions()));
     d->activityTimer->setSingleShot(true);
     d->activityTimer->start(300);
 
     // show main window timer
     d->visibleTimer = new QTimer(this);
+    d->visibleTimer->setObjectName(QString::fromAscii("visibleTimer"));
     connect(d->visibleTimer, SIGNAL(timeout()),this, SLOT(showMainWindow()));
     d->visibleTimer->setSingleShot(true);
 
@@ -321,13 +324,6 @@ MainWindow::MainWindow(QWidget * parent, Qt::WFlags f)
     QString home = Gui::Dialog::DlgOnlineHelpImp::getStartpage();
     HelpView* pcHelpView = new HelpView( home, this );
     pDockMgr->registerDockWindow("Std_HelpView", pcHelpView);
-
-    // TaskPanel view
-    TaskPanelView* pcTaskPanelView = new TaskPanelView(0, this);
-    pcTaskPanelView->setObjectName
-        (QString::fromAscii(QT_TRANSLATE_NOOP("QDockWidget","Task View")));
-    pcTaskPanelView->setMinimumWidth(210);
-    pDockMgr->registerDockWindow("Std_TaskPanelView", pcTaskPanelView);
 #endif
 
     // Tree view
@@ -374,7 +370,7 @@ MainWindow::MainWindow(QWidget * parent, Qt::WFlags f)
     // Python console
     PythonConsole* pcPython = new PythonConsole(this);
     pcPython->setWordWrapMode(QTextOption::NoWrap);
-    pcPython->setWindowIcon(Gui::BitmapFactory().pixmap("applications-python"));
+    pcPython->setWindowIcon(Gui::BitmapFactory().iconFromTheme("applications-python"));
     pcPython->setObjectName
         (QString::fromAscii(QT_TRANSLATE_NOOP("QDockWidget","Python console")));
     pDockMgr->registerDockWindow("Std_PythonView", pcPython);
@@ -1160,13 +1156,29 @@ void MainWindow::stopSplasher(void)
 
 QPixmap MainWindow::splashImage() const
 {
+    // search in the UserAppData dir as very first
     QPixmap splash_image;
     QDir dir(QString::fromUtf8(App::Application::Config()["UserAppData"].c_str()));
     QFileInfo fi(dir.filePath(QString::fromAscii("pixmaps/splash_image.png")));
     if (fi.isFile() && fi.exists())
         splash_image.load(fi.filePath(), "PNG");
-    if (splash_image.isNull())
-        splash_image = Gui::BitmapFactory().pixmap(App::Application::Config()["SplashScreen"].c_str());
+
+    // if no image was found try the config
+    std::string splash_path = App::Application::Config()["SplashScreen"];
+    if (splash_image.isNull()) {
+        QString path = QString::fromUtf8(splash_path.c_str());
+        if (QDir(path).isRelative()) {
+            QString home = QString::fromUtf8(App::GetApplication().getHomePath());
+            path = QFileInfo(QDir(home), path).absoluteFilePath();
+        }
+
+        splash_image.load(path);
+    }
+
+    // now try the icon paths
+    if (splash_image.isNull()) {
+        splash_image = Gui::BitmapFactory().pixmap(splash_path.c_str());
+    }
 
     // include application name and version number
     std::map<std::string,std::string>::const_iterator tc = App::Application::Config().find("SplashInfoColor");
@@ -1548,6 +1560,19 @@ void MainWindow::customEvent(QEvent* e)
             d->actionTimer->start(5000);
         }
     }
+    else if (e->type() == ActionStyleEvent::EventType) {
+        QList<TaskView::TaskView*> tasks = findChildren<TaskView::TaskView*>();
+        if (static_cast<ActionStyleEvent*>(e)->getType() == ActionStyleEvent::Clear) {
+            for (QList<TaskView::TaskView*>::iterator it = tasks.begin(); it != tasks.end(); ++it) {
+                (*it)->clearActionStyle();
+            }
+        }
+        else {
+            for (QList<TaskView::TaskView*>::iterator it = tasks.begin(); it != tasks.end(); ++it) {
+                (*it)->restoreActionStyle();
+            }
+        }
+    }
 }
 
 // ----------------------------------------------------------
@@ -1627,6 +1652,20 @@ void StatusBarObserver::Log(const char *m)
     // Send the event to the main window to allow thread-safety. Qt will delete it when done.
     CustomMessageEvent* ev = new CustomMessageEvent(CustomMessageEvent::Log, QString::fromUtf8(m));
     QApplication::postEvent(getMainWindow(), ev);
+}
+
+// -------------------------------------------------------------
+
+int ActionStyleEvent::EventType = -1;
+
+ActionStyleEvent::ActionStyleEvent(Style type)
+  : QEvent(QEvent::Type(EventType)), type(type)
+{
+}
+
+ActionStyleEvent::Style ActionStyleEvent::getType() const
+{
+    return type;
 }
 
 

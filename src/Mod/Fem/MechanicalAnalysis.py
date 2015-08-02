@@ -22,10 +22,8 @@
 
 import ccxFrdReader
 import FreeCAD
-import FemGui
+from FemTools import FemTools
 import os
-import sys
-import tempfile
 import time
 
 if FreeCAD.GuiUp:
@@ -43,7 +41,7 @@ def makeMechanicalAnalysis(name):
     '''makeFemAnalysis(name): makes a Fem Analysis object'''
     obj = FreeCAD.ActiveDocument.addObject("Fem::FemAnalysisPython", name)
     _FemAnalysis(obj)
-    _ViewProviderFemAnalysis(obj.ViewObject)
+    _ViewProviderFemAnalysis()
     #FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -51,7 +49,7 @@ def makeMechanicalAnalysis(name):
 class _CommandNewMechanicalAnalysis:
     "the Fem Analysis command definition"
     def GetResources(self):
-        return {'Pixmap': 'Fem_Analysis',
+        return {'Pixmap': 'fem-analysis',
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_Analysis", "New mechanical analysis"),
                 'Accel': "N, A",
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_Analysis", "Create a new mechanical analysis")}
@@ -86,7 +84,7 @@ class _CommandNewMechanicalAnalysis:
 
 class _CommandFemFromShape:
     def GetResources(self):
-        return {'Pixmap': 'Fem_FemMesh',
+        return {'Pixmap': 'fem-fem-mesh-from-shape',
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_CreateFromShape", "Create FEM mesh"),
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_CreateFromShape", "Create FEM mesh from shape")}
 
@@ -113,62 +111,97 @@ class _CommandFemFromShape:
 class _CommandMechanicalJobControl:
     "the Fem JobControl command definition"
     def GetResources(self):
-        return {'Pixmap': 'Fem_NewAnalysis',
+        return {'Pixmap': 'fem-new-analysis',
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_JobControl", "Start calculation"),
                 'Accel': "S, C",
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_JobControl", "Dialog to start the calculation of the mechanical anlysis")}
 
     def Activated(self):
+        import FemGui
         taskd = _JobControlTaskPanel(FemGui.getActiveAnalysis())
         #taskd.obj = vobj.Object
         taskd.update()
         FreeCADGui.Control.showDialog(taskd)
 
     def IsActive(self):
+        import FemGui
         return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
 
 
 class _CommandPurgeFemResults:
     def GetResources(self):
-        return {'Pixmap': 'Fem_Purge_Results',
+        return {'Pixmap': 'fem-purge-results',
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_PurgeResults", "Purge results"),
                 'Accel': "S, S",
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_PurgeResults", "Purge results from an analysis")}
 
     def Activated(self):
-        purge_fem_results()
-        reset_mesh_color()
-        reset_mesh_deformation()
+        fea = FemTools()
+        fea.purge_results()
+        fea.reset_mesh_color()
+        fea.reset_mesh_deformation()
 
     def IsActive(self):
         return FreeCADGui.ActiveDocument is not None and results_present()
 
 
+class _CommandQuickAnalysis:
+    def GetResources(self):
+        return {'Pixmap': 'fem-quick-analysis',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_Quick_Analysis", "Run CalculiX ccx"),
+                'Accel': "R, C",
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_Quick_Analysis", "Write .inp file and run CalculiX ccx")}
+
+    def Activated(self):
+        def load_results(ret_code):
+            if ret_code == 0:
+                self.fea.load_results()
+                self.show_results_on_mesh()
+            else:
+                print "CalculiX failed ccx finished with error {}".format(ret_code)
+
+        self.fea = FemTools()
+        self.fea.purge_results()
+        self.fea.reset_mesh_color()
+        self.fea.reset_mesh_deformation()
+        message = self.fea.check_prerequisites()
+        if message:
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", message)
+            return
+        self.fea.finished.connect(load_results)
+        QtCore.QThreadPool.globalInstance().start(self.fea)
+
+    def show_results_on_mesh(self):
+        #FIXME proprer mesh refreshing as per FreeCAD.FEM_dialog settings required
+        # or confirmation that it's safe to call restore_result_dialog
+        tp = _ResultControlTaskPanel()
+        tp.restore_result_dialog()
+
+    def IsActive(self):
+        import FemGui
+        return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
+
+
 class _CommandMechanicalShowResult:
     "the Fem JobControl command definition"
     def GetResources(self):
-        return {'Pixmap': 'Fem_Result',
-                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_ResultDisplacement", "Show result"),
+        return {'Pixmap': 'fem-result',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_Result", "Show result"),
                 'Accel': "S, R",
-                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_ResultDisplacement", "Show result information of an analysis")}
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_Result", "Show result information of an analysis")}
 
     def Activated(self):
-        DisplacementObject = None
+        import FemGui
+        self.result_object = None
         for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemResultVector"):
-                if i.DataType == 'Displacement':
-                    DisplacementObject = i
-        StressObject = None
-        for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemResultValue"):
-                if i.DataType == 'VonMisesStress':
-                    StressObject = i
+            if i.isDerivedFrom("Fem::FemResultObject"):
+                self.result_object = i
 
-        if not DisplacementObject and not StressObject:
+        if not self.result_object:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", "No result found in active Analysis")
             return
 
-        taskd = _ResultControlTaskPanel(FemGui.getActiveAnalysis())
+        taskd = _ResultControlTaskPanel()
         FreeCADGui.Control.showDialog(taskd)
 
     def IsActive(self):
@@ -201,12 +234,12 @@ class _FemAnalysis:
 class _ViewProviderFemAnalysis:
     "A View Provider for the Material object"
 
-    def __init__(self, vobj):
+    def __init__(self):
         #vobj.addProperty("App::PropertyLength", "BubbleSize", "Base", str(translate("Fem", "The size of the axis bubbles")))
-        vobj.Proxy = self
+        pass
 
     def getIcon(self):
-        return ":/icons/Fem_Analysis.svg"
+        return ":/icons/fem-analysis.svg"
 
     def attach(self, vobj):
         self.ViewObject = vobj
@@ -220,6 +253,7 @@ class _ViewProviderFemAnalysis:
         return
 
     def doubleClicked(self, vobj):
+        import FemGui
         if not FemGui.getActiveAnalysis() == self.Object:
             if FreeCADGui.activeWorkbench().name() != 'FemWorkbench':
                 FreeCADGui.activateWorkbench("FemWorkbench")
@@ -238,11 +272,7 @@ class _ViewProviderFemAnalysis:
 
 
 class _JobControlTaskPanel:
-    '''The editmode TaskPanel for Material objects'''
-    def __init__(self, object):
-        # the panel has a tree widget that contains categories
-        # for the subcomponents, such as additions, subtractions.
-        # the categories are shown only if they are not empty.
+    def __init__(self, analysis_object):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalAnalysis.ui")
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -257,12 +287,10 @@ class _JobControlTaskPanel:
                 self.CalculixBinary = FreeCAD.getHomePath() + 'bin/ccx.exe'
             else:
                 self.CalculixBinary = 'ccx'
-        self.TempDir = FreeCAD.ActiveDocument.TransientDir.replace('\\', '/') + '/FemAnl_' + object.Uid[-4:]
-        if not os.path.isdir(self.TempDir):
-            os.mkdir(self.TempDir)
+        self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+        self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
 
-        self.obj = object
-        #self.params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+        self.analysis_object = analysis_object
         self.Calculix = QtCore.QProcess()
         self.Timer = QtCore.QTimer()
         self.Timer.start(300)
@@ -270,7 +298,7 @@ class _JobControlTaskPanel:
         self.fem_console_message = ''
 
         #Connect Signals and Slots
-        QtCore.QObject.connect(self.form.toolButton_chooseOutputDir, QtCore.SIGNAL("clicked()"), self.chooseOutputDir)
+        QtCore.QObject.connect(self.form.tb_choose_working_dir, QtCore.SIGNAL("clicked()"), self.choose_working_dir)
         QtCore.QObject.connect(self.form.pushButton_write, QtCore.SIGNAL("clicked()"), self.write_input_file_handler)
         QtCore.QObject.connect(self.form.pushButton_edit, QtCore.SIGNAL("clicked()"), self.editCalculixInputFile)
         QtCore.QObject.connect(self.form.pushButton_generate, QtCore.SIGNAL("clicked()"), self.runCalculix)
@@ -291,8 +319,6 @@ class _JobControlTaskPanel:
         self.form.textEdit_Output.moveCursor(QtGui.QTextCursor.End)
 
     def printCalculiXstdout(self):
-        #There is probably no need to show user output from CalculiX. It should be
-        #written to a file in the calcs directory and shown to user upon request [BUTTON]
         out = self.Calculix.readAllStandardOutput()
         if out.isEmpty():
             self.femConsoleMessage("CalculiX stdout is empty", "#FF0000")
@@ -333,6 +359,7 @@ class _JobControlTaskPanel:
                 self.femConsoleMessage("CalculiX stopped.")
 
     def calculixFinished(self, exitCode):
+        import FemGui
         print "calculixFinished()", exitCode
         print self.Calculix.state()
 
@@ -348,9 +375,10 @@ class _JobControlTaskPanel:
         print "Loading results...."
         self.femConsoleMessage("Loading result sets...")
         self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
-        purge_fem_results()
-        reset_mesh_color()
-        reset_mesh_deformation()
+        fea = FemTools()
+        fea.purge_results()
+        fea.reset_mesh_color()
+        fea.reset_mesh_deformation()
         if os.path.isfile(self.base_name + '.frd'):
             QApplication.setOverrideCursor(Qt.WaitCursor)
             ccxFrdReader.importFrd(self.base_name + '.frd', FemGui.getActiveAnalysis())
@@ -365,7 +393,7 @@ class _JobControlTaskPanel:
 
     def update(self):
         'fills the widgets'
-        self.form.lineEdit_outputDir.setText(tempfile.gettempdir())
+        self.form.le_working_dir.setText(self.working_dir)
         return
 
     def accept(self):
@@ -374,86 +402,42 @@ class _JobControlTaskPanel:
     def reject(self):
         FreeCADGui.Control.closeDialog()
 
-    def chooseOutputDir(self):
-        print "chooseOutputDir"
-        dirname = QtGui.QFileDialog.getExistingDirectory(None, 'Choose material directory', self.params.GetString("JobDir", '/'))
-        if(dirname):
-            self.params.SetString("JobDir", str(dirname))
-            self.form.lineEdit_outputDir.setText(dirname)
+    def choose_working_dir(self):
+        self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+        self.working_dir = QtGui.QFileDialog.getExistingDirectory(None,
+                                                                  'Choose CalculiX working directory',
+                                                                  self.fem_prefs.GetString("WorkingDir", '/tmp'))
+        if self.working_dir:
+            self.fem_prefs.SetString("WorkingDir", str(self.working_dir))
+            self.form.le_working_dir.setText(self.working_dir)
 
     def write_input_file_handler(self):
         QApplication.restoreOverrideCursor()
-        if self.check_prerequisites():
+        if self.check_prerequisites_helper():
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            try:
-                import ccxInpWriter as iw
-                inp_writer = iw.inp_writer(self.TempDir, self.MeshObject, self.MaterialObjects,
-                                           self.FixedObjects, self.ForceObjects, self.PressureObjects)
-                self.base_name = inp_writer.write_calculix_input_file()
-                if self.base_name != "":
-                    self.femConsoleMessage("Write completed.")
-                else:
-                    self.femConsoleMessage("Write .inp file failed!", "#FF0000")
-            except:
-                print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
-                raise
-            finally:
-                QApplication.restoreOverrideCursor()
-            if self.base_name:
+            self.base_name = ""
+            fea = FemTools()
+            fea.update_objects()
+            fea.write_inp_file()
+            if fea.base_name != "":
+                self.base_name = fea.base_name
+                self.femConsoleMessage("Write completed.")
                 self.form.pushButton_edit.setEnabled(True)
                 self.form.pushButton_generate.setEnabled(True)
+            else:
+                self.femConsoleMessage("Write .inp file failed!", "#FF0000")
+            QApplication.restoreOverrideCursor()
 
-    def check_prerequisites(self):
+    def check_prerequisites_helper(self):
         self.Start = time.time()
         self.femConsoleMessage("Check dependencies...")
         self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
-        self.MeshObject = None
-        # [{'Object':MaterialObject}, {}, ...]
-        self.MaterialObjects = []
-        # [{'Object':FixedObject, 'NodeSupports':bool}, {}, ...]
-        self.FixedObjects = []
-        # [{'Object':ForceObject, 'NodeLoad':value}, {}, ...
-        self.ForceObjects = []
-        # [{'Object':PressureObject, 'xxxxxxxx':value}, {}, ...]
-        self.PressureObjects = []
-        if not FemGui.getActiveAnalysis():
-            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No active Analysis")
-            return False
 
-        for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemMeshObject"):
-                self.MeshObject = i
-            elif i.isDerivedFrom("App::MaterialObjectPython"):
-                MaterialObjectDict = {}
-                MaterialObjectDict['Object'] = i
-                self.MaterialObjects.append(MaterialObjectDict)
-            elif i.isDerivedFrom("Fem::ConstraintFixed"):
-                FixedObjectDict = {}
-                FixedObjectDict['Object'] = i
-                self.FixedObjects.append(FixedObjectDict)
-            elif i.isDerivedFrom("Fem::ConstraintForce"):
-                ForceObjectDict = {}
-                ForceObjectDict['Object'] = i
-                self.ForceObjects.append(ForceObjectDict)
-            elif i.isDerivedFrom("Fem::ConstraintPressure"):
-                PressureObjectDict = {}
-                PressureObjectDict['Object'] = i
-                self.PressureObjects.append(PressureObjectDict)
-
-        if not self.MeshObject:
-            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No mesh object in the Analysis")
-            return False
-
-        if not self.MaterialObjects:
-            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No material object in the Analysis")
-            return False
-
-        if not self.FixedObjects:
-            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No fixed-constraint nodes defined in the Analysis")
-            return False
-
-        if not (self.ForceObjects or self.PressureObjects):
-            QtGui.QMessageBox.critical(None, "Missing prerequisite", "No force-constraint or pressure-constraint defined in the Analysis")
+        fea = FemTools()
+        fea.update_objects()
+        message = fea.check_prerequisites()
+        if message != "":
+            QtGui.QMessageBox.critical(None, "Missing prerequisit(s)", message)
             return False
         return True
 
@@ -464,6 +448,7 @@ class _JobControlTaskPanel:
             self.ext_editor_process.start(ext_editor_path, [filename])
 
     def editCalculixInputFile(self):
+        import FemGui
         filename = self.base_name + '.inp'
         print 'editCalculixInputFile {}'.format(filename)
         if self.fem_prefs.GetBool("UseInternalEditor", True):
@@ -497,10 +482,8 @@ class _JobControlTaskPanel:
 
 class _ResultControlTaskPanel:
     '''The control for the displacement post-processing'''
-    def __init__(self, object):
+    def __init__(self):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/ShowDisplacement.ui")
-
-        self.obj = object
 
         #Connect Signals and Slots
         QtCore.QObject.connect(self.form.rb_none, QtCore.SIGNAL("toggled(bool)"), self.none_selected)
@@ -515,8 +498,6 @@ class _ResultControlTaskPanel:
         QtCore.QObject.connect(self.form.sb_displacement_factor, QtCore.SIGNAL("valueChanged(int)"), self.sb_disp_factor_changed)
         QtCore.QObject.connect(self.form.sb_displacement_factor_max, QtCore.SIGNAL("valueChanged(int)"), self.sb_disp_factor_max_changed)
 
-        self.DisplacementObject = None
-        self.StressObject = None
         self.update()
         self.restore_result_dialog()
 
@@ -560,24 +541,25 @@ class _ResultControlTaskPanel:
         return int(QtGui.QDialogButtonBox.Close)
 
     def get_result_stats(self, type_name, analysis=None):
+        import FemGui
         if analysis is None:
             analysis = FemGui.getActiveAnalysis()
         for i in analysis.Member:
-            if i.isDerivedFrom("Fem::FemResultValue"):
-                if i.DataType == 'AnalysisStats':
-                    match_table = {"U1": (i.Values[0], i.Values[1], i.Values[2]),
-                                   "U2": (i.Values[3], i.Values[4], i.Values[5]),
-                                   "U3": (i.Values[6], i.Values[7], i.Values[8]),
-                                   "Uabs": (i.Values[9], i.Values[10], i.Values[11]),
-                                   "Sabs": (i.Values[12], i.Values[13], i.Values[14]),
-                                   "None": (0.0, 0.0, 0.0)}
-                    return match_table[type_name]
+            if (i.isDerivedFrom("Fem::FemResultObject")) and ("Stats" in i.PropertiesList):
+                match_table = {"U1": (i.Stats[0], i.Stats[1], i.Stats[2]),
+                               "U2": (i.Stats[3], i.Stats[4], i.Stats[5]),
+                               "U3": (i.Stats[6], i.Stats[7], i.Stats[8]),
+                               "Uabs": (i.Stats[9], i.Stats[10], i.Stats[11]),
+                               "Sabs": (i.Stats[12], i.Stats[13], i.Stats[14]),
+                               "None": (0.0, 0.0, 0.0)}
+                return match_table[type_name]
         return (0.0, 0.0, 0.0)
 
     def none_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "None"
         self.set_result_stats("mm", 0.0, 0.0, 0.0)
-        reset_mesh_color()
+        fea = FemTools()
+        fea.reset_mesh_color()
 
     def abs_displacement_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "Uabs"
@@ -598,20 +580,21 @@ class _ResultControlTaskPanel:
     def vm_stress_selected(self, state):
         FreeCAD.FEM_dialog["results_type"] = "Sabs"
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        (minm, maxm, avg) = (0.0, 0.0, 0.0)
-        if self.StressObject:
-            self.MeshObject.ViewObject.setNodeColorByResult(self.StressObject)
-            (minm, maxm, avg) = self.get_result_stats("Sabs")
+        self.MeshObject.ViewObject.setNodeColorByScalars(self.result_object.ElementNumbers, self.result_object.StressValues)
+        (minm, avg, maxm) = self.get_result_stats("Sabs")
         self.set_result_stats("MPa", minm, avg, maxm)
         QtGui.qApp.restoreOverrideCursor()
 
     def select_displacement_type(self, disp_type):
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        (minm, maxm, avg) = (0.0, 0.0, 0.0)
-        if self.DisplacementObject:
-            match = {"Uabs": 0, "U1": 1, "U2": 2, "U3": 3}
-            self.MeshObject.ViewObject.setNodeColorByResult(self.DisplacementObject, match[disp_type])
-            (minm, maxm, avg) = self.get_result_stats(disp_type)
+        if disp_type == "Uabs":
+            self.MeshObject.ViewObject.setNodeColorByScalars(self.result_object.ElementNumbers, self.result_object.DisplacementLengths)
+        else:
+            match = {"U1": 0, "U2": 1, "U3": 2}
+            d = zip(*self.result_object.DisplacementVectors)
+            displacements = list(d[match[disp_type]])
+            self.MeshObject.ViewObject.setNodeColorByScalars(self.result_object.ElementNumbers, displacements)
+        (minm, avg, maxm) = self.get_result_stats(disp_type)
         self.set_result_stats("mm", minm, avg, maxm)
         QtGui.qApp.restoreOverrideCursor()
 
@@ -629,7 +612,7 @@ class _ResultControlTaskPanel:
         factor = 0.0
         if checked:
             factor = self.form.hsb_displacement_factor.value()
-        self.MeshObject.ViewObject.setNodeDisplacementByResult(self.DisplacementObject)
+        self.MeshObject.ViewObject.setNodeDisplacementByVectors(self.result_object.ElementNumbers, self.result_object.DisplacementVectors)
         self.MeshObject.ViewObject.applyDisplacement(factor)
         QtGui.qApp.restoreOverrideCursor()
 
@@ -646,16 +629,13 @@ class _ResultControlTaskPanel:
         self.form.hsb_displacement_factor.setValue(value)
 
     def update(self):
+        import FemGui
         self.MeshObject = None
         for i in FemGui.getActiveAnalysis().Member:
             if i.isDerivedFrom("Fem::FemMeshObject"):
                 self.MeshObject = i
-            elif i.isDerivedFrom("Fem::FemResultVector"):
-                if i.DataType == 'Displacement':
-                    self.DisplacementObject = i
-            elif i.isDerivedFrom("Fem::FemResultValue"):
-                if i.DataType == 'VonMisesStress':
-                    self.StressObject = i
+            elif i.isDerivedFrom('Fem::FemResultObject'):
+                self.result_object = i
 
     def accept(self):
         FreeCADGui.Control.closeDialog()
@@ -667,47 +647,19 @@ class _ResultControlTaskPanel:
 
 
 def results_present():
+    import FemGui
     results = False
     analysis_members = FemGui.getActiveAnalysis().Member
     for o in analysis_members:
-        if o.isDerivedFrom('Fem::FemResultVector'):
-            results = True
-        elif o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'VonMisesStress':
+        if o.isDerivedFrom('Fem::FemResultObject'):
             results = True
     return results
 
 
-def purge_fem_results(Analysis=None):
-    if Analysis is None:
-        analysis_members = FemGui.getActiveAnalysis().Member
-    else:
-        analysis_members = FemGui.Analysis().Member
-    for o in analysis_members:
-        if (o.isDerivedFrom('Fem::FemResultVector') or
-           (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'VonMisesStress') or
-           (o.isDerivedFrom("Fem::FemResultValue") and o.DataType == 'AnalysisStats')):
-            FreeCAD.ActiveDocument.removeObject(o.Name)
-
-
-def reset_mesh_color(mesh=None):
-    if mesh is None:
-        for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemMeshObject"):
-                mesh = i
-    mesh.ViewObject.NodeColor = {}
-    mesh.ViewObject.ElementColor = {}
-    mesh.ViewObject.setNodeColorByResult()
-
-
-def reset_mesh_deformation(mesh=None):
-    if mesh is None:
-        for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemMeshObject"):
-                mesh = i
-    mesh.ViewObject.applyDisplacement(0.0)
-
-FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
-FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
-FreeCADGui.addCommand('Fem_MechanicalJobControl', _CommandMechanicalJobControl())
-FreeCADGui.addCommand('Fem_PurgeResults', _CommandPurgeFemResults())
-FreeCADGui.addCommand('Fem_ShowResult', _CommandMechanicalShowResult())
+if FreeCAD.GuiUp:
+    FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
+    FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
+    FreeCADGui.addCommand('Fem_MechanicalJobControl', _CommandMechanicalJobControl())
+    FreeCADGui.addCommand('Fem_Quick_Analysis', _CommandQuickAnalysis())
+    FreeCADGui.addCommand('Fem_PurgeResults', _CommandPurgeFemResults())
+    FreeCADGui.addCommand('Fem_ShowResult', _CommandMechanicalShowResult())

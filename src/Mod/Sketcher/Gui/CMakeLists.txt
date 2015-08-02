@@ -11,11 +11,11 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Boost_INCLUDE_DIRS}
     ${OCC_INCLUDE_DIR}
-    ${COIN3D_INCLUDE_DIR}
-    ${PYTHON_INCLUDE_PATH}
+    ${COIN3D_INCLUDE_DIRS}
+    ${PYTHON_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
     ${QT_INCLUDE_DIR}
-    ${XERCESC_INCLUDE_DIR}
+    ${XercesC_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
 )
 link_directories(${OCC_LIBRARY_DIR})
@@ -32,6 +32,7 @@ set(SketcherGui_MOC_HDRS
     TaskSketcherCreateCommands.h
     TaskSketcherGeneral.h
     TaskSketcherMessages.h
+    TaskSketcherSolverAdvanced.h
     TaskSketcherValidation.h
     TaskDlgEditSketch.h
     SketchOrientationDialog.h
@@ -48,6 +49,7 @@ set(SketcherGui_UIC_SRCS
     TaskSketcherElements.ui
     TaskSketcherGeneral.ui
     TaskSketcherMessages.ui
+    TaskSketcherSolverAdvanced.ui
     TaskSketcherValidation.ui
     InsertDatum.ui
     SketchOrientationDialog.ui
@@ -90,6 +92,9 @@ SET(SketcherGui_SRCS
     TaskSketcherMessages.ui
     TaskSketcherMessages.cpp
     TaskSketcherMessages.h
+    TaskSketcherSolverAdvanced.ui
+    TaskSketcherSolverAdvanced.h
+    TaskSketcherSolverAdvanced.cpp
     TaskSketcherValidation.ui
     TaskSketcherValidation.cpp
     TaskSketcherValidation.h

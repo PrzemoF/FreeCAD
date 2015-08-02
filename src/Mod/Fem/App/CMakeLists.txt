@@ -18,9 +18,9 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
     ${QT_INCLUDE_DIR}
     ${OCC_INCLUDE_DIR}
-    ${PYTHON_INCLUDE_PATH}
+    ${PYTHON_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIR}
-    ${XERCESC_INCLUDE_DIR}
+    ${XercesC_INCLUDE_DIRS}
     ${SMESH_INCLUDE_DIR}
 )
 
@@ -71,6 +71,10 @@ SET(FemScripts_SRCS
     convert2TetGen.py
     ccxFrdReader.py
     ccxInpWriter.py
+    TestFem.py
+    FemTools.py
+    mesh_points.csv
+    mesh_volumes.csv
     MechanicalAnalysis.ui
     MechanicalAnalysis.py
     MechanicalMaterial.ui
@@ -131,10 +135,6 @@ SET(FemConstraints_SRCS
 SOURCE_GROUP("Constraints" FILES ${FemConstraints_SRCS})
 
 SET(FemResult_SRCS
-    FemResultValue.cpp
-    FemResultValue.h
-    FemResultVector.cpp
-    FemResultVector.h
 	)
 SOURCE_GROUP("ResultObjects" FILES ${FemResult_SRCS})
 

@@ -30,6 +30,7 @@
 # include <Inventor/nodes/SoRotation.h>
 # include <Inventor/nodes/SoMultipleCopy.h>
 # include <Precision.hxx>
+# include <QMessageBox>
 #endif
 
 #include "ViewProviderFemConstraintFixed.h"
@@ -47,7 +48,7 @@ PROPERTY_SOURCE(FemGui::ViewProviderFemConstraintFixed, FemGui::ViewProviderFemC
 
 ViewProviderFemConstraintFixed::ViewProviderFemConstraintFixed()
 {
-    sPixmap = "Fem_ConstraintFixed";
+    sPixmap = "fem-constraint-fixed";
 }
 
 ViewProviderFemConstraintFixed::~ViewProviderFemConstraintFixed()

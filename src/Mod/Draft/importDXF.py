@@ -175,8 +175,10 @@ def deformat(text):
                     print("unable to decode text: ",text)
     t = ns
     # replace degrees, diameters chars
-    t = re.sub('%%d','°',t)
-    t = re.sub('%%c','Ø',t)
+    t = re.sub('%%d',u'°',t)
+    t = re.sub('%%c',u'Ø',t)
+    t = re.sub('%%D',u'°',t)
+    t = re.sub('%%C',u'Ø',t)
     #print("output text: ",t)
     return t
 
@@ -1320,7 +1322,8 @@ def processdxf(document,filename,getShapes=False):
                             newob.ViewObject.FontSize = draftui.fontsize
                         else:
                             st = rawValue(dim,3)
-                            newob.ViewObject.FontSize = float(getdimheight(st))*TEXTSCALING
+                            size = getdimheight(st) or 1
+                            newob.ViewObject.FontSize = float(size)*TEXTSCALING
     else:
         FreeCAD.Console.PrintMessage("skipping dimensions...\n")
 
@@ -1466,6 +1469,9 @@ def open(filename):
     readPreferences()
     if dxfReader:
         docname = os.path.splitext(os.path.basename(filename))[0]
+        if isinstance(docname,unicode): 
+            import sys #workaround since newDocument currently can't handle unicode filenames
+            docname = docname.encode(sys.getfilesystemencoding())
         doc = FreeCAD.newDocument(docname)
         doc.Label = decodeName(docname)
         processdxf(doc,filename)

@@ -100,6 +100,7 @@
 // or the Python script "SubWCRev.py" on Linux based systems which builds
 // src/Build/Version.h. Or create your own from src/Build/Version.h.in!
 #include <Build/Version.h>
+#include "Branding.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/token_functions.hpp>
@@ -107,6 +108,7 @@
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
 #include <QDir>
+#include <QFileInfo>
 
 using namespace App;
 using namespace std;
@@ -1132,6 +1134,17 @@ void Application::initConfig(int argc, char ** argv)
     _argc = argc;
     _argv = argv;
 
+    // Now it's time to read-in the file branding.xml if it exists
+    Branding brand;
+    QString binDir = QString::fromUtf8((mConfig["AppHomePath"] + "bin").c_str());
+    QFileInfo fi(binDir, QString::fromAscii("branding.xml"));
+    if (brand.readFile(fi.absoluteFilePath())) {
+        Branding::XmlConfig cfg = brand.getUserDefines();
+        for (Branding::XmlConfig::iterator it = cfg.begin(); it != cfg.end(); ++it) {
+            App::Application::Config()[it.key()] = it.value();
+        }
+    }
+
     // extract home paths
     ExtractUserPath();
 
@@ -1397,6 +1410,21 @@ void Application::LoadParameters(void)
 
     try {
         if (_pcUserParamMngr->LoadOrCreateDocument(mConfig["UserParameter"].c_str()) && !(mConfig["Verbose"] == "Strict")) {
+            // The user parameter file doesn't exist. When an alternative parameter file is offered
+            // this will be used.
+            std::map<std::string, std::string>::iterator it = mConfig.find("UserParameterTemplate");
+            if (it != mConfig.end()) {
+                QString path = QString::fromUtf8(it->second.c_str());
+                if (QDir(path).isRelative()) {
+                    QString home = QString::fromUtf8(mConfig["AppHomePath"].c_str());
+                    path = QFileInfo(QDir(home), path).absoluteFilePath();
+                }
+                QFileInfo fi(path);
+                if (fi.exists()) {
+                    _pcUserParamMngr->LoadDocument(path.toUtf8().constData());
+                }
+            }
+
             // Configuration file optional when using as Python module
             if (!Py_IsInitialized()) {
                 Console().Warning("   User settings not existing, write initial one\n");
@@ -1501,6 +1529,8 @@ void Application::ParseOptions(int ac, char ** av)
     ("help,h", "Prints help message")
     ("console,c", "Starts in console mode")
     ("response-file", value<string>(),"Can be specified with '@name', too")
+    ("dump-config", "Dumps configuration")
+    ("get-config", value<string>(), "Prints the value of the requested configuration key")
     ;
 
     // Declare a group of options that will be
@@ -1740,6 +1770,25 @@ void Application::ParseOptions(int ac, char ** av)
         };
     }
 
+    if (vm.count("dump-config")) {
+        std::stringstream str;
+        for (std::map<std::string,std::string>::iterator it=mConfig.begin(); it != mConfig.end(); ++it) {
+            str << it->first << "=" << it->second << std::endl;
+        }
+        throw Base::ProgramInformation(str.str());
+    }
+
+    if (vm.count("get-config")) {
+        std::string configKey = vm["get-config"].as<string>();
+        std::stringstream str;
+        std::map<std::string,std::string>::iterator pos;
+        pos = mConfig.find(configKey);
+        if (pos != mConfig.end()) {
+            str << pos->second;
+        }
+        str << std::endl;
+        throw Base::ProgramInformation(str.str());
+    }
 }
 
 void Application::ExtractUserPath()

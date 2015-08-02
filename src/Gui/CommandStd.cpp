@@ -127,7 +127,7 @@ Action * StdCmdWorkbench::createAction(void)
     pcAction->setShortcut(QString::fromAscii(sAccel));
     applyCommandData(this->className(), pcAction);
     if (sPixmap)
-        pcAction->setIcon(Gui::BitmapFactory().pixmap(sPixmap));
+        pcAction->setIcon(Gui::BitmapFactory().iconFromTheme(sPixmap));
 
     return pcAction;
 }
@@ -678,7 +678,7 @@ StdCmdUnitsCalculator::StdCmdUnitsCalculator()
     sToolTipText  = QT_TR_NOOP("Start the units calculator");
     sWhatsThis    = QT_TR_NOOP("Start the units calculator");
     sStatusTip    = QT_TR_NOOP("Start the units calculator");
-    //sPixmap     = "";
+    sPixmap       = "accessories-calculator";
     eType         = 0;
 }
 

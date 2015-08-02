@@ -41,7 +41,9 @@
 # include <QGLFramebufferObject>
 #endif
 # include <QSessionManager>
+# include <QStatusBar>
 # include <QTextStream>
+# include <QTimer>
 #endif
 
 #include <boost/interprocess/sync/file_lock.hpp>
@@ -83,6 +85,8 @@
 #include "View3DPy.h"
 #include "DlgOnlineHelpImp.h"
 #include "SpaceballEvent.h"
+#include "Control.h"
+#include "TaskView/TaskView.h"
 
 #include "SplitView3DInventor.h"
 #include "View3DInventor.h"
@@ -1165,11 +1169,10 @@ QPixmap Application::workbenchIcon(const QString& wb) const
     QIcon icon = QApplication::windowIcon();
     if (!icon.isNull()) {
         QList<QSize> s = icon.availableSizes();
-        return icon.pixmap(s[0]);
+        if (!s.isEmpty())
+            return icon.pixmap(s[0]);
     }
-    else {
-        return QPixmap();
-    }
+    return QPixmap();
 }
 
 QString Application::workbenchToolTip(const QString& wb) const
@@ -1636,6 +1639,16 @@ void Application::runApplication(void)
     plugin += QLatin1String("/plugins");
     QCoreApplication::addLibraryPath(plugin);
 
+    // setup the search paths for Qt style sheets
+    QStringList qssPaths;
+    qssPaths << QString::fromUtf8((App::Application::getUserAppDataDir() + "Gui/Stylesheets/").c_str())
+             << QString::fromUtf8((App::Application::getResourceDir() + "Gui/Stylesheets/").c_str())
+             << QLatin1String(":/stylesheets");
+    QDir::setSearchPaths(QString::fromLatin1("qss"), qssPaths);
+
+    // register action style event type
+    ActionStyleEvent::EventType = QEvent::registerEventType(QEvent::User + 1);
+
     // check for OpenGL
     if (!QGLFormat::hasOpenGL()) {
         QMessageBox::critical(0, QObject::tr("No OpenGL"), QObject::tr("This system does not support OpenGL"));
@@ -1672,6 +1685,11 @@ void Application::runApplication(void)
         Base::Console().Log("OpenGL version 1.1 or higher is present\n");
     else if (version & QGLFormat::OpenGL_Version_None)
         Base::Console().Log("No OpenGL is present or no OpenGL context is current\n");
+
+#if !defined(Q_WS_X11)
+    QIcon::setThemeSearchPaths(QIcon::themeSearchPaths() << QString::fromLatin1(":/icons/FreeCAD-default"));
+    QIcon::setThemeName(QLatin1String("FreeCAD-default"));
+#endif
 
     Application app(true);
     MainWindow mw;
@@ -1779,6 +1797,9 @@ void Application::runApplication(void)
             mdi->setBackground(QBrush(Qt::NoBrush));
             QTextStream str(&f);
             qApp->setStyleSheet(str.readAll());
+
+            ActionStyleEvent e(ActionStyleEvent::Clear);
+            qApp->sendEvent(&mw, &e);
         }
     }
 

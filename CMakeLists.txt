@@ -44,9 +44,9 @@ endif(WIN32)
 
 # ================================================================================
 
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     set(CMAKE_COMPILER_IS_CLANGXX TRUE)
-endif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+endif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     include(cMake/ConfigureChecks.cmake)
@@ -117,8 +117,10 @@ endif(MSVC)
 OPTION(BUILD_GUI "Build FreeCAD Gui. Otherwise you have only the command line and the Python import module." ON)
 OPTION(FREECAD_MAINTAINERS_BUILD "Build FreeCAD for Maintainers, with Docu and 3rd party libs. On Windows the Installer is build." OFF)
 OPTION(FREECAD_USE_EXTERNAL_ZIPIOS "Use system installed zipios++ instead of the bundled." OFF)
-OPTION(FREECAD_USE_EXTERNAL_PIVY "Use system installed python-pivy instead of the bundled." OFF)
+OPTION(FREECAD_USE_EXTERNAL_PIVY "Use system installed python-pivy instead of the bundled." ON)
 OPTION(FREECAD_USE_EXTERNAL_SMESH "Use system installed smesh instead of the bundled." OFF)
+OPTION(FREECAD_USE_EXTERNAL_KDL "Use system installed orocos-kdl instead of the bundled." OFF)
+OPTION(FREECAD_USE_FREETYPE "Builds the features using FreeType libs" ON)
 OPTION(FREECAD_BUILD_DEBIAN "Prepare for a build of a Debian package" OFF)
 
 if(APPLE)
@@ -144,7 +146,6 @@ if(APPLE)
     endif(FREECAD_CREATE_MAC_APP)
 endif(APPLE)
 
-OPTION(BUILD_CAM "Build the FreeCAD CAM module and the needed libs, be aware, unfinished code!" OFF)
 OPTION(BUILD_FEM "Build the FreeCAD FEM module, be aware, unfinished code!" ON)
 OPTION(BUILD_SANDBOX "Build the FreeCAD Sandbox module which is only for testing purposes" OFF)
 OPTION(BUILD_TEMPLATE "Build the FreeCAD template module which is only for testing purposes" OFF)
@@ -164,6 +165,7 @@ OPTION(BUILD_MESH_PART "Build the FreeCAD mesh part module" ON)
 OPTION(BUILD_OPENSCAD "Build the FreeCAD openscad module" ON)
 OPTION(BUILD_PART "Build the FreeCAD part module" ON)
 OPTION(BUILD_PART_DESIGN "Build the FreeCAD part design module" ON)
+OPTION(BUILD_PATH "Build the FreeCAD path module" ON)
 OPTION(BUILD_PLOT "Build the FreeCAD plot module" ON)
 OPTION(BUILD_POINTS "Build the FreeCAD points module" ON)
 OPTION(BUILD_RAYTRACING "Build the FreeCAD ray tracing module" ON)
@@ -178,7 +180,6 @@ OPTION(BUILD_WEB "Build the FreeCAD web module" ON)
 OPTION(BUILD_VR "Build the FreeCAD Oculus Rift support (need Oculus SDK 4.x or higher)" OFF)
 
 if(MSVC)
-    OPTION(FREECAD_USE_FREETYPE "Builds the features using FreeType libs" OFF)
     OPTION(BUILD_FEM_NETGEN "Build the FreeCAD FEM module with the NETGEN mesher" ON)
     OPTION(FREECAD_USE_3DCONNEXION "Use the 3D connexion SDK to support 3d mouse." ON)
 elseif(APPLE)
@@ -192,10 +193,8 @@ else(MSVC)
     set(FREECAD_USE_3DCONNEXION OFF)
 endif(MSVC)
 if(NOT MSVC)
-    OPTION(FREECAD_USE_FREETYPE "Builds the features using FreeType libs" ON)
     OPTION(BUILD_FEM_NETGEN "Build the FreeCAD FEM module with the NETGEN mesher" OFF)
     OPTION(FREECAD_USE_PCL "Build the features that use PCL libs" OFF)
-    OPTION(FREECAD_USE_EXTERNAL_PIVY "Use system installed python-pivy instead of the bundled." ON)
 endif(NOT MSVC)
 
 # if this is set override some options
@@ -275,12 +274,6 @@ if(BUILD_MESH_PART)
   set(BUILD_SMESH ON)
 endif(BUILD_MESH_PART)
 
-#inferred from cmakelists.txt. build errors. obsolete?
-if(BUILD_CAM)
-  set(BUILD_PART ON)
-  set(BUILD_MESH ON)
-endif(BUILD_CAM)
-
 #inferred from cmakelists.txt. appears to be working.
 if(BUILD_RAYTRACING)
   set(BUILD_PART ON)
@@ -295,6 +288,12 @@ endif(BUILD_DRAWING)
 if(BUILD_ROBOT)
   set(BUILD_PART ON)
 endif(BUILD_ROBOT)
+
+#path module dependencies.
+if(BUILD_PATH)
+  set(BUILD_PART ON)
+  set(BUILD_ROBOT ON)
+endif(BUILD_PATH)
 
 #inferred from cmakelists.txt. appears to be working.
 if(BUILD_SKETCHER)
@@ -431,7 +430,7 @@ if(NOT FREECAD_LIBPACK_USE OR FREECAD_LIBPACK_CHECKFILE_CLBUNDLER)
 
 #http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=677598
 # Acceptable versions of Python
-set(Python_ADDITIONAL_VERSIONS "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9")
+set(Python_ADDITIONAL_VERSIONS "2.5" "2.6" "2.7" "2.8" "2.9")
 
 # For building on OS X
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -546,6 +545,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
     find_package(PythonInterp REQUIRED)
+    set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
     IF (NOT DEFINED PYTHON_VERSION_STRING)
         find_package(PythonLibs REQUIRED)
     ELSE (NOT DEFINED PYTHON_VERSION_STRING)
@@ -554,7 +554,9 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 
     IF(NOT PYTHONLIBS_FOUND)
-        MESSAGE(FATAL_ERROR "Python not found, install python!")
+        MESSAGE(FATAL_ERROR "=================================\n"
+                            "Python not found, install Python!\n"
+                            "=================================\n")
     ENDIF(NOT PYTHONLIBS_FOUND)
 
 # -------------------------------- pcl ----------------------------------
@@ -566,15 +568,30 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # -------------------------------- Boost --------------------------------
 
-    SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.41.0" "1.39.0" "1.38.0" "1.37.0"
-        "1.36.1" "1.36.0" "1.35.1" "1.35.0" "1.35" "1.34.1" "1.34.0" "1.34"
-        "1.33.1" "1.33.0" "1.33" )
+    SET(_boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS})
 
     find_package(Boost COMPONENTS filesystem program_options regex signals system thread REQUIRED)
+
+    IF(NOT Boost_FOUND)
+        MESSAGE(FATAL_ERROR "========================================\n"
+                            "boost not found, install the components:\n"
+                            " * filesystem\n"
+                            " * program_options\n"
+                            " * regex\n"
+                            " * signals\n"
+                            " * system\n"
+                            " * thread\n"
+                            "========================================\n")
+    ENDIF(NOT Boost_FOUND)
 
 # -------------------------------- XercesC --------------------------------
 
     find_package(XercesC REQUIRED)
+    IF(NOT XercesC_FOUND)
+        MESSAGE(FATAL_ERROR "==================\n"
+                            "XercesC not found!\n"
+                            "==================\n")
+    ENDIF(NOT XercesC_FOUND)
 
 # -------------------------------- ZLIB --------------------------------
 
@@ -587,6 +604,11 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 # -------------------------------- OpenCasCade --------------------------------
 
     find_package(OpenCasCade)
+    IF(NOT OCC_FOUND)
+        MESSAGE(FATAL_ERROR "================================================================\n"
+                            "Neither OpenCASCADE Community Edition nor OpenCASCADE was found!\n"
+                            "================================================================\n")
+    ENDIF(NOT OCC_FOUND)
 
 # -------------------------------- Salome SMESH --------------------------
 
@@ -620,12 +642,19 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     find_package(SWIG)
 
     IF(NOT SWIG_FOUND)
-        MESSAGE("SWIG was not found, build no SWIG binding for pivy")
+        MESSAGE("==================================================\n"
+                "SWIG was not found, build no SWIG binding for pivy\n"
+                "==================================================\n")
     ENDIF(NOT SWIG_FOUND)
 
 # -------------------------------- Eigen --------------------------------
 
     find_package(Eigen3)
+    IF(NOT EIGEN3_FOUND)
+        MESSAGE("====================\n"
+                "Eigen3 was not found\n"
+                "====================\n")
+    ENDIF(NOT EIGEN3_FOUND)
 
 # -------------------------------- ODE ----------------------------------
 
@@ -644,16 +673,21 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         set(QT_USE_QTUITOOLS TRUE)
         set(QT_USE_QTWEBKIT TRUE)
     endif(BUILD_GUI)
-    find_package(Qt4 REQUIRED)
+
+    find_package(Qt4)# REQUIRED
 
     include(${QT_USE_FILE})
 
     IF(NOT QT4_FOUND)
-        MESSAGE("Library qt-4.3 or above is not available, install QT or FreeCAD Gui version will not be built")
+        MESSAGE(FATAL_ERROR "=======================\n"
+                            "Qt libraries not found!\n"
+                            "=======================\n")
     ENDIF(NOT QT4_FOUND)
 
     IF(NOT QT_QTWEBKIT_FOUND)
-        MESSAGE("Qt Webkit not found, will not build browser integration!")
+        MESSAGE("========================================================\n"
+                "Qt Webkit not found, will not build browser integration!\n"
+                "========================================================\n")
     ENDIF(NOT QT_QTWEBKIT_FOUND)
 
 
@@ -687,7 +721,9 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     if(FREECAD_USE_FREETYPE)
         find_package(Freetype)
         if(NOT FREETYPE_FOUND)
-            MESSAGE("FreeType2 library is not available. Part module will lack of makeWireString().")
+            MESSAGE("==============================================================================\n"
+                    "FreeType2 library is not available. Part module will lack of makeWireString().\n"
+                    "==============================================================================\n")
         endif(NOT FREETYPE_FOUND)
     endif(FREECAD_USE_FREETYPE)
 
@@ -703,12 +739,21 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
                         "Found OpenGLU: ${OPENGL_glu_LIBRARY}"
                         "[${OPENGL_glu_LIBRARY}][${OEPNGL_INCLUDE_DIR}]")
                 else(OPENGL_GLU_FOUND)
-                    message(FATAL_ERROR "The GLU library is required. Make sure it is installed.")
+                    message(FATAL_ERROR "==============================\n"
+                                        "The GLU library was not found.\n"
+                                        "==============================\n")
                 endif(OPENGL_GLU_FOUND)
 
 # -------------------------------- Coin3D --------------------------------
 
-        find_package(Coin3D REQUIRED)
+        if(BUILD_GUI)
+            find_package(Coin3D REQUIRED)
+            if(NOT COIN3D_FOUND)
+                MESSAGE(FATAL_ERROR "====================\n"
+                                    "Coin3D was not found\n"
+                                    "====================\n")
+            endif(NOT COIN3D_FOUND)
+        endif(BUILD_GUI)
 
 # ------------------------------ Spaceball -------------------------------
 
@@ -729,9 +774,21 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
             find_package(PySide REQUIRED HINTS "${PYTHON_LIBRARY_DIR}/cmake")
         endif(DEFINED MACPORTS_PREFIX)
 
-        find_package(Shiboken REQUIRED)
-        find_package(PySide REQUIRED)
-        find_package(PySideTools REQUIRED) # Pyside utilities (pyside-uic & pyside-rcc)
+        find_package(Shiboken)# REQUIRED
+        if(NOT SHIBOKEN_INCLUDE_DIR)
+            MESSAGE(FATAL_ERROR "===================\n"
+                                "shiboken not found.\n"
+                                "===================\n")
+        endif(NOT SHIBOKEN_INCLUDE_DIR)
+
+        find_package(PySide)# REQUIRED
+        if(NOT PYSIDE_INCLUDE_DIR)
+            MESSAGE(FATAL_ERROR "=================\n"
+                                "PySide not found.\n"
+                                "=================\n")
+        endif(NOT PYSIDE_INCLUDE_DIR)
+
+        find_package(PySideTools REQUIRED) # PySide utilities (pyside-uic & pyside-rcc)
 
 # ------------------------------ Matplotlib ------------------------------
 
@@ -791,7 +848,8 @@ IF(MSVC)
 	set (CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES}")
 	# set linker flag /nodefaultlib
 	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB")
-	SET (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB")
+	set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /NODEFAULTLIB")
+	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB")
 	IF(FREECAD_RELEASE_PDB)
 		set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
 		set (CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
@@ -946,3 +1004,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR MINGW)
               WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 endif(CMAKE_COMPILER_IS_GNUCXX OR MINGW)
+
+# Print message to start build process
+if (${CMAKE_BUILD_TOOL} MATCHES "make")
+    MESSAGE("=======================================\n"
+            "Now run 'make' to build ${PACKAGE_NAME}\n"
+            "=======================================\n")
+endif()
+

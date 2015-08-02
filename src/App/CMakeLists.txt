@@ -17,24 +17,18 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Boost_INCLUDE_DIRS}
-    ${PYTHON_INCLUDE_PATH}
-    ${XERCESC_INCLUDE_DIR}
+    ${PYTHON_INCLUDE_DIRS}
+    ${XercesC_INCLUDE_DIRS}
     ${QT_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
 )
 
-if(WIN32)
-    set(FreeCADApp_LIBS
-        FreeCADBase
-        ${Boost_DEBUG_LIBRARIES}
-        ${Boost_LIBRARIES}
-    )
-else(WIN32)
-    set(FreeCADApp_LIBS
-        FreeCADBase
-        ${Boost_LIBRARIES}
-    )
-endif(WIN32)
+set(FreeCADApp_LIBS
+    FreeCADBase
+    ${Boost_LIBRARIES}
+    ${QT_QTCORE_LIBRARY}
+    ${QT_QTXML_LIBRARY}
+)
 
 generate_from_xml(DocumentPy)
 generate_from_xml(DocumentObjectPy)
@@ -144,6 +138,7 @@ SET(FreeCADApp_CPP_SRCS
     ${Properties_CPP_SRCS}
     Application.cpp
     ApplicationPy.cpp
+    Branding.cpp
     ColorModel.cpp
     ComplexGeoData.cpp
     ComplexGeoDataPyImp.cpp
@@ -156,6 +151,7 @@ SET(FreeCADApp_HPP_SRCS
     ${Document_HPP_SRCS}
     ${Properties_HPP_SRCS}
     Application.h
+    Branding.h
     ColorModel.h
     ComplexGeoData.h
     Enumeration.h

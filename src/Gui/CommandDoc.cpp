@@ -361,71 +361,9 @@ StdCmdExportGraphviz::StdCmdExportGraphviz()
 void StdCmdExportGraphviz::activated(int iMsg)
 {
     App::Document* doc = App::GetApplication().getActiveDocument();
-    std::stringstream str;
-    doc->exportGraphviz(str);
-
-    ParameterGrp::handle hGrp = App::GetApplication().GetParameterGroupByPath("User parameter:BaseApp/Preferences/Paths");
-    QProcess proc;
-    QStringList args;
-    args << QLatin1String("-Tpng");
-#ifdef FC_OS_LINUX
-    QString path = QString::fromUtf8(hGrp->GetASCII("Graphviz", "/usr/bin").c_str());
-#else
-    QString path = QString::fromUtf8(hGrp->GetASCII("Graphviz").c_str());
-#endif
-    bool pathChanged = false;
-#ifdef FC_OS_WIN32
-    QString exe = QString::fromAscii("\"%1/dot\"").arg(path);
-#else
-    QString exe = QString::fromAscii("%1/dot").arg(path);
-#endif
-    proc.setEnvironment(QProcess::systemEnvironment());
-    do {
-        proc.start(exe, args);
-        if (!proc.waitForStarted()) {
-            int ret = QMessageBox::warning(getMainWindow(),
-                qApp->translate("Std_ExportGraphviz","Graphviz not found"),
-                qApp->translate("Std_ExportGraphviz","Graphviz couldn't be found on your system.\n"
-                                "Do you want to specify its installation path if it's already installed?"),
-                                QMessageBox::Yes, QMessageBox::No);
-            if (ret == QMessageBox::No)
-                return;
-            path = QFileDialog::getExistingDirectory(Gui::getMainWindow(),
-                qApp->translate("Std_ExportGraphviz","Graphviz installation path"));
-            if (path.isEmpty())
-                return;
-            pathChanged = true;
-#ifdef FC_OS_WIN32
-            exe = QString::fromAscii("\"%1/dot\"").arg(path);
-#else
-            exe = QString::fromAscii("%1/dot").arg(path);
-#endif
-        }
-        else {
-            if (pathChanged)
-                hGrp->SetASCII("Graphviz", (const char*)path.toUtf8());
-            break;
-        }
-    }
-    while(true);
-
-    proc.write(str.str().c_str(), str.str().size());
-    proc.closeWriteChannel();
-    if (!proc.waitForFinished())
-        return;
-
-    QPixmap px;
-    if (px.loadFromData(proc.readAll(), "PNG")) {
-        Gui::GraphvizView* view = new Gui::GraphvizView(px);
-        view->setDependencyGraph(str.str());
-        view->setWindowTitle(qApp->translate("Std_ExportGraphviz","Dependency graph"));
-        getMainWindow()->addWindow(view);
-    }
-    else {
-        QMessageBox::warning(getMainWindow(),
-        qApp->translate("Std_ExportGraphviz","Graphviz failed"),
-        qApp->translate("Std_ExportGraphviz","Graphviz failed to create an image file"));
-    }
+    Gui::GraphvizView* view = new Gui::GraphvizView(*doc);
+    view->setWindowTitle(qApp->translate("Std_ExportGraphviz","Dependency graph"));
+    getMainWindow()->addWindow(view);
 }
 
 bool StdCmdExportGraphviz::isActive(void)
@@ -539,6 +477,40 @@ bool StdCmdSaveAs::isActive(void)
 }
 
 //===========================================================================
+// Std_Revert
+//===========================================================================
+DEF_STD_CMD_A(StdCmdRevert);
+
+StdCmdRevert::StdCmdRevert()
+  :Command("Std_Revert")
+{
+    sGroup        = QT_TR_NOOP("File");
+    sMenuText     = QT_TR_NOOP("Revert");
+    sToolTipText  = QT_TR_NOOP("Reverts to the saved version of this file");
+    sWhatsThis    = "Std_Revert";
+    sStatusTip    = QT_TR_NOOP("Reverts to the saved version of this file");
+  //sPixmap       = "document-revert";
+}
+
+void StdCmdRevert::activated(int iMsg)
+{
+    App::Document* doc = App::GetApplication().getActiveDocument();
+    QMessageBox msgBox;
+    msgBox.setText(qApp->translate("Std_Revert","This will discard all the changes since last file save."));
+    msgBox.setInformativeText(qApp->translate("Std_Revert","Are you sure?"));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::Yes)
+        doCommand(Command::App,"App.ActiveDocument.restore()");
+}
+
+bool StdCmdRevert::isActive(void)
+{
+  return ( getActiveGuiDocument() ? true : false );
+}
+
+//===========================================================================
 // Std_ProjectInfo
 //===========================================================================
 
@@ -640,6 +612,7 @@ StdCmdPrintPreview::StdCmdPrintPreview()
     sToolTipText  = QT_TR_NOOP("Print the document");
     sWhatsThis    = "Std_PrintPreview";
     sStatusTip    = QT_TR_NOOP("Print preview");
+    sPixmap       = "document-print-preview";
 }
 
 void StdCmdPrintPreview::activated(int iMsg)
@@ -697,7 +670,7 @@ StdCmdQuit::StdCmdQuit()
   sWhatsThis    = "Std_Quit";
   sStatusTip    = QT_TR_NOOP("Quits the application");
 #if QT_VERSION >= 0x040200
-  sPixmap       = "system-log-out";
+  sPixmap       = "application-exit";
 #endif
   sAccel        = "Alt+F4";
 }
@@ -746,7 +719,7 @@ Action * StdCmdUndo::createAction(void)
     pcAction->setShortcut(QString::fromAscii(sAccel));
     applyCommandData(this->className(), pcAction);
     if (sPixmap)
-        pcAction->setIcon(Gui::BitmapFactory().pixmap(sPixmap));
+        pcAction->setIcon(Gui::BitmapFactory().iconFromTheme(sPixmap));
 
     return pcAction;
 }
@@ -789,7 +762,7 @@ Action * StdCmdRedo::createAction(void)
     pcAction->setShortcut(QString::fromAscii(sAccel));
     applyCommandData(this->className(), pcAction);
     if (sPixmap)
-        pcAction->setIcon(Gui::BitmapFactory().pixmap(sPixmap));
+        pcAction->setIcon(Gui::BitmapFactory().iconFromTheme(sPixmap));
 
     return pcAction;
 }
@@ -1357,6 +1330,7 @@ void CreateDocCommands(void)
 
     rcCmdMgr.addCommand(new StdCmdSave());
     rcCmdMgr.addCommand(new StdCmdSaveAs());
+    rcCmdMgr.addCommand(new StdCmdRevert());
     rcCmdMgr.addCommand(new StdCmdProjectInfo());
     rcCmdMgr.addCommand(new StdCmdProjectUtil());
     rcCmdMgr.addCommand(new StdCmdUndo());

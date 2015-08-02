@@ -1,23 +1,24 @@
-import FemGui
 import FreeCAD
 import os
-import time
 import sys
 
 
 class inp_writer:
-    def __init__(self, dir_name, mesh_obj, mat_obj, fixed_obj, force_obj, pressure_obj):
+    def __init__(self, analysis_obj, mesh_obj, mat_obj, fixed_obj, force_obj, pressure_obj, dir_name=None):
+        self.dir_name = dir_name
         self.mesh_object = mesh_obj
         self.material_objects = mat_obj
         self.fixed_objects = fixed_obj
         self.force_objects = force_obj
         self.pressure_objects = pressure_obj
-        self.base_name = dir_name + '/' + self.mesh_object.Name
+        if not dir_name:
+            self.dir_name = FreeCAD.ActiveDocument.TransientDir.replace('\\', '/') + '/FemAnl_' + analysis_obj.Uid[-4:]
+        if not os.path.isdir(self.dir_name):
+            os.mkdir(self.dir_name)
+        self.base_name = self.dir_name + '/' + self.mesh_object.Name
         self.file_name = self.base_name + '.inp'
-        print 'CalculiX .inp file will be written to: ', self.file_name
 
     def write_calculix_input_file(self):
-        print 'write_calculix_input_file'
         self.mesh_object.FemMesh.writeABAQUS(self.file_name)
 
         # reopen file with "append" and add the analysis definition
@@ -43,10 +44,8 @@ class inp_writer:
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for m in self.material_objects:
             mat_obj = m['Object']
-            mat_obj_name = mat_obj.Name
-            mat_name = mat_obj.Material['Name'][:80]
+            mat_obj_name = mat_obj.Name[:80]
 
-            print mat_obj_name, ':  ', mat_name
             f.write('*ELSET,ELSET=' + mat_obj_name + '\n')
             if len(self.material_objects) == 1:
                 f.write('Eall\n')
@@ -60,19 +59,15 @@ class inp_writer:
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for fobj in self.fixed_objects:
             fix_obj = fobj['Object']
-            print fix_obj.Name
             f.write('*NSET,NSET=' + fix_obj.Name + '\n')
             for o, elem in fix_obj.References:
                 fo = o.Shape.getElement(elem)
                 n = []
                 if fo.ShapeType == 'Face':
-                    print '  Face Support (fixed face) on: ', elem
                     n = self.mesh_object.FemMesh.getNodesByFace(fo)
                 elif fo.ShapeType == 'Edge':
-                    print '  Line Support (fixed edge) on: ', elem
                     n = self.mesh_object.FemMesh.getNodesByEdge(fo)
                 elif fo.ShapeType == 'Vertex':
-                    print '  Point Support (fixed vertex) on: ', elem
                     n = self.mesh_object.FemMesh.getNodesByVertex(fo)
                 for i in n:
                     f.write(str(i) + ',\n')
@@ -127,8 +122,12 @@ class inp_writer:
             # write material properties
             f.write('*MATERIAL, NAME=' + mat_name + '\n')
             f.write('*ELASTIC \n')
-            f.write('{}, '.format(YM_in_MPa))
+            f.write('{}, \n'.format(YM_in_MPa))
             f.write('{0:.3f}\n'.format(PR))
+            density = FreeCAD.Units.Quantity(mat_obj.Material['Density'])
+            density_in_kg_per_mm3 = density.getValueAs('t/mm^3')
+            f.write('*DENSITY \n')
+            f.write('{}, \n'.format(density_in_kg_per_mm3))
             # write element properties
             if len(self.material_objects) == 1:
                 f.write('*SOLID SECTION, ELSET=' + mat_obj_name + ', MATERIAL=' + mat_name + '\n')
@@ -344,16 +343,9 @@ class inp_writer:
         f.write('*END STEP \n')
 
     def write_footer(self, f):
-        FcVersionInfo = FreeCAD.Version()
         f.write('\n***********************************************************\n')
         f.write('** CalculiX Input file\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
-        f.write('**\n')
-        f.write('**   written by    --> FreeCAD ' + FcVersionInfo[0] + '.' + FcVersionInfo[1] + '.' + FcVersionInfo[2] + '\n')
-        f.write('**   written on    --> ' + time.ctime() + '\n')
-        f.write('**   file name     --> ' + os.path.basename(FreeCAD.ActiveDocument.FileName) + '\n')
-        f.write('**   analysis name --> ' + FemGui.getActiveAnalysis().Name + '\n')
-        f.write('**\n')
         f.write('**\n')
         f.write('**   Units\n')
         f.write('**\n')

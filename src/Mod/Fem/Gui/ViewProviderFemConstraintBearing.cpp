@@ -29,6 +29,7 @@
 # include <Inventor/nodes/SoTranslation.h>
 # include <Inventor/nodes/SoRotation.h>
 # include <Precision.hxx>
+# include <QMessageBox>
 #endif
 
 #include "ViewProviderFemConstraintBearing.h"
@@ -46,7 +47,7 @@ PROPERTY_SOURCE(FemGui::ViewProviderFemConstraintBearing, FemGui::ViewProviderFe
 
 ViewProviderFemConstraintBearing::ViewProviderFemConstraintBearing()
 {
-    sPixmap = "Fem_ConstraintBearing";
+    sPixmap = "fem-constraint-bearing";
     wizardWidget = NULL;
 }
 

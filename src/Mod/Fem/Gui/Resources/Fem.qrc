@@ -1,24 +1,23 @@
 <RCC>
     <qresource> 
-        <file>icons/Fem_FemMesh.svg</file>
-        <file>icons/Fem_FemMesh_createnodebypoly.svg</file>
-        <file>icons/Fem_Analysis.svg</file>
-        <file>icons/Fem_ConstraintForce.svg</file>
-        <file>icons/Fem_ConstraintFixed.svg</file>
-        <file>icons/Fem_ConstraintPressure.svg</file>
-        <file>icons/Fem_ConstraintBearing.svg</file>
-        <file>icons/Fem_ConstraintGear.svg</file>
-        <file>icons/Fem_ConstraintPulley.svg</file>
-        <file>icons/Fem_AddFemMesh.svg</file>
-        <file>icons/Fem_AddMaterial.svg</file>
-        <file>icons/Fem_AddPart.svg</file>
-        <file>icons/Fem_Inp_Editor.svg</file>
-        <file>icons/Fem_Material.svg</file>
-        <file>icons/Fem_NewAnalysis.svg</file>
-        <file>icons/Fem_Purge_Results.svg</file>
-        <file>icons/Fem_Result.svg</file>
-        <file>icons/Fem_ResultDisplacement.svg</file>
-        <file>icons/Fem_ResultStress.svg</file>
+        <file>icons/fem-fem-mesh-from-shape.svg</file>
+        <file>icons/fem-fem-mesh-create-node-by-poly.svg</file>
+        <file>icons/fem-analysis.svg</file>
+        <file>icons/fem-constraint-force.svg</file>
+        <file>icons/fem-constraint-fixed.svg</file>
+        <file>icons/fem-constraint-pressure.svg</file>
+        <file>icons/fem-constraint-bearing.svg</file>
+        <file>icons/fem-constraint-gear.svg</file>
+        <file>icons/fem-constraint-pulley.svg</file>
+        <file>icons/fem-add-fem-mesh.svg</file>
+        <file>icons/fem-add-material.svg</file>
+        <file>icons/fem-add-part.svg</file>
+        <file>icons/fem-inp-editor.svg</file>
+        <file>icons/fem-material.svg</file>
+        <file>icons/fem-new-analysis.svg</file>
+        <file>icons/fem-purge-results.svg</file>
+        <file>icons/fem-quick-analysis.svg</file>
+        <file>icons/fem-result.svg</file>
         <file>icons/preferences-fem.svg</file>
         <file>translations/Fem_af.qm</file>
         <file>translations/Fem_de.qm</file>

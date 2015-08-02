@@ -581,7 +581,7 @@ def loadTexture(filename,size=None):
             return img
     return None
     
-def getMovableChildren(objectslist,recursive=False):
+def getMovableChildren(objectslist,recursive=True):
     '''getMovableChildren(objectslist,[recursive]): extends the given list of objects
     with all child objects that have a "MoveWithHost" property set to True. If
     recursive is True, all descendents are considered, otherwise only direct children.'''
@@ -592,7 +592,7 @@ def getMovableChildren(objectslist,recursive=False):
             children = obj.OutList
             if  hasattr(obj,"Proxy"):
                 if obj.Proxy:
-                    if hasattr(obj.Proxy,"getSiblings"):
+                    if hasattr(obj.Proxy,"getSiblings") and not(getType(obj) in ["Window"]):
                         children.extend(obj.Proxy.getSiblings(obj))
             for child in children:
                 if hasattr(child,"MoveWithHost"):
@@ -4369,7 +4369,8 @@ class _DrawingView(_DraftObject):
                     svg = ""
                     shapes = []
                     others = []
-                    for o in obj.Source.Group:
+                    objs = getGroupContents([obj.Source])
+                    for o in objs:
                         if o.ViewObject.isVisible():
                             svg += getSVG(o,obj.Scale,obj.LineWidth,obj.FontSize.Value,obj.FillStyle,obj.Direction,ls,lc)
                 else:
@@ -4989,15 +4990,15 @@ class _Point(_DraftObject):
     "The Draft Point object"
     def __init__(self, obj,x=0,y=0,z=0):
         _DraftObject.__init__(self,obj,"Point")
-        obj.addProperty("App::PropertyFloat","X","Draft","Location").X = x
-        obj.addProperty("App::PropertyFloat","Y","Draft","Location").Y = y
-        obj.addProperty("App::PropertyFloat","Z","Draft","Location").Z = z
+        obj.addProperty("App::PropertyDistance","X","Draft","Location").X = x
+        obj.addProperty("App::PropertyDistance","Y","Draft","Location").Y = y
+        obj.addProperty("App::PropertyDistance","Z","Draft","Location").Z = z
         mode = 2
         obj.setEditorMode('Placement',mode)
 
     def execute(self, obj):
         import Part
-        shape = Part.Vertex(Vector(obj.X,obj.Y,obj.Z))
+        shape = Part.Vertex(Vector(obj.X.Value,obj.Y.Value,obj.Z.Value))
         obj.Shape = shape
 
 class _ViewProviderPoint(_ViewProviderDraft):
@@ -5250,11 +5251,14 @@ class _Facebinder(_DraftObject):
         if not faces:
             return
         import Part
-        sh = faces.pop()
         try:
-            for f in faces:
-                sh = sh.fuse(f)
-            sh = sh.removeSplitter()
+            if len(faces) > 1:
+                sh = faces.pop()
+                sh = sh.multiFuse(faces)
+                sh = sh.removeSplitter()
+            else:
+                sh = faces[0]
+                sh.transformShape(sh.Matrix, True)
         except Part.OCCError:
             print("Draft: error building facebinder")
             return

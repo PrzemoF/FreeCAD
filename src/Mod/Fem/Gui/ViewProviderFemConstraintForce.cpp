@@ -30,6 +30,7 @@
 # include <Inventor/nodes/SoRotation.h>
 # include <Inventor/nodes/SoMultipleCopy.h>
 # include <Precision.hxx>
+# include <QMessageBox>
 #endif
 
 #include "ViewProviderFemConstraintForce.h"
@@ -46,7 +47,7 @@ PROPERTY_SOURCE(FemGui::ViewProviderFemConstraintForce, FemGui::ViewProviderFemC
 
 ViewProviderFemConstraintForce::ViewProviderFemConstraintForce()
 {
-    sPixmap = "Fem_ConstraintForce";
+    sPixmap = "fem-constraint-force";
 }
 
 ViewProviderFemConstraintForce::~ViewProviderFemConstraintForce()

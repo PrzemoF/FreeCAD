@@ -25,8 +25,10 @@
 #ifndef _PreComp_
 # include <QInputDialog>
 # include <QHeaderView>
+# include <QMenu>
 # include <QMessageBox>
 # include <QToolBar>
+# include <QToolButton>
 #endif
 
 #include "DlgToolbarsImp.h"
@@ -206,7 +208,7 @@ void DlgCustomToolbars::on_categoryBox_activated(int index)
         item->setData(1, Qt::UserRole, QByteArray((*it)->getName()));
         item->setSizeHint(0, QSize(32, 32));
         if ((*it)->getPixmap())
-            item->setIcon(0, BitmapFactory().pixmap((*it)->getPixmap()));
+            item->setIcon(0, BitmapFactory().iconFromTheme((*it)->getPixmap()));
     }
 }
 
@@ -264,7 +266,7 @@ void DlgCustomToolbars::importCustomToolbars(const QByteArray& name)
                     item->setText(0, qApp->translate(pCmd->className(), pCmd->getMenuText()));
                     item->setData(0, Qt::UserRole, QByteArray(it2->first.c_str()));
                     if (pCmd->getPixmap())
-                        item->setIcon(0, BitmapFactory().pixmap(pCmd->getPixmap()));
+                        item->setIcon(0, BitmapFactory().iconFromTheme(pCmd->getPixmap()));
                     item->setSizeHint(0, QSize(32, 32));
                 }
             }
@@ -538,7 +540,7 @@ void DlgCustomToolbars::onAddMacroAction(const QByteArray& macro)
         item->setSizeHint(0, QSize(32, 32));
         item->setBackgroundColor(0, Qt::lightGray);
         if (pCmd->getPixmap())
-            item->setIcon(0, BitmapFactory().pixmap(pCmd->getPixmap()));
+            item->setIcon(0, BitmapFactory().iconFromTheme(pCmd->getPixmap()));
     }
 }
 
@@ -579,7 +581,7 @@ void DlgCustomToolbars::onModifyMacroAction(const QByteArray& macro)
                 item->setSizeHint(0, QSize(32, 32));
                 item->setBackgroundColor(0, Qt::lightGray);
                 if (pCmd->getPixmap())
-                    item->setIcon(0, BitmapFactory().pixmap(pCmd->getPixmap()));
+                    item->setIcon(0, BitmapFactory().iconFromTheme(pCmd->getPixmap()));
                 break;
             }
         }
@@ -592,7 +594,7 @@ void DlgCustomToolbars::onModifyMacroAction(const QByteArray& macro)
                 if (command == macro) {
                     item->setText(0, QString::fromUtf8(pCmd->getMenuText()));
                     if (pCmd->getPixmap())
-                        item->setIcon(0, BitmapFactory().pixmap(pCmd->getPixmap()));
+                        item->setIcon(0, BitmapFactory().iconFromTheme(pCmd->getPixmap()));
                 }
             }
         }
@@ -680,6 +682,41 @@ void DlgCustomToolbarsImp::renameCustomToolbar(const QString& old_name, const QS
     }
 }
 
+QList<QAction*> DlgCustomToolbarsImp::getActionGroup(QAction* action)
+{
+    QList<QAction*> group;
+    QList<QWidget*> widgets = action->associatedWidgets();
+    for (QList<QWidget*>::iterator it = widgets.begin(); it != widgets.end(); ++it) {
+        QToolButton* tb = qobject_cast<QToolButton*>(*it);
+        if (tb) {
+            QMenu* menu = tb->menu();
+            if (menu) {
+                group = menu->actions();
+                break;
+            }
+        }
+    }
+    return group;
+}
+
+void DlgCustomToolbarsImp::setActionGroup(QAction* action, const QList<QAction*>& group)
+{
+    // See also ActionGroup::addTo()
+    QList<QWidget*> widgets = action->associatedWidgets();
+    for (QList<QWidget*>::iterator it = widgets.begin(); it != widgets.end(); ++it) {
+        QToolButton* tb = qobject_cast<QToolButton*>(*it);
+        if (tb) {
+            QMenu* menu = tb->menu();
+            if (!menu) {
+                tb->setPopupMode(QToolButton::MenuButtonPopup);
+                QMenu* menu = new QMenu(tb);
+                menu->addActions(group);
+                tb->setMenu(menu);
+            }
+        }
+    }
+}
+
 void DlgCustomToolbarsImp::addCustomCommand(const QString& name, const QByteArray& cmd)
 {
     QVariant data = workbenchBox->itemData(workbenchBox->currentIndex(), Qt::UserRole);
@@ -757,8 +794,11 @@ void DlgCustomToolbarsImp::moveUpCustomCommand(const QString& name, const QByteA
                     }
                 }
                 if (before != 0) {
+                    QList<QAction*> group = getActionGroup(*it);
                     bars.front()->removeAction(*it);
                     bars.front()->insertAction(before, *it);
+                    if (!group.isEmpty())
+                        setActionGroup(*it, group);
                     break;
                 }
             }
@@ -797,13 +837,19 @@ void DlgCustomToolbarsImp::moveDownCustomCommand(const QString& name, const QByt
                 ++it;
                 // second last item
                 if (*it == actions.back()) {
+                    QList<QAction*> group = getActionGroup(act);
                     bars.front()->removeAction(act);
                     bars.front()->addAction(act);
+                    if (!group.isEmpty())
+                        setActionGroup(act, group);
                     break;
                 }
                 ++it;
+                QList<QAction*> group = getActionGroup(act);
                 bars.front()->removeAction(act);
                 bars.front()->insertAction(*it, act);
+                if (!group.isEmpty())
+                    setActionGroup(act, group);
                 break;
             }
         }

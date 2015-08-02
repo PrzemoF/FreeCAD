@@ -24,6 +24,7 @@
 #include "PreCompiled.h"
 #ifndef _PreComp_
 # include <Standard_math.hxx>
+# include <QApplication>
 # include <QMessageBox>
 #endif
 
@@ -92,7 +93,7 @@ CmdFemCreateAnalysis::CmdFemCreateAnalysis()
     sToolTipText    = QT_TR_NOOP("Create a FEM analysis");
     sWhatsThis      = "Fem_CreateAnalysis";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_Analysis";
+    sPixmap         = "fem-analysis";
 }
 
 void CmdFemCreateAnalysis::activated(int iMsg)
@@ -154,7 +155,7 @@ CmdFemAddPart::CmdFemAddPart()
     sToolTipText    = QT_TR_NOOP("Add a part to the Analysis");
     sWhatsThis      = "Fem_FemAddPart";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_AddFemMesh";
+    sPixmap         = "fem-add-fem-mesh";
 }
 
 void CmdFemAddPart::activated(int iMsg)
@@ -217,7 +218,7 @@ CmdFemConstraintBearing::CmdFemConstraintBearing()
     sToolTipText    = QT_TR_NOOP("Create FEM constraint for a bearing");
     sWhatsThis      = "Fem_ConstraintBearing";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_ConstraintBearing";
+    sPixmap         = "fem-constraint-bearing";
 }
 
 void CmdFemConstraintBearing::activated(int iMsg)
@@ -255,7 +256,7 @@ CmdFemConstraintFixed::CmdFemConstraintFixed()
     sToolTipText    = QT_TR_NOOP("Create FEM constraint for a fixed geometric entity");
     sWhatsThis      = "Fem_ConstraintFixed";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_ConstraintFixed";
+    sPixmap         = "fem-constraint-fixed";
 }
 
 void CmdFemConstraintFixed::activated(int iMsg)
@@ -293,7 +294,7 @@ CmdFemConstraintForce::CmdFemConstraintForce()
     sToolTipText    = QT_TR_NOOP("Create FEM constraint for a force acting on a geometric entity");
     sWhatsThis      = "Fem_ConstraintForce";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_ConstraintForce";
+    sPixmap         = "fem-constraint-force";
 }
 
 void CmdFemConstraintForce::activated(int iMsg)
@@ -332,7 +333,7 @@ CmdFemConstraintPressure::CmdFemConstraintPressure()
     sToolTipText    = QT_TR_NOOP("Create FEM constraint for a pressure acting on a face");
     sWhatsThis      = "Fem_ConstraintPressure";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_ConstraintPressure";
+    sPixmap         = "fem-constraint-pressure";
 }
 
 void CmdFemConstraintPressure::activated(int iMsg)
@@ -372,7 +373,7 @@ CmdFemConstraintGear::CmdFemConstraintGear()
     sToolTipText    = QT_TR_NOOP("Create FEM constraint for a gear");
     sWhatsThis      = "Fem_ConstraintGear";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_ConstraintGear";
+    sPixmap         = "fem-constraint-gear";
 }
 
 void CmdFemConstraintGear::activated(int iMsg)
@@ -410,7 +411,7 @@ CmdFemConstraintPulley::CmdFemConstraintPulley()
     sToolTipText    = QT_TR_NOOP("Create FEM constraint for a pulley");
     sWhatsThis      = "Fem_ConstraintPulley";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_ConstraintPulley";
+    sPixmap         = "fem-constraint-pulley";
 }
 
 void CmdFemConstraintPulley::activated(int iMsg)
@@ -542,7 +543,7 @@ CmdFemDefineNodesSet::CmdFemDefineNodesSet()
     sToolTipText  = QT_TR_NOOP("Create node set by Poly");
     sWhatsThis    = "Create node set by Poly";
     sStatusTip    = QT_TR_NOOP("Create node set by Poly");
-    sPixmap       = "Fem_FemMesh_createnodebypoly";
+    sPixmap       = "fem-fem-mesh-create-node-by-poly";
 }
 
 void CmdFemDefineNodesSet::activated(int iMsg)
@@ -599,7 +600,7 @@ CmdFemCreateNodesSet::CmdFemCreateNodesSet()
     sToolTipText    = QT_TR_NOOP("Define/create a nodes set...");
     sWhatsThis      = "Fem_CreateNodesSet";
     sStatusTip      = sToolTipText;
-    sPixmap         = "Fem_FemMesh_createnodebypoly";
+    sPixmap         = "fem-fem-mesh-create-node-by-poly";
 }
 
 void CmdFemCreateNodesSet::activated(int iMsg)

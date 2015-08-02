@@ -108,6 +108,7 @@
 #include <qradiobutton.h>
 #include <QScrollArea>
 #include <qscrollbar.h>
+#include <QSessionManager>
 #include <QSettings>
 #include <QShortcut>
 #include <qslider.h>
@@ -169,5 +170,8 @@
 //#include <QWebSettings>
 #endif
 
+#include "qmath.h"
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
 #endif
