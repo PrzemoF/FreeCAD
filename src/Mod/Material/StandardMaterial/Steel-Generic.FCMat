@@ -6,16 +6,11 @@
 [FCMat]
 Name = Steel
 
-CompressiveStrength =
-Description: This is a blend Steel material card. The values are at the low end of the spectrum. If you need a more precise material definition use the more specialised steel cards.
-Elasticity =
+Description = This is a blend Steel material card. The values are at the low end of the spectrum. If you need a more precise material definition use the more specialised steel cards.
 Father = Metal
-FractureToughness:
-Density=7900 kg/m^3
+Density = 7900 kg/m^3
 PoissonRatio = 0.3
 ProductURL = http://en.wikipedia.org/wiki/Steel
-SpecificPrice = 1,5 Euro/Kg
+SpecificPrice = 1.5 Euro/Kg
 SpecificWeight = 7800.0e-12
-UltimateTensileStrength =
-Vendor:
 YoungsModulus = 200000 MPa

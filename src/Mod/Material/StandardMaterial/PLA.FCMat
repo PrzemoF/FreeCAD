@@ -6,13 +6,12 @@
 [FCMat]
 Name = PLA
 
-Density=1300 kg/m^3
-Description: Polylactic acid or polylactide (PLA, Poly) is a biodegradable thermoplastic aliphatic polyester derived from renewable resources, such as corn starch, tapioca roots, chips, starch or sugarcane.
+Density = 1300 kg/m^3
+Description = Polylactic acid or polylactide (PLA, Poly) is a biodegradable thermoplastic aliphatic polyester derived from renewable resources, such as corn starch, tapioca roots, chips, starch or sugarcane.
 Father = Thermoplast
 PoissonRatio = 0.36
 ProductURL = http://en.wikipedia.org/wiki/Polylactic_acid
 SpecificPrice = 4
 SpecificWeight = 1.27e-06
 UltimateTensileStrength = 49.6 MPa
-Vendor:
 YoungsModulus = 3640 MPa

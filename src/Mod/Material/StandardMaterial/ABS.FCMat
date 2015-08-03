@@ -6,13 +6,13 @@
 [FCMat]
 Name = ABS
 
-Density=1070 kg/m^3
-Description: This is a blend ABS material card. The values are at the low end of the spectrum. If you need a more precise material definition use the more specialised ABS-blend cards.
+Density = 1070 kg/m^3
+Description = This is a blend ABS material card. The values are at the low end of the spectrum. If you need a more precise material definition use the more specialised ABS-blend cards.
 Father = Thermoplast
 PoissonRatio = 0.35
 ProductURL = http://en.wikipedia.org/wiki/Acrylonitrile_butadiene_styrene
 SpecificPrice = 3
 SpecificWeight = 3.5e-06
 UltimateTensileStrength = 38 MPa
-Vendor:
+Vendor =
 YoungsModulus = 2320 MPa

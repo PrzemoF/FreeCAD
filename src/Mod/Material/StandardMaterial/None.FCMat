@@ -6,13 +6,11 @@
 [FCMat]
 Name = None
 
-Density=0 kg/m^3
-Description: This is a not defined material
+Density = 0 kg/m^3
+Description = This is a not defined material
 Father = None
 PoissonRatio = 0.0
-ProductURL =
 SpecificPrice = 0.0
 SpecificWeight = 0.0
 UltimateTensileStrength = 0 MPa
-Vendor:
 YoungsModulus = 0 MPa
