@@ -1,12 +1,10 @@
-; Standard Material for CalculiX Sample Calculations
-
-[General]
-; General name, need to be the same as the file name
+; Standard material for CalculiX sample calculations
 
 [FCMat]
-
-Density=1000 kg/m^3
-Father = Metal
 Name = CalculiX
+
+Density = 1000 kg/m^3
+Description = Standard material for CalculiX sample calculations
+Father = Metal
 PoissonRatio = 0.3
 YoungsModulus = 210000 MPa

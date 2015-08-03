@@ -15,6 +15,9 @@ Description =
 ; Example of localized description. 2 letter codes as per ISO-639-1 https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 DescriptionDE =
 
+; Example of localized description. 2 letter codes as per ISO-639-1 https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+DescriptionPL =
+
 ; Father of the material, i.e. for PLA is Thermoplast, for Steel is Metal
 Father =
 
@@ -37,7 +40,7 @@ YoungsModulus = value MPa
 UltimateTensileStrength = value MPa
 
 ; Poisson's ratio [unitless], see https://en.wikipedia.org/wiki/Poisson%27s_ratio for the details
-PoissonRatio  = 0.36
+PoissonRatio =
 
 ; Descrition to be updated
 AmbientColor =

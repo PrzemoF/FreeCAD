@@ -4,8 +4,8 @@
 ; http://www.freecadweb.org/wiki/index.php?title=Material
 
 [FCMat]
-Name=1C22
-NameDE=C22
+Name = 1C22
+NameDE = C22
 
 Description = Case hardened alloy steel
 DescriptionPL = Stal stopowa do nawęglania
