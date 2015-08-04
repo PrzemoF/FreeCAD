@@ -21,9 +21,6 @@ DescriptionPL =
 ; Father of the material, i.e. for PLA is Thermoplast, for Steel is Metal
 Father =
 
-; Specific weight in [kg/mm^3], i.e 1.27e-06
-SpecificWeight =
-
 ; Vendor of the material. Leave blank if not required
 Vendor =
 
@@ -51,8 +48,8 @@ Color =
 ; Compressive strength https://en.wikipedia.org/wiki/Compressive_strength
 CompressiveStrength =
 
-; Density https://en.wikipedia.org/wiki/Density
-Density =
+; Density in [kg/m^3] https://en.wikipedia.org/wiki/Density
+Density = value kg/m^3
 
 ; Descrition to be updated
 DiffuseColor =
@@ -129,7 +126,7 @@ TextureScaling =
 ; Thermal conductivity https://en.wikipedia.org/wiki/Thermal_conductivity
 ThermalConductivity =
 
-; Thermal expansion coefficient https://en.wikipedia.org/wiki/Thermal_expansion
+; Thermal expansion coefficient (linear) in [1/K] https://en.wikipedia.org/wiki/Thermal_expansion
 ThermalExpansionCoefficient =
 
 ; Descrition to be updated
@@ -153,5 +150,5 @@ ViewFillPattern =
 ; Descrition to be updated
 ViewLinewidth =
 
-; Yield strength https://en.wikipedia.org/wiki/Yield_%28engineering%29
-YieldStrength =
+; Yield strength in [MPa] https://en.wikipedia.org/wiki/Yield_%28engineering%29
+YieldStrength = value MPa
