@@ -451,7 +451,10 @@ Eall
 ** Young's modulus unit is MPa = N/mm2
 *MATERIAL, NAME=Test Material
 *ELASTIC 
-20000 , 0.360
+20000 , 
+0.360
+*DENSITY 
+1e-09 , 
 *SOLID SECTION, ELSET=MechanicalMaterial, MATERIAL=Test Material
 
 ***********************************************************
