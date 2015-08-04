@@ -153,7 +153,7 @@ class FemTest(unittest.TestCase):
         FreeCAD.Console.PrintMessage('\nChecking FEM inp file write...\n')
         fea.setup_working_dir(working_dir)
         error = fea.write_inp_file()
-        ret = self.compare_inp_files(standard_inp_file, working_dir + mesh_name + '.inp')
+        ret = self.compare_inp_files(standard_inp_file, working_dir + "/" + mesh_name + '.inp')
         self.assertFalse(ret, "FemTools write_inp_file failed.\n{}".format(ret))
 
     def tearDown(self):
