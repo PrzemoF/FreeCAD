@@ -74,83 +74,99 @@ foreach( _dir    csg general geom2d gprim linalg meshing occ stlgeom )
     endif( )
 endforeach ( )
 
-# Some needed libraris for tests
-find_library( NETGEN_LIBRARY_mesh NAMES mesh ngmesh PATHS ${NGLIB_LIBRARY_DIRS})
-find_library( NETGEN_LIBRARY_occ  NAMES occ  ngocc PATHS ${NGLIB_LIBRARY_DIRS})
-mark_as_advanced( NETGEN_LIBRARY_mesh NETGEN_LIBRARY_occ)
+if( NOT MSVC )
+    # Check some features provoded by the library
 
-cmake_push_check_state()
+    # Some needed libraris for tests
 
-# Check if NETGEN provides API version 5
-set( CMAKE_REQUIRED_INCLUDES  ${NETGEN_DIR_general} ${NETGEN_DIR_meshing} ${NETGEN_DIR_linalg} )
-if( NOT "${NETGEN_LIBRARY_occ}" STREQUAL "NETGEN_LIBRARY_occ-NOTFOUND")
-    set( CMAKE_REQUIRED_LIBRARIES ${NGLIB_LIBRARIES} ${NETGEN_LIBRARY_mesh} )
-else( )
-    set( CMAKE_REQUIRED_LIBRARIES ${NGLIB_LIBRARIES} )
-endif( )
+    find_library( NETGEN_LIBRARY_mesh NAMES mesh ngmesh PATHS ${NGLIB_LIBRARY_DIRS})
+    find_library( NETGEN_LIBRARY_occ  NAMES occ  ngocc PATHS ${NGLIB_LIBRARY_DIRS})
+    mark_as_advanced( NETGEN_LIBRARY_mesh NETGEN_LIBRARY_occ)
 
-set( CMAKE_REQUIRED_DEFINITIONS ${NETGEN_DEFINITIONS} )
-check_cxx_source_compiles (
-    " #include <meshing.hpp>
-    int main() { netgen::Mesh* mesh; mesh->CalcLocalH(0.); } "
-    NETGEN_VERSION_5
-)
+    cmake_push_check_state()
 
-cmake_reset_check_state()
+    # Check if NETGEN provides API version 5
 
-# Check if NETGEN was built with parthreads
-set( CMAKE_REQUIRED_INCLUDES  ${NETGEN_DIR_general} )
-set( CMAKE_REQUIRED_DEFINITIONS )
-check_cxx_source_compiles (
-    " #include <myadt.hpp>
-    int main() { netgen::NgMutex foo; } "
-    NETGEN_WITH_PARALLEL_THREADS
-)
+    set( CMAKE_REQUIRED_INCLUDES  ${NETGEN_DIR_general} ${NETGEN_DIR_meshing} ${NETGEN_DIR_linalg} )
+    if( NOT "${NETGEN_LIBRARY_occ}" STREQUAL "NETGEN_LIBRARY_occ-NOTFOUND" )
+        set( CMAKE_REQUIRED_LIBRARIES ${NGLIB_LIBRARIES} ${NETGEN_LIBRARY_mesh} )
+    else( )
+        set( CMAKE_REQUIRED_LIBRARIES ${NGLIB_LIBRARIES} )
+    endif( )
 
-if( NOT NETGEN_WITH_PARALLEL_THREADS )
-    list( APPEND NETGEN_DEFINITIONS "-DNO_PARALLEL_THREADS")
-endif( )
-# Check if NETGEN build with opencascade
+    set( CMAKE_REQUIRED_DEFINITIONS ${NETGEN_DEFINITIONS} )
+    check_cxx_source_compiles (
+        " #include <meshing.hpp>
+        int main() { netgen::Mesh* mesh; mesh->CalcLocalH(0.); } "
+        NETGEN_VERSION_5
+        )
 
-cmake_reset_check_state()
+    cmake_reset_check_state()
 
-set( CMAKE_REQUIRED_INCLUDES
-    ${NETGEN_DIR_occ} ${NETGEN_DIR_general} ${NETGEN_DIR_meshing} ${NETGEN_DIR_linalg}
-    ${OCC_INCLUDE_DIR}
-)
+    # Check if NETGEN was built with parthreads
 
-# Get full paths for OCC libraris because CMAKE_REQUIRED_LIBRARIES supposes to get such
-foreach( _lib ${OCC_LIBRARIES})
-    find_library( OCC_LIBRARY_${_lib}  ${_lib} HINTS ${OCC_LIBRARY_DIR} )
-    if( NOT "${OCC_LIBRARY_${_lib}}" STREQUAL "OCC_LIBRARY_${_lib}-NOTFOUND")
-        list(APPEND _OCC_LIBRARIES_FULL_PATHS ${OCC_LIBRARY_${_lib}})
-    endif()
-endforeach ()
+    set( CMAKE_REQUIRED_INCLUDES  ${NETGEN_DIR_general} )
+    set( CMAKE_REQUIRED_DEFINITIONS )
+    check_cxx_source_compiles (
+        " #include <myadt.hpp>
+        int main() { netgen::NgMutex foo; } "
+        NETGEN_WITH_PARALLEL_THREADS
+        )
 
-if( NETGEN_VERSION_5 )
-    set( CMAKE_REQUIRED_LIBRARIES ${NETGEN_LIBRARY_mesh} ${NETGEN_LIBRARY_occ})
-endif( )
+    if( NOT NETGEN_WITH_PARALLEL_THREADS )
+        list( APPEND NETGEN_DEFINITIONS "-DNO_PARALLEL_THREADS")
+    endif( )
 
-set( CMAKE_REQUIRED_LIBRARIES
-    ${CMAKE_REQUIRED_LIBRARIES}
-    ${NGLIB_LIBRARIES}
-    ${_OCC_LIBRARIES_FULL_PATHS}
-)
-set( CMAKE_REQUIRED_DEFINITIONS ${NETGEN_DEFINITIONS} -DOCCGEOMETRY )
+    cmake_reset_check_state()
 
-check_cxx_source_compiles (
-    "#include <occgeom.hpp>
-    int main() { netgen::OCCGeometry foo; }"
-    NETGEN_WITH_OCC
-)
+    # Check if NETGEN build with opencascade
 
-unset( _OCC_LIBRARIES_FULL_PATHS )
+    set( CMAKE_REQUIRED_INCLUDES
+        ${NETGEN_DIR_occ} ${NETGEN_DIR_general} ${NETGEN_DIR_meshing} ${NETGEN_DIR_linalg}
+        ${OCC_INCLUDE_DIR}
+        )
 
-if( NETGEN_WITH_OCC )
-    list( APPEND NETGEN_DEFINITIONS "-DOCCGEOMETRY" )
-endif( )
+    # Get full paths for OCC libraris because CMAKE_REQUIRED_LIBRARIES supposes to get such
+    foreach( _lib ${OCC_LIBRARIES})
+        find_library( OCC_LIBRARY_${_lib}  ${_lib} HINTS ${OCC_LIBRARY_DIR} )
+        if( NOT "${OCC_LIBRARY_${_lib}}" STREQUAL "OCC_LIBRARY_${_lib}-NOTFOUND")
+            list(APPEND _OCC_LIBRARIES_FULL_PATHS ${OCC_LIBRARY_${_lib}})
+        endif()
+    endforeach ()
 
-cmake_pop_check_state( )
+    if( NETGEN_VERSION_5 )
+        set( CMAKE_REQUIRED_LIBRARIES ${NETGEN_LIBRARY_mesh} ${NETGEN_LIBRARY_occ})
+    endif( )
+
+    set( CMAKE_REQUIRED_LIBRARIES
+        ${CMAKE_REQUIRED_LIBRARIES}
+        ${NGLIB_LIBRARIES}
+        ${_OCC_LIBRARIES_FULL_PATHS}
+        )
+    set( CMAKE_REQUIRED_DEFINITIONS ${NETGEN_DEFINITIONS} -DOCCGEOMETRY )
+
+    check_cxx_source_compiles (
+        "#include <occgeom.hpp>
+        int main() { netgen::OCCGeometry foo; }"
+        NETGEN_WITH_OCC
+        )
+
+    unset( _OCC_LIBRARIES_FULL_PATHS )
+
+    if( NETGEN_WITH_OCC )
+        list( APPEND NETGEN_DEFINITIONS "-DOCCGEOMETRY" )
+    endif( )
+
+    cmake_pop_check_state( )
+else( NOT MSVC )
+    # if some one willing to fix up autoconfiguration with MSVC fill free
+    message( STATUS "-- nglib features check skipped due to msvc compiller" )
+    set ( NETGEN_VERSION_5 TRUE CACHE "true if netgen library version is 5" INTERNAL )
+    set ( NETGEN_WITH_OCC  TRUE CACHE "netgen is build with opencascade support" INTERNAL )
+    set ( NETGEN_WITH_PARALLEL FALSE CACHE "true if netgen is build without parallel threads support" INTERNAL )
+
+    set( NETGEN_DEFINITIONS -DNO_PARALLEL_THREADS -DOCCGEOMETRY )
+endif( NOT MSVC )
 
 set( NETGEN_DEFINITIONS ${NETGEN_DEFINITIONS} CACHE
     "Additional definitions switches required to build against private headers" INTERNAL )
