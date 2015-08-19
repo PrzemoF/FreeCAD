@@ -1,0 +1,31 @@
+WARNING: The scripts operate without any checks and can be dangerious.
+         Commit your changes before using the scripts!
+
+That direcory contains set of scripts for FCMat->csv/ods->FCMat conversions.
+The main purpose of conversion FCMAt->ods is to allow batch editing as
+it's much easier to edit a column in spreadsheet than 25 separate FCMat files.
+Also creating new materials similar to an existing material is just
+a matter of copying a row, changing file names and relevant properties.
+
+Typical workflow:
+
+1. Run
+
+	./make_ods.sh
+
+   to create Materials.ods
+2. Edit Materials.ods
+3. Export to a csv file using | as field delimiter and " as text delimiter to Materials.csv
+4. Run
+
+	./cvs2FCMats Materials.csv
+
+   to create directory with new FCMat files
+5. Copy edited FCMat files to StandardMaterials directory
+
+Important comments:
+1. First 5 lines of a FCMat file are copied without modification to the new FCMat file
+2. The scripts are to be used only on linux, in the source code directory.
+4. unoconv has to be installed
+5. The scripts should not be used to make small changes to the FCMat files
+   or creating one new material - direct editing is easier.
