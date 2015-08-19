@@ -3,39 +3,21 @@
 ; information about the content of this card can be found here:
 ; http://www.freecadweb.org/wiki/index.php?title=Material
 
-[General]
-Vendor=
-Name=17CrNiMo6
-NameDE=17CrNiMo6
-MaterialNumber=1.6587
-Norm=EN 10084
-KindOfMaterial=Case-hardened steel
-KindOfMaterialDE=Einsatzstahl
-SpecificPrice=
-Father=Metal
-ProductURL=
-; Specific Weight - kg/m³
-SpecificWeight=7800
-Description=
-DescriptionDE=höchste Beanspruchung, Wellen, Zahnräder
+[FCMat]
+Name = 17CrNiMo6
+NameDE = 17CrNiMo6
 
-[Mechanical]
-;Ultimate Tensile Strength - Rm - N/mm²
-UltimateTensileStrength=1150
-; Yield Strength - Re - N/mm²
-YieldStrength=830
-CompressiveStrength=
-; Youngs Modulus - E-Modul - N/mm²
-YoungsModulus=210000 MPa
-; ModulusOfShare - G-Modul - N/mm²
-ModulusOfShare=81000
-Elasticity=
-FractureToughness=
-; Ultimate Strain - Bruchdehnung - %
-UltimateStrain=8
-; Thermal Expansion Coefficient - Ausdehnungskoeffizient - 1/K
-ThermalExpansionCoefficient=1,10E-05
-
-[FEM]
-; Poisson Ratio - Querkontraktionszahl
-PoissonRatio=0.3
+DescriptionDE = höchste Beanspruchung, Wellen, Zahnräder
+Father = Metal
+KindOfMaterial = Case-hardened steel
+KindOfMaterialDE = Einsatzstahl
+MaterialNumber = 1.6587
+ModulusOfShare = 81000
+Norm = EN 10084
+PoissonRatio = 0.3
+SpecificWeight = 7800
+ThermalExpansionCoefficient = 1.10E-05
+UltimateStrain = 8
+UltimateTensileStrength = 1150
+YieldStrength = 830
+YoungsModulus = 210000 MPa
