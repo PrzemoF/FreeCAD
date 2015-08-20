@@ -33,6 +33,8 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         QtCore.QRunnable.__init__(self)
         QtCore.QObject.__init__(self)
 
+        self.known_analysis_types = ["static", "frequency"]
+
         if analysis:
             self.analysis = analysis
         else:
@@ -40,6 +42,7 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
             self.analysis = FemGui.getActiveAnalysis()
         if self.analysis:
             self.update_objects()
+            self.set_analysis_type()
             self.base_name = ""
             self.results_present = False
             self.setup_working_dir()
@@ -119,14 +122,17 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         message = ""
         if not self.analysis:
             message += "No active Analysis\n"
+        if self.analysis_type not in self.known_analysis_types:
+            message += "Unknown analysis type: {}\n".format(self.analysis_type)
         if not self.mesh:
             message += "No mesh object in the Analysis\n"
         if not self.material:
             message += "No material object in the Analysis\n"
         if not self.fixed_constraints:
             message += "No fixed-constraint nodes defined in the Analysis\n"
-        if not (self.force_constraints or self.pressure_constraints):
-            message += "No force-constraint or pressure-constraint defined in the Analysis\n"
+        if self.analysis_type == "static":
+            if not (self.force_constraints or self.pressure_constraints):
+                message += "No force-constraint or pressure-constraint defined in the Analysis\n"
         return message
 
     def write_inp_file(self):
@@ -136,7 +142,7 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         try:
             inp_writer = iw.inp_writer(self.analysis, self.mesh, self.material,
                                        self.fixed_constraints, self.force_constraints,
-                                       self.pressure_constraints, self.working_dir)
+                                       self.pressure_constraints, self.analysis_type, self.working_dir)
             self.base_name = inp_writer.write_calculix_input_file()
         except:
             print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
@@ -165,6 +171,18 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
             return p.returncode
         return -1
 
+    def set_base_name(self, base_name=None):
+        if base_name is None:
+            self.base_name = ""
+        else:
+            self.base_name = base_name
+
+    def set_analysis_type(self, analysis_type=None):
+        if analysis_type is None:
+            self.analysis_type = "static"
+        else:
+            self.analysis_type = analysis_type
+
     def setup_working_dir(self, working_dir=None):
         if working_dir is None:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
@@ -189,23 +207,25 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
     def load_results(self):
         import ccxFrdReader
         import os
+        self.results_present = False
+        result_file = self.base_name + ".frd"
         if os.path.isfile(self.base_name + ".frd"):
-            ccxFrdReader.importFrd(self.base_name + ".frd", self.analysis)
-            self.results_present = True
+            ccxFrdReader.importFrd(result_file, self.analysis)
             for m in self.analysis.Member:
                 if m.isDerivedFrom("Fem::FemResultObject"):
                     self.result_object = m
+            if self.result_object is not None:
+                self.results_present = True
         else:
-            self.results_present = False
+            raise Exception('FEM: No results found at {}!'.format(result_file))
 
     def use_results(self, results_name=None):
         for m in self.analysis.Member:
             if m.isDerivedFrom("Fem::FemResultObject") and m.Name == results_name:
-                ro = m
-        if not ro:
-            print "{} doesn't exist".format(results_name)
-        else:
-            self.result_object = ro
+                self.result_object = m
+                break
+        if not self.result_object:
+            raise ("{} doesn't exist".format(results_name))
 
     def run(self):
         ret_code = 0

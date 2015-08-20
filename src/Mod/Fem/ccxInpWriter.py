@@ -5,9 +5,10 @@ import time
 
 
 class inp_writer:
-    def __init__(self, analysis_obj, mesh_obj, mat_obj, fixed_obj, force_obj, pressure_obj, dir_name=None):
+    def __init__(self, analysis_obj, mesh_obj, mat_obj, fixed_obj, force_obj, pressure_obj, analysis_type=None, dir_name=None):
         self.dir_name = dir_name
         self.analysis = analysis_obj
+        self.analysis_type = analysis_type
         self.mesh_object = mesh_obj
         self.material_objects = mat_obj
         self.fixed_objects = fixed_obj
@@ -33,8 +34,11 @@ class inp_writer:
         self.write_materials(inpfile)
         self.write_step_begin(inpfile)
         self.write_constraints_fixed(inpfile)
-        self.write_constraints_force(inpfile)
-        self.write_face_load(inpfile)
+        if self.analysis_type == "static":
+            self.write_constraints_force(inpfile)
+            self.write_face_load(inpfile)
+        elif self.analysis_type == "frequency":
+            self.write_frequency(inpfile)
         self.write_outputs_types(inpfile)
         self.write_step_end(inpfile)
         self.write_footer(inpfile)
@@ -325,6 +329,13 @@ class inp_writer:
                     f.write("** Load on face {}\n".format(e))
                     for i in v:
                         f.write("{},P{},{}\n".format(i[0], i[1], rev * prs_obj.Pressure))
+
+    def write_frequency(self, f):
+        f.write('\n***********************************************************\n')
+        f.write('** Frequency analysis\n')
+        f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
+        f.write('*FREQUENCY\n')
+        f.write('10\n')
 
     def write_outputs_types(self, f):
         f.write('\n***********************************************************\n')
