@@ -179,6 +179,36 @@ class _CommandQuickAnalysis:
         return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
 
 
+class _CommandFrequencyAnalysis:
+    def GetResources(self):
+        return {'Pixmap': 'fem-frequency-analysis',
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_Frequency_Analysis", "Run frequency analysis with CalculiX ccx"),
+                'Accel': "R, F",
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_Frequency_Analysis", "Write .inp file and run frequency analysis with CalculiX ccx")}
+
+    def Activated(self):
+        def load_results(ret_code):
+            if ret_code == 0:
+                self.fea.load_results()
+            else:
+                print "CalculiX failed ccx finished with error {}".format(ret_code)
+
+        self.fea = FemTools()
+        self.fea.purge_results()
+        self.fea.reset_mesh_color()
+        self.fea.reset_mesh_deformation()
+        self.fea.set_analysis_type('frequency')
+        message = self.fea.check_prerequisites()
+        if message:
+            QtGui.QMessageBox.critical(None, "Missing prerequisite", message)
+            return
+        self.fea.finished.connect(load_results)
+        QtCore.QThreadPool.globalInstance().start(self.fea)
+
+    def IsActive(self):
+        return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
+
+
 class _CommandMechanicalShowResult:
     "the Fem JobControl command definition"
     def GetResources(self):
@@ -188,10 +218,12 @@ class _CommandMechanicalShowResult:
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_Result", "Show result information of an analysis")}
 
     def Activated(self):
-        self.result_object = None
-        for i in FemGui.getActiveAnalysis().Member:
-            if i.isDerivedFrom("Fem::FemResultObject"):
-                self.result_object = i
+        self.result_object = get_results_object(FreeCADGui.Selection.getSelection())
+
+        if self.result_object is None:
+            print "reult_object is still none but shouldn't be"
+        else:
+            print "reult_object is not none"
 
         if not self.result_object:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", "No result found in active Analysis")
@@ -598,19 +630,28 @@ class _ResultControlTaskPanel:
         self.form.le_max.setProperty("unit", unit)
         self.form.le_max.setText("{:.6} {}".format(maxm, unit))
 
+    def update_displacement(self, reset=None):
+        factor = 0.0
+        if FreeCAD.FEM_dialog["show_disp"]:
+            factor = self.form.hsb_displacement_factor.value()
+        if reset:
+            factor = 0.0
+        self.MeshObject.ViewObject.applyDisplacement(factor)
+
     def show_displacement(self, checked):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         FreeCAD.FEM_dialog["show_disp"] = checked
-        factor = 0.0
-        if checked:
-            factor = self.form.hsb_displacement_factor.value()
+        if "result_object" in FreeCAD.FEM_dialog:
+            if FreeCAD.FEM_dialog["result_object"] != self.result_object:
+                self.update_displacement(reset=True)
+        FreeCAD.FEM_dialog["result_object"] = self.result_object
         self.MeshObject.ViewObject.setNodeDisplacementByVectors(self.result_object.ElementNumbers, self.result_object.DisplacementVectors)
-        self.MeshObject.ViewObject.applyDisplacement(factor)
+        self.update_displacement()
         QtGui.qApp.restoreOverrideCursor()
 
     def hsb_disp_factor_changed(self, value):
-        self.MeshObject.ViewObject.applyDisplacement(value)
         self.form.sb_displacement_factor.setValue(value)
+        self.update_displacement()
 
     def sb_disp_factor_max_changed(self, value):
         FreeCAD.FEM_dialog["disp_factor_max"] = value
@@ -622,11 +663,17 @@ class _ResultControlTaskPanel:
 
     def update(self):
         self.MeshObject = None
+        self.result_object = get_results_object(FreeCADGui.Selection.getSelection())
+
+        if self.result_object is None:
+            print "update:reult_object is still none but shouldn't be"
+        else:
+            print "update:reult_object is not none"
+
         for i in FemGui.getActiveAnalysis().Member:
             if i.isDerivedFrom("Fem::FemMeshObject"):
                 self.MeshObject = i
-            elif i.isDerivedFrom('Fem::FemResultObject'):
-                self.result_object = i
+                break
 
     def accept(self):
         FreeCADGui.Control.closeDialog()
@@ -646,10 +693,21 @@ def results_present():
     return results
 
 
+def get_results_object(sel):
+    if (len(sel) == 1):
+        if sel[0].isDerivedFrom("Fem::FemResultObject"):
+            return sel[0]
+
+    for i in FemGui.getActiveAnalysis().Member:
+        if(i.isDerivedFrom("Fem::FemResultObject")):
+            return i
+    return None
+
 if FreeCAD.GuiUp:
     FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
     FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
     FreeCADGui.addCommand('Fem_MechanicalJobControl', _CommandMechanicalJobControl())
     FreeCADGui.addCommand('Fem_Quick_Analysis', _CommandQuickAnalysis())
+    FreeCADGui.addCommand('Fem_Frequency_Analysis', _CommandFrequencyAnalysis())
     FreeCADGui.addCommand('Fem_PurgeResults', _CommandPurgeFemResults())
     FreeCADGui.addCommand('Fem_ShowResult', _CommandMechanicalShowResult())
