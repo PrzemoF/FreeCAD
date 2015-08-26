@@ -1,0 +1,14 @@
+; (c) 2013-2015 Juergen Riegel (CC-BY 3.0)
+; information about the content of such cards you can find here:
+; http://www.freecadweb.org/wiki/index.php?title=Material
+
+[FCMat]
+[FCMat]
+Father = of the material, i.e. for PLA is Thermoplast, for Steel is Metal
+Vendor = of the material. Leave blank if not required
+ProductURL = http://en.wikipedia.org/wiki/
+YoungsModulus = value MPa
+UltimateTensileStrength = value MPa
+Density = in [kg/m^3] https://en.wikipedia.org/wiki/Density value kg/m^3
+Elasticity = https://en.wikipedia.org/wiki/Elasticity_%28physics%29
+YieldStrength = value MPa
