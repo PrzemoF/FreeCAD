@@ -208,9 +208,9 @@ def importFrd(filename, Analysis=None):
             x_max, y_max, z_max = map(max, zip(*displacement))
             if result_set_number > 1:
                 max_disp = max(x_max, y_max, z_max)
-                # Allow for max displacement to be 10% of the span
+                # Allow for max displacement to be 1% of the span
                 # FIXME - add to Preferences
-                max_allowed_disp = 0.1 * span
+                max_allowed_disp = 0.01 * span
                 scale = max_allowed_disp / max_disp
             else:
                 scale = 1.0
