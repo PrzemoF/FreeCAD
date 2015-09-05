@@ -43,6 +43,7 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         if self.analysis:
             self.update_objects()
             self.set_analysis_type()
+            self.set_eigenmode_parameters()
             self.base_name = ""
             self.results_present = False
             self.setup_working_dir()
@@ -142,7 +143,8 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         try:
             inp_writer = iw.inp_writer(self.analysis, self.mesh, self.material,
                                        self.fixed_constraints, self.force_constraints,
-                                       self.pressure_constraints, self.analysis_type, self.working_dir)
+                                       self.pressure_constraints, self.analysis_type,
+                                       self.eigenmode_parameters, self.working_dir)
             self.base_name = inp_writer.write_calculix_input_file()
         except:
             print "Unexpected error when writing CalculiX input file:", sys.exc_info()[0]
@@ -170,6 +172,14 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
             QtCore.QDir.setCurrent(cwd)
             return p.returncode
         return -1
+
+    ## sets eigenmode parameters for CalculiX frequency analysis
+    #  @param self The python object self
+    #  @number number of eigenmodes that wll be calculated, default 10
+    #  @limit_low lower value of requested eigenfrequency range, default 0.0
+    #  @limit_high higher value of requested eigenfrequency range, default 1000000.0
+    def set_eigenmode_parameters(self, number=10, limit_low=0.0, limit_high=1000000.0):
+        self.eigenmode_parameters = (number, limit_low, limit_high) 
 
     def set_base_name(self, base_name=None):
         if base_name is None:

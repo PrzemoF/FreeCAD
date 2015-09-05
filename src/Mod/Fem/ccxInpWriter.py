@@ -5,15 +5,20 @@ import time
 
 
 class inp_writer:
-    def __init__(self, analysis_obj, mesh_obj, mat_obj, fixed_obj, force_obj, pressure_obj, analysis_type=None, dir_name=None):
+    def __init__(self, analysis_obj, mesh_obj, mat_obj, fixed_obj, force_obj,
+                 pressure_obj, analysis_type=None, eigenmode_parameters=None, dir_name=None):
         self.dir_name = dir_name
         self.analysis = analysis_obj
-        self.analysis_type = analysis_type
         self.mesh_object = mesh_obj
         self.material_objects = mat_obj
         self.fixed_objects = fixed_obj
         self.force_objects = force_obj
         self.pressure_objects = pressure_obj
+        if eigenmode_parameters:
+            self.no_of_eigenfrequencies = eigenmode_parameters[0]
+            self.eigenfrequeny_range_low = eigenmode_parameters[1]
+            self.eigenfrequeny_range_high = eigenmode_parameters[2]
+        self.analysis_type = analysis_type
         if not dir_name:
             self.dir_name = FreeCAD.ActiveDocument.TransientDir.replace('\\', '/') + '/FemAnl_' + analysis_obj.Uid[-4:]
         if not os.path.isdir(self.dir_name):
@@ -34,7 +39,7 @@ class inp_writer:
         self.write_materials(inpfile)
         self.write_step_begin(inpfile)
         self.write_constraints_fixed(inpfile)
-        if self.analysis_type == "static":
+        if self.analysis_type is None or self.analysis_type == "static":
             self.write_constraints_force(inpfile)
             self.write_face_load(inpfile)
         elif self.analysis_type == "frequency":
@@ -335,7 +340,7 @@ class inp_writer:
         f.write('** Frequency analysis\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         f.write('*FREQUENCY\n')
-        f.write('10\n')
+        f.write('{},{},{}\n'.format(self.no_of_eigenfrequencies, self.eigenfrequeny_range_low, self.eigenfrequeny_range_high))
 
     def write_outputs_types(self, f):
         f.write('\n***********************************************************\n')
