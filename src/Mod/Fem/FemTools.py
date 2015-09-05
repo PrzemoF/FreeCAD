@@ -175,9 +175,9 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
 
     ## sets eigenmode parameters for CalculiX frequency analysis
     #  @param self The python object self
-    #  @number number of eigenmodes that wll be calculated, default 10
-    #  @limit_low lower value of requested eigenfrequency range, default 0.0
-    #  @limit_high higher value of requested eigenfrequency range, default 1000000.0
+    #  @param number number of eigenmodes that wll be calculated, default 10
+    #  @param limit_low lower value of requested eigenfrequency range, default 0.0
+    #  @param limit_high higher value of requested eigenfrequency range, default 1000000.0
     def set_eigenmode_parameters(self, number=10, limit_low=0.0, limit_high=1000000.0):
         self.eigenmode_parameters = (number, limit_low, limit_high) 
 
