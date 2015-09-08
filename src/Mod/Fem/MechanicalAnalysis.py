@@ -108,16 +108,16 @@ class _CommandFemFromShape:
         return False
 
 
-class _CommandMechanicalJobControl:
-    "the Fem JobControl command definition"
+class _CommandStaticAnalysis:
+    "the FEM static analysis command definition"
     def GetResources(self):
         return {'Pixmap': 'fem-new-analysis',
-                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_JobControl", "Start calculation"),
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_StaticAnalysis", "Start calculation"),
                 'Accel': "S, C",
-                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_JobControl", "Dialog to start the calculation of the mechanical anlysis")}
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_StaticAnalysis", "Dialog to start the calculation of the mechanical anlysis")}
 
     def Activated(self):
-        taskd = _JobControlTaskPanel(FemGui.getActiveAnalysis())
+        taskd = _StaticAnalysisTaskPanel(FemGui.getActiveAnalysis())
         #taskd.obj = vobj.Object
         taskd.update()
         FreeCADGui.Control.showDialog(taskd)
@@ -168,7 +168,7 @@ class _CommandQuickAnalysis:
     def show_results_on_mesh(self):
         #FIXME proprer mesh refreshing as per FreeCAD.FEM_dialog settings required
         # or confirmation that it's safe to call restore_result_dialog
-        tp = _ResultControlTaskPanel()
+        tp = _ShowResultControlTaskPanel()
         tp.restore_result_dialog()
 
     def IsActive(self):
@@ -203,13 +203,13 @@ class _CommandFrequencyAnalysis:
         return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is not None
 
 
-class _CommandMechanicalShowResult:
-    "the Fem JobControl command definition"
+class _CommandShowResult:
+    "the Fem Show Result command definition"
     def GetResources(self):
         return {'Pixmap': 'fem-result',
-                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_Result", "Show result"),
+                'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_Show_Result", "Show result"),
                 'Accel': "S, R",
-                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_Result", "Show result information of an analysis")}
+                'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_Show_Result", "Show result information of an analysis")}
 
     def Activated(self):
         self.result_object = get_results_object(FreeCADGui.Selection.getSelection())
@@ -218,7 +218,7 @@ class _CommandMechanicalShowResult:
             QtGui.QMessageBox.critical(None, "Missing prerequisite", "No result found in active Analysis")
             return
 
-        taskd = _ResultControlTaskPanel()
+        taskd = _ShowResultControlTaskPanel()
         FreeCADGui.Control.showDialog(taskd)
 
     def IsActive(self):
@@ -276,7 +276,7 @@ class _ViewProviderFemAnalysis:
             FemGui.setActiveAnalysis(self.Object)
             return True
         else:
-            taskd = _JobControlTaskPanel(self.Object)
+            taskd = _StaticAnalysisTaskPanel(self.Object)
             FreeCADGui.Control.showDialog(taskd)
         return True
 
@@ -287,7 +287,7 @@ class _ViewProviderFemAnalysis:
         return None
 
 
-class _JobControlTaskPanel:
+class _StaticAnalysisTaskPanel:
     def __init__(self, analysis_object):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalAnalysis.ui")
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
@@ -492,7 +492,7 @@ class _JobControlTaskPanel:
         QApplication.restoreOverrideCursor()
 
 
-class _ResultControlTaskPanel:
+class _ShowResultControlTaskPanel:
     '''The control for the displacement post-processing'''
     def __init__(self):
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/ShowDisplacement.ui")
@@ -688,8 +688,8 @@ def get_results_object(sel):
 if FreeCAD.GuiUp:
     FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
     FreeCADGui.addCommand('Fem_CreateFromShape', _CommandFemFromShape())
-    FreeCADGui.addCommand('Fem_MechanicalJobControl', _CommandMechanicalJobControl())
+    FreeCADGui.addCommand('Fem_StaticAnalysis', _CommandStaticAnalysis())
     FreeCADGui.addCommand('Fem_Quick_Analysis', _CommandQuickAnalysis())
     FreeCADGui.addCommand('Fem_Frequency_Analysis', _CommandFrequencyAnalysis())
     FreeCADGui.addCommand('Fem_PurgeResults', _CommandPurgeFemResults())
-    FreeCADGui.addCommand('Fem_ShowResult', _CommandMechanicalShowResult())
+    FreeCADGui.addCommand('Fem_ShowResult', _CommandShowResult())
