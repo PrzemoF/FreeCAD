@@ -95,7 +95,6 @@ def readResult(frd_input):
             mode_disp_x = float(line[13:25])
             mode_disp_y = float(line[25:37])
             mode_disp_z = float(line[37:49])
-            #mode_disp[elem] = FreeCAD.Vector(scale * mode_disp_x, scale * mode_disp_y, scale * mode_disp_z)
             mode_disp[elem] = FreeCAD.Vector(mode_disp_x, mode_disp_y, mode_disp_z)
         if line[5:11] == "STRESS":
             mode_stress_found = True
@@ -111,7 +110,6 @@ def readResult(frd_input):
             mode_stress[elem] = (stress_1, stress_2, stress_3, stress_4, stress_5, stress_6)
         #Check for the end of a section
         if line[1:3] == "-3":
-            #scale = 1.0
             if mode_disp_found:
                 mode_disp_found = False
 
