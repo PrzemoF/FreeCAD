@@ -33,12 +33,12 @@ import tempfile
 import unittest
 
 mesh_name = 'Mesh'
-static_analysis_dir = tempfile.gettempdir() + '/FEM_static/'
-frequency_analysis_dir = tempfile.gettempdir() + '/FEM_frequency/'
-static_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/static_analysis.inp'
-frequency_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/frequency_analysis.inp'
-mesh_points_file = FreeCAD.getHomePath() + 'Mod/Fem/mesh_points.csv'
-mesh_volumes_file = FreeCAD.getHomePath() + 'Mod/Fem/mesh_volumes.csv'
+static_analysis_dir = tempfile.gettempdir() + '/FEM_static'
+frequency_analysis_dir = tempfile.gettempdir() + '/FEM_frequency'
+static_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/cube_static.inp'
+frequency_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/cube_frequency.inp'
+mesh_points_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/mesh_points.csv'
+mesh_volumes_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/mesh_volumes.csv'
 
 
 class FemTest(unittest.TestCase):
@@ -64,24 +64,25 @@ class FemTest(unittest.TestCase):
         with open(mesh_points_file, 'r') as points_file:
             reader = csv.reader(points_file)
             for p in reader:
-                self.mesh.addNode(float(p[0]), float(p[1]), float(p[2]), int(p[3]))
+                self.mesh.addNode(float(p[1]), float(p[2]), float(p[3]), int(p[0]))
 
         with open(mesh_volumes_file, 'r') as volumes_file:
             reader = csv.reader(volumes_file)
+            #FIXME _v, __v
             for _v in reader:
-                v = [int(x) for x in _v]
-                self.mesh.addVolume([v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]])
-
+                __v = [x if x is not " " else '0' for x in _v]
+                v = [int(x) for x in __v]
+                self.mesh.addVolume([v[2], v[1], v[3], v[4], v[5], v[7], v[6], v[9], v[8], v[10]], v[0])
         self.mesh_object.FemMesh = self.mesh
         self.active_doc.recompute()
 
     def create_new_material(self):
         self.new_material_object = self.active_doc.addObject("App::MaterialObjectPython", 'MechanicalMaterial')
         mat = self.new_material_object.Material
-        mat['Name'] = "TestMaterial"
-        mat['YoungsModulus'] = "20000 MPa"
-        mat['PoissonRatio'] = "0.36"
-        mat['Density'] = "1000 kg/m^3"
+        mat['Name'] = "Steel"
+        mat['YoungsModulus'] = "200000 MPa"
+        mat['PoissonRatio'] = "0.30"
+        mat['Density'] = "7900 kg/m^3"
         self.new_material_object.Material = mat
 
     def create_fixed_constraint(self):
@@ -90,14 +91,14 @@ class FemTest(unittest.TestCase):
 
     def create_force_constraint(self):
         self.force_constraint = self.active_doc.addObject("Fem::ConstraintForce", "FemConstraintForce")
-        self.force_constraint.References = [(self.box, "Face3")]
+        self.force_constraint.References = [(self.box, "Face2")]
         self.force_constraint.Force = 10.000000
-        self.force_constraint.Direction = (self.box, ["Edge12"])
+        self.force_constraint.Direction = (self.box, ["Edge5"])
         self.force_constraint.Reversed = True
 
     def create_pressure_constraint(self):
         self.pressure_constraint = self.active_doc.addObject("Fem::ConstraintPressure", "FemConstraintPressure")
-        self.pressure_constraint.References = [(self.box, "Face4")]
+        self.pressure_constraint.References = [(self.box, "Face2")]
         self.pressure_constraint.Pressure = 10.000000
         self.pressure_constraint.Reversed = True
 
