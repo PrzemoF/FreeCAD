@@ -14,10 +14,6 @@ INSTALL(
         ccxInpWriter.py
         FemTools.py
         TestFem.py
-	mesh_points.csv
-	mesh_volumes.csv
-	static_analysis.inp
-	frequency_analysis.inp
         FemExample.py
         MechanicalAnalysis.py
         MechanicalMaterial.py
@@ -28,3 +24,12 @@ INSTALL(
         Mod/Fem
 )
 
+INSTALL(
+    FILES
+	test_files/mesh_points.csv
+	test_files/mesh_volumes.csv
+	test_files/static_analysis.inp
+	test_files/frequency_analysis.inp
+    DESTINATION
+        Mod/Fem/test_files
+)
