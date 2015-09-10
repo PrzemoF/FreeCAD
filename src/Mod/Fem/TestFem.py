@@ -35,10 +35,10 @@ import unittest
 mesh_name = 'Mesh'
 static_analysis_dir = tempfile.gettempdir() + '/FEM_static/'
 frequency_analysis_dir = tempfile.gettempdir() + '/FEM_frequency/'
-static_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/static_analysis.inp'
-frequency_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/frequency_analysis.inp'
-mesh_points_file = FreeCAD.getHomePath() + 'Mod/Fem/mesh_points.csv'
-mesh_volumes_file = FreeCAD.getHomePath() + 'Mod/Fem/mesh_volumes.csv'
+static_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/static_analysis.inp'
+frequency_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/frequency_analysis.inp'
+mesh_points_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/mesh_points.csv'
+mesh_volumes_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/mesh_volumes.csv'
 
 
 class FemTest(unittest.TestCase):
