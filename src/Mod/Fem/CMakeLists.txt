@@ -30,8 +30,8 @@ INSTALL(
 	test_files/mesh_volumes.csv
 	test_files/static_analysis.inp
 	test_files/frequency_analysis.inp
-        test_files/cube_10x10x10_frequency.inp
-	test_files/cube_10x10x10_static.inp
+        test_files/cube_10x10x10_no_1_frequency.inp
+	test_files/cube_10x10x10_no_1_static.inp
     DESTINATION
         Mod/Fem/test_files
 )
