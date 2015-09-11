@@ -33,8 +33,8 @@ import tempfile
 import unittest
 
 mesh_name = 'Mesh'
-static_analysis_dir = tempfile.gettempdir() + '/FEM_static/'
-frequency_analysis_dir = tempfile.gettempdir() + '/FEM_frequency/'
+static_analysis_dir = tempfile.gettempdir() + '/FEM_static'
+frequency_analysis_dir = tempfile.gettempdir() + '/FEM_frequency'
 static_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/static_analysis.inp'
 frequency_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/frequency_analysis.inp'
 mesh_points_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/mesh_points.csv'
