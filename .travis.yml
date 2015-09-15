@@ -55,5 +55,5 @@ script:
     - sudo make install
     - bin/FreeCAD --log-file /tmp/FreeCAD.log&
     - sleep 15 && pkill FreeCAD
-    - < /tmp/FreeCAD.log | grep "Warning" 2>&1 > /dev/null && exiti(1);
+    - < /tmp/FreeCAD.log | grep "Warning" 2>&1 > /dev/null && exit 1;
 
