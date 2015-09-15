@@ -53,6 +53,7 @@ script:
     - make -j2
     - PYTHONPATH=$(pwd)/lib/ python -c "import sys, unittest, FreeCAD, TestApp; sys.exit(0 if unittest.TextTestRunner().run(TestApp.All()).wasSuccessful() else 1)"
     - sudo make install
-    - bin/FreeCAD -c --log-file /tmp/FreeCAD.log
-    - cat /tmp/FreeCAD.log
+    - bin/FreeCAD -c --log-file /tmp/FreeCAD.log&
+    - sleep 15 && pkill FreeCAD
+    - < /tmp/FreeCAD.log | grep "Warning" 2>&1 > /dev/null && exiti(1);
 
