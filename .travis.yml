@@ -52,4 +52,8 @@ script:
     - make -j2
     - PYTHONPATH=$(pwd)/lib/ python -c "import sys, unittest, FreeCAD, TestApp; sys.exit(0 if unittest.TextTestRunner().run(TestApp.All()).wasSuccessful() else 1)"
     - sudo make install
+#FreeCAD is expected to fail on xorg connection, but it generates log file anyway/. Overrive exit code with "true"
+    - bin/FreeCAD --log-file /tmp/FreeCAD.log ; true
+    - cat /tmp/FreeCAD.log
+    - grep --file=../.log_errors /tmp/FreeCAD.log || echo "No errors from log_errors file found in the log"
 
