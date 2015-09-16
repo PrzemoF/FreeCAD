@@ -57,9 +57,9 @@ script:
     - bin/FreeCAD --log-file /tmp/FreeCAD.log &
     - sleep 10 && pkill FreeCAD
     - cat /tmp/FreeCAD.log
-    - grep --file=../.log_errors /tmp/FreeCAD.log || echo "No errors from log_errors file found in the log after start from build directory"
+    - grep --file=../.log_errors /tmp/FreeCAD.log || echo "No errors from log_errors file found in the log after start from build directory" && false
     - /usr/local/bin/FreeCAD --log-file /tmp/FreeCAD_installed.log &
     - sleep 10 && pkill FreeCAD
     - cat /tmp/FreeCAD_installed.log
-    - grep --file=../.log_errors /tmp/FreeCAD_installed.log || echo "No errors from log_errors file found in the log after start from /usr/local directory"
+    - grep --file=../.log_errors /tmp/FreeCAD_installed.log || echo "No errors from log_errors file found in the log after start from /usr/local directory" && false
 
