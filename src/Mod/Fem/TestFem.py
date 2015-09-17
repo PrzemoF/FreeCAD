@@ -36,7 +36,9 @@ mesh_name = 'Mesh'
 static_analysis_dir = tempfile.gettempdir() + '/FEM_static'
 frequency_analysis_dir = tempfile.gettempdir() + '/FEM_frequency'
 static_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/cube_static.inp'
+static_expected_values = "Mod/Fem/test_files/cube_static_expected_values"
 frequency_analysis_inp_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/cube_frequency.inp'
+frequency_expected_values = "Mod/Fem/test_files/cube_frequency_expected_values"
 mesh_points_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/mesh_points.csv'
 mesh_volumes_file = FreeCAD.getHomePath() + 'Mod/Fem/test_files/mesh_volumes.csv'
 
@@ -118,6 +120,23 @@ class FemTest(unittest.TestCase):
         file2.close()
         return result
 
+    def compare_stats(self, fea, stat_file=None):
+        if stat_file:
+            sf = open(stat_file, 'r')
+            sf_content = sf.readlines()
+            sf.close()
+        stat_types = ["U1", "U2", "U3", "Uabs", "Sabs"]
+        stats = []
+        for s in stat_types:
+            stats.append("{}: {}\n".format(s, fea.get_stats(s)))
+        if sf_content != stats:
+            print ("Expected stats from {}".format(stat_file))
+            print sf_content
+            print ("Stats read from {}.frd file".format(fea.base_name))
+            print stats
+            return True
+        return False
+
     def test_new_analysis(self):
         FreeCAD.Console.PrintMessage('\n ---------- Start of FEM tests ----------\n')
         FreeCAD.Console.PrintMessage('Checking FEM new analysis...\n')
@@ -165,14 +184,11 @@ class FemTest(unittest.TestCase):
         FreeCAD.Console.PrintMessage('Checking FEM frd file read from static analysis...\n')
         fea.load_results()
         FreeCAD.Console.PrintMessage('Result object created as \"{}\"\n'.format(fea.result_object.Name))
-        #FIXME read stats
         self.assertTrue(fea.results_present, "Cannot read results from {}.frd frd file".format(fea.base_name))
 
-        FreeCAD.Console.PrintMessage('Reading stats from result object...\n')
-        stat_types = ["U1", "U2", "U3", "Uabs", "Sabs"]
-        for stats in stat_types:
-            print "{}: {}".format(stats, fea.get_stats(stats))
-            #FIXME Prepare test suite with expected result stats to compare
+        FreeCAD.Console.PrintMessage('Reading stats from result object for static analysis...\n')
+        ret = self.compare_stats(fea, static_expected_values)
+        self.assertFalse(ret, "Invalid results read from .frd file")
 
         fea.set_analysis_type("frequency")
         fea.setup_working_dir(frequency_analysis_dir)
@@ -185,11 +201,12 @@ class FemTest(unittest.TestCase):
         FreeCAD.Console.PrintMessage('Checking FEM frd file read from frequency analysis...\n')
         fea.load_results()
         FreeCAD.Console.PrintMessage('Last result object created as \"{}\"\n'.format(fea.result_object.Name))
-        #FIXME read stats, check number of eigenmodes
-        print ("Eigenmode parameters: {}".format(fea.eigenmode_parameters))
-
-        #FIXME Prepare test suite with expected result stats to compare
         self.assertTrue(fea.results_present, "Cannot read results from {}.frd frd file".format(fea.base_name))
+
+        FreeCAD.Console.PrintMessage('Reading stats from result object for frequency analysis...\n')
+        ret = self.compare_stats(fea, frequency_expected_values)
+        self.assertFalse(ret, "Invalid results read from .frd file")
+
 
         FreeCAD.Console.PrintMessage('-------------- End of FEM tests ----------- \n')
 

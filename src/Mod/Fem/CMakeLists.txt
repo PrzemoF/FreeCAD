@@ -31,7 +31,9 @@ INSTALL(
 	test_files/static_analysis.inp
 	test_files/frequency_analysis.inp
         test_files/cube_frequency.inp
+	test_files/cube_frequency_expected_values
 	test_files/cube_static.inp
+	test_files/cube_static_expected_values
     DESTINATION
         Mod/Fem/test_files
 )
