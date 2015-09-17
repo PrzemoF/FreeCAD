@@ -119,6 +119,7 @@ class FemTest(unittest.TestCase):
         return result
 
     def test_new_analysis(self):
+        FreeCAD.Console.PrintMessage('\nStart of FEM tests\n')
         FreeCAD.Console.PrintMessage('\nChecking FEM new analysis...\n')
         self.create_new_analysis()
         self.assertTrue(self.analysis, "FemTest of new analysis failed")
@@ -161,6 +162,18 @@ class FemTest(unittest.TestCase):
         ret = self.compare_inp_files(static_analysis_inp_file, static_analysis_dir + "/" + mesh_name + '.inp')
         self.assertFalse(ret, "FemTools write_inp_file test failed.\n{}".format(ret))
 
+        FreeCAD.Console.PrintMessage('\nChecking FEM frd file read from static analysis...\n')
+        fea.load_results()
+        FreeCAD.Console.PrintMessage('\nResult object created as \"{}\"\n'.format(fea.result_object.Name))
+        #FIXME read stats
+        self.assertTrue(fea.results_present, "Cannot read results from {}.frd frd file".format(fea.base_name))
+
+        FreeCAD.Console.PrintMessage('\nReading stats from result object...\n')
+        stat_types = ["U1", "U2", "U3", "Uabs", "Sabs"]
+        for stats in stat_types:
+            print "{}: {}".format(stats, fea.get_stats(stats))
+            #FIXME Prepare test suite with expected result stats to compare
+
         fea.set_analysis_type("frequency")
         fea.setup_working_dir(frequency_analysis_dir)
         FreeCAD.Console.PrintMessage('\nWriting {}/{}.inp for frequency analysis\n'.format(frequency_analysis_dir, mesh_name))
@@ -168,6 +181,17 @@ class FemTest(unittest.TestCase):
         FreeCAD.Console.PrintMessage('\nComparing {} to {}/{}.inp\n'.format(frequency_analysis_inp_file, frequency_analysis_dir, mesh_name))
         ret = self.compare_inp_files(frequency_analysis_inp_file, frequency_analysis_dir + "/" + mesh_name + '.inp')
         self.assertFalse(ret, "FemTools write_inp_file test failed.\n{}".format(ret))
+
+        FreeCAD.Console.PrintMessage('\nChecking FEM frd file read from frequency analysis...\n')
+        fea.load_results()
+        FreeCAD.Console.PrintMessage('\nLast result object created as \"{}\"\n'.format(fea.result_object.Name))
+        #FIXME read stats, check number of eigenmodes
+        print ("Eigenmode parameters: {}".format(fea.eigenmode_parameters))
+
+        #FIXME Prepare test suite with expected result stats to compare
+        self.assertTrue(fea.results_present, "Cannot read results from {}.frd frd file".format(fea.base_name))
+
+        FreeCAD.Console.PrintMessage('\nEnd of FEM tests\n')
 
     def tearDown(self):
         FreeCAD.closeDocument("FemTest")
