@@ -119,56 +119,56 @@ class FemTest(unittest.TestCase):
         return result
 
     def test_new_analysis(self):
-        FreeCAD.Console.PrintMessage('\nStart of FEM tests\n')
-        FreeCAD.Console.PrintMessage('\nChecking FEM new analysis...\n')
+        FreeCAD.Console.PrintMessage('\n ---------- Start of FEM tests ----------\n')
+        FreeCAD.Console.PrintMessage('Checking FEM new analysis...\n')
         self.create_new_analysis()
         self.assertTrue(self.analysis, "FemTest of new analysis failed")
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM new mesh...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM new mesh...\n')
         self.create_new_mesh()
         self.assertTrue(self.mesh, "FemTest of new mesh failed")
         self.analysis.Member = self.analysis.Member + [self.mesh_object]
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM new material...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM new material...\n')
         self.create_new_material()
         self.assertTrue(self.new_material_object, "FemTest of new material failed")
         self.analysis.Member = self.analysis.Member + [self.new_material_object]
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM new fixed constraint...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM new fixed constraint...\n')
         self.create_fixed_constraint()
         self.assertTrue(self.fixed_constraint, "FemTest of new fixed constraint failed")
         self.analysis.Member = self.analysis.Member + [self.fixed_constraint]
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM new force constraint...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM new force constraint...\n')
         self.create_force_constraint()
         self.assertTrue(self.force_constraint, "FemTest of new force constraint failed")
         self.analysis.Member = self.analysis.Member + [self.force_constraint]
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM new pressure constraint...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM new pressure constraint...\n')
         self.create_pressure_constraint()
         self.assertTrue(self.pressure_constraint, "FemTest of new pressure constraint failed")
         self.analysis.Member = self.analysis.Member + [self.pressure_constraint]
 
         fea = FemTools.FemTools(self.analysis)
-        FreeCAD.Console.PrintMessage('\nChecking FEM inp file prerequisites...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM inp file prerequisites...\n')
         error = fea.check_prerequisites()
         self.assertFalse(error, "FemTools check_prerequisites returned error message: {}".format(error))
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM inp file write...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM inp file write...\n')
         fea.setup_working_dir(static_analysis_dir)
-        FreeCAD.Console.PrintMessage('\nWriting {}/{}.inp for static analysis\n'.format(static_analysis_dir, mesh_name))
+        FreeCAD.Console.PrintMessage('Writing {}/{}.inp for static analysis\n'.format(static_analysis_dir, mesh_name))
         error = fea.write_inp_file()
-        FreeCAD.Console.PrintMessage('\nComparing {} to {}/{}.inp\n'.format(static_analysis_inp_file, static_analysis_dir, mesh_name))
+        FreeCAD.Console.PrintMessage('Comparing {} to {}/{}.inp\n'.format(static_analysis_inp_file, static_analysis_dir, mesh_name))
         ret = self.compare_inp_files(static_analysis_inp_file, static_analysis_dir + "/" + mesh_name + '.inp')
         self.assertFalse(ret, "FemTools write_inp_file test failed.\n{}".format(ret))
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM frd file read from static analysis...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM frd file read from static analysis...\n')
         fea.load_results()
-        FreeCAD.Console.PrintMessage('\nResult object created as \"{}\"\n'.format(fea.result_object.Name))
+        FreeCAD.Console.PrintMessage('Result object created as \"{}\"\n'.format(fea.result_object.Name))
         #FIXME read stats
         self.assertTrue(fea.results_present, "Cannot read results from {}.frd frd file".format(fea.base_name))
 
-        FreeCAD.Console.PrintMessage('\nReading stats from result object...\n')
+        FreeCAD.Console.PrintMessage('Reading stats from result object...\n')
         stat_types = ["U1", "U2", "U3", "Uabs", "Sabs"]
         for stats in stat_types:
             print "{}: {}".format(stats, fea.get_stats(stats))
@@ -176,22 +176,22 @@ class FemTest(unittest.TestCase):
 
         fea.set_analysis_type("frequency")
         fea.setup_working_dir(frequency_analysis_dir)
-        FreeCAD.Console.PrintMessage('\nWriting {}/{}.inp for frequency analysis\n'.format(frequency_analysis_dir, mesh_name))
+        FreeCAD.Console.PrintMessage('Writing {}/{}.inp for frequency analysis\n'.format(frequency_analysis_dir, mesh_name))
         error = fea.write_inp_file()
-        FreeCAD.Console.PrintMessage('\nComparing {} to {}/{}.inp\n'.format(frequency_analysis_inp_file, frequency_analysis_dir, mesh_name))
+        FreeCAD.Console.PrintMessage('Comparing {} to {}/{}.inp\n'.format(frequency_analysis_inp_file, frequency_analysis_dir, mesh_name))
         ret = self.compare_inp_files(frequency_analysis_inp_file, frequency_analysis_dir + "/" + mesh_name + '.inp')
         self.assertFalse(ret, "FemTools write_inp_file test failed.\n{}".format(ret))
 
-        FreeCAD.Console.PrintMessage('\nChecking FEM frd file read from frequency analysis...\n')
+        FreeCAD.Console.PrintMessage('Checking FEM frd file read from frequency analysis...\n')
         fea.load_results()
-        FreeCAD.Console.PrintMessage('\nLast result object created as \"{}\"\n'.format(fea.result_object.Name))
+        FreeCAD.Console.PrintMessage('Last result object created as \"{}\"\n'.format(fea.result_object.Name))
         #FIXME read stats, check number of eigenmodes
         print ("Eigenmode parameters: {}".format(fea.eigenmode_parameters))
 
         #FIXME Prepare test suite with expected result stats to compare
         self.assertTrue(fea.results_present, "Cannot read results from {}.frd frd file".format(fea.base_name))
 
-        FreeCAD.Console.PrintMessage('\nEnd of FEM tests\n')
+        FreeCAD.Console.PrintMessage('-------------- End of FEM tests ----------- \n')
 
     def tearDown(self):
         FreeCAD.closeDocument("FemTest")
