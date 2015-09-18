@@ -221,7 +221,7 @@ class FemTest(unittest.TestCase):
         fea.set_analysis_type("frequency")
         self.assertTrue(True if fea.analysis_type == 'frequency' else False, "Setting anlysis type to \'frequency\' failed")
 
-        fcc_print('Setting up working directory {}'.format(frequency_analysis_dir))
+        fcc_print('Setting up working directory to {} in order to write frequency calculations'.format(frequency_analysis_dir))
         fea.setup_working_dir(frequency_analysis_dir)
         self.assertTrue(True if fea.working_dir == frequency_analysis_dir else False,
                         "Setting working directory {} failed".format(frequency_analysis_dir))
@@ -234,7 +234,7 @@ class FemTest(unittest.TestCase):
         ret = self.compare_inp_files(frequency_analysis_inp_file, frequency_analysis_dir + "/" + mesh_name + '.inp')
         self.assertFalse(ret, "FemTools write_inp_file test failed.\n{}".format(ret))
 
-        fcc_print('Setting working directory to read simulated calculations...')
+        fcc_print('Setting up working directory to {} in order to read simulated calculations'.format(test_file_dir))
         fea.setup_working_dir(test_file_dir)
         self.assertTrue(True if fea.working_dir == test_file_dir else False,
                         "Setting working directory {} failed".format(test_file_dir))
