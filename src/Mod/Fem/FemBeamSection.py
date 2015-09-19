@@ -35,11 +35,14 @@ __author__ = "Bernd Hahnebach"
 __url__ = "http://www.freecadweb.org"
 
 
+#FIXME hight -> height
 def makeFemBeamSection(width=20.0, hight=20.0, name="BeamSection"):
+#FIXME hight -> height
     '''makeFemBeamSection([width], [hight], [name]): creates an beamsection object to define a cross section'''
     obj = FreeCAD.ActiveDocument.addObject("App::FeaturePython", name)
     _FemBeamSection(obj)
     obj.Width = width
+#FIXME hight -> height
     obj.Hight = hight
     if FreeCAD.GuiUp:
         _ViewProviderFemBeamSection(obj.ViewObject)
@@ -52,6 +55,7 @@ class _CommandFemBeamSection:
         return {'Pixmap': 'fem-beam-section',
                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Fem_BeamSection", "FEM Beam Cross Section Definition ..."),
                 'Accel': "C, B",
+#FIXME an -> a
                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("Fem_BeamSection", "Creates an FEM Beam Cross Section")}
 
     def Activated(self):
@@ -61,6 +65,8 @@ class _CommandFemBeamSection:
         FreeCADGui.doCommand("App.activeDocument()." + FemGui.getActiveAnalysis().Name + ".Member = App.activeDocument()." + FemGui.getActiveAnalysis().Name + ".Member + [App.ActiveDocument.ActiveObject]")
 
     def IsActive(self):
+#FIXME Possible one line solution
+	#True if FemGui.getActiveAnalysis() else False
         if FemGui.getActiveAnalysis():
             return True
         else:
@@ -71,6 +77,7 @@ class _FemBeamSection:
     "The FemBeamSection object"
     def __init__(self, obj):
         obj.addProperty("App::PropertyLength", "Width", "BeamSection", "set width of the beam elements")
+#FIXME typos Height
         obj.addProperty("App::PropertyLength", "Hight", "BeamSection", "set hight of the beam elements")
         obj.addProperty("App::PropertyLinkSubList", "References", "BeamSection", "List of beam section shapes")
         obj.Proxy = self
@@ -160,6 +167,7 @@ class _FemBeamSectionTaskPanel:
     def references_list_right_clicked(self, QPos):
         self.form.contextMenu = QtGui.QMenu()
         menu_item = self.form.contextMenu.addAction("Remove Reference")
+#FIXME if self.references: should be OK
         if len(self.references) == 0:
             menu_item.setDisabled(True)
         self.form.connect(menu_item, QtCore.SIGNAL("triggered()"), self.remove_reference)
@@ -168,6 +176,7 @@ class _FemBeamSectionTaskPanel:
         self.form.contextMenu.show()
 
     def remove_reference(self):
+#FIXME if self.references: should be OK
         if len(self.references) == 0:
             return
         currentItemName = str(self.form.list_References.currentItem().text())
@@ -196,6 +205,7 @@ class _FemBeamSectionTaskPanel:
                     self.references.append(selsub)
                     self.rebuild_list_References()
                 else:
+#FIXME typo Already
                     print sel.Name, '-->', sub, ' is allready in reference list!'
 
         else:
@@ -222,6 +232,7 @@ class ReferenceShapeSelectionObserver:
     def addSelection(self, docName, objName, sub, pos):
         selected_object = FreeCAD.getDocument(docName).getObject(objName)  # get the obj objName
         self.added_obj = (selected_object, sub)
+#FIXME if sub: should be OK as well
         if len(sub) > 0:         # on doubleClick the solid is selected and sub will be empty
             self.parseSelectionFunction(self.added_obj)
 
