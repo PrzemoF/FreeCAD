@@ -141,9 +141,9 @@ class FemTest(unittest.TestCase):
             stats.append("{}: {}\n".format(s, fea.get_stats(s)))
         if sf_content != stats:
             fcc_print("Expected stats from {}".format(stat_file))
-            fcc_print(sf_content)
+            fcc_print(str(sf_content))
             fcc_print("Stats read from {}.frd file".format(fea.base_name))
-            fcc_print(stats)
+            fcc_print(str(stats))
             return True
         return False
 
