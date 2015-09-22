@@ -223,6 +223,15 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         else:
             self.inp_file_name = self.working_dir + '/' + self.base_name + '.inp'
 
+    ## sets inp file name that is used to determine location and name of frd result file.
+    # Normally inp file name is set set by write_inp_file
+    # Can be used to read mock calculations file
+    def set_inp_file_name(self, inp_file_name=None):
+        if inp_file_name is not None:
+            self.inp_file_name = inp_file_name
+        else:
+            self.inp_file_name = self.working_dir + '/' + self.base_name + '.inp'
+
     def set_analysis_type(self, analysis_type=None):
         if analysis_type is None:
             self.analysis_type = "static"
