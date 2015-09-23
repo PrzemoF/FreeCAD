@@ -29,11 +29,11 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
 
     finished = QtCore.Signal(int)
 
+    known_analysis_types = ["static", "frequency"]
+
     def __init__(self, analysis=None, test_mode=False):
         QtCore.QRunnable.__init__(self)
         QtCore.QObject.__init__(self)
-
-        self.known_analysis_types = ["static", "frequency"]
 
         if analysis:
             self.analysis = analysis
@@ -218,16 +218,7 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         # Update inp file name
         self.set_inp_file_name()
 
-    ## sets inp file name that is used to determine location and name of frd result file.
-    # Normally inp file name is set set by write_inp_file
-    # Can be used to read mock calculations file
-    def set_inp_file_name(self, inp_file_name=None):
-        if inp_file_name is not None:
-            self.inp_file_name = inp_file_name
-        else:
-            self.inp_file_name = self.working_dir + '/' + self.base_name + '.inp'
-
-    ## sets inp file name that is used to determine location and name of frd result file.
+    ## Sets inp file name that is used to determine location and name of frd result file.
     # Normally inp file name is set set by write_inp_file
     # Can be used to read mock calculations file
     def set_inp_file_name(self, inp_file_name=None):

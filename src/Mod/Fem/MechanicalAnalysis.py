@@ -306,6 +306,13 @@ class _JobControlTaskPanel:
         self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
 
         self.analysis_object = analysis_object
+        try:
+            self.analysis_type = FreeCAD.FEM_analysis["type"]
+        except:
+            analysis_type = self.fem_prefs.GetInt("AnalysisType", 0)
+            self.analysis_type = FemTools.known_analysis_types[analysis_type]
+            FreeCAD.FEM_analysis = {"type": self.analysis_type}
+
         self.Calculix = QtCore.QProcess()
         self.Timer = QtCore.QTimer()
         self.Timer.start(300)
@@ -314,9 +321,11 @@ class _JobControlTaskPanel:
 
         #Connect Signals and Slots
         QtCore.QObject.connect(self.form.tb_choose_working_dir, QtCore.SIGNAL("clicked()"), self.choose_working_dir)
-        QtCore.QObject.connect(self.form.pushButton_write, QtCore.SIGNAL("clicked()"), self.write_input_file_handler)
-        QtCore.QObject.connect(self.form.pushButton_edit, QtCore.SIGNAL("clicked()"), self.editCalculixInputFile)
-        QtCore.QObject.connect(self.form.pushButton_generate, QtCore.SIGNAL("clicked()"), self.runCalculix)
+        QtCore.QObject.connect(self.form.pb_write_inp, QtCore.SIGNAL("clicked()"), self.write_input_file_handler)
+        QtCore.QObject.connect(self.form.pb_edit_inp, QtCore.SIGNAL("clicked()"), self.editCalculixInputFile)
+        QtCore.QObject.connect(self.form.pb_run_ccx, QtCore.SIGNAL("clicked()"), self.runCalculix)
+        QtCore.QObject.connect(self.form.rb_static_analysis, QtCore.SIGNAL("clicked()"), self.select_static_analysis)
+        QtCore.QObject.connect(self.form.rb_frequency_analysis, QtCore.SIGNAL("clicked()"), self.select_frequency_analysis)
 
         QtCore.QObject.connect(self.Calculix, QtCore.SIGNAL("started()"), self.calculixStarted)
         QtCore.QObject.connect(self.Calculix, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.calculixStateChanged)
@@ -354,7 +363,7 @@ class _JobControlTaskPanel:
 
     def UpdateText(self):
         if(self.Calculix.state() == QtCore.QProcess.ProcessState.Running):
-            self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
+            self.form.l_time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
 
     def calculixError(self, error):
         print "Error()", error
@@ -363,7 +372,7 @@ class _JobControlTaskPanel:
     def calculixStarted(self):
         print "calculixStarted()"
         print self.Calculix.state()
-        self.form.pushButton_generate.setText("Break Calculix")
+        self.form.pb_run_ccx.setText("Break Calculix")
 
     def calculixStateChanged(self, newState):
         if (newState == QtCore.QProcess.ProcessState.Starting):
@@ -385,10 +394,10 @@ class _JobControlTaskPanel:
 
         self.femConsoleMessage("Calculix done!", "#00AA00")
 
-        self.form.pushButton_generate.setText("Re-run Calculix")
+        self.form.pb_run_ccx.setText("Re-run Calculix")
         print "Loading results...."
         self.femConsoleMessage("Loading result sets...")
-        self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
+        self.form.l_time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
         fea = FemTools()
         fea.reset_all()
         frd_result_file = os.path.splitext(self.inp_file_name)[0] + '.frd'
@@ -399,7 +408,7 @@ class _JobControlTaskPanel:
             self.femConsoleMessage("Loading results done!", "#00AA00")
         else:
             self.femConsoleMessage("Loading results failed! Results file doesn\'t exist", "#FF0000")
-        self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
+        self.form.l_time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
 
     def getStandardButtons(self):
         return int(QtGui.QDialogButtonBox.Close)
@@ -407,6 +416,10 @@ class _JobControlTaskPanel:
     def update(self):
         'fills the widgets'
         self.form.le_working_dir.setText(self.working_dir)
+        if self.analysis_type == 'static':
+            self.form.rb_static_analysis.setChecked(True)
+        elif self.analysis_type == 'frequency':
+            self.form.rb_frequency_analysis.setChecked(True)
         return
 
     def accept(self):
@@ -430,13 +443,14 @@ class _JobControlTaskPanel:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             self.inp_file_name = ""
             fea = FemTools()
+            fea.set_analysis_type(self.analysis_type)
             fea.update_objects()
             fea.write_inp_file()
             if fea.inp_file_name != "":
                 self.inp_file_name = fea.inp_file_name
                 self.femConsoleMessage("Write completed.")
-                self.form.pushButton_edit.setEnabled(True)
-                self.form.pushButton_generate.setEnabled(True)
+                self.form.pb_edit_inp.setEnabled(True)
+                self.form.pb_run_ccx.setEnabled(True)
             else:
                 self.femConsoleMessage("Write .inp file failed!", "#FF0000")
             QApplication.restoreOverrideCursor()
@@ -444,7 +458,7 @@ class _JobControlTaskPanel:
     def check_prerequisites_helper(self):
         self.Start = time.time()
         self.femConsoleMessage("Check dependencies...")
-        self.form.label_Time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
+        self.form.l_time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
 
         fea = FemTools()
         fea.update_objects()
@@ -489,6 +503,19 @@ class _JobControlTaskPanel:
         self.Calculix.start(self.CalculixBinary, ['-i', fi.baseName()])
 
         QApplication.restoreOverrideCursor()
+
+    def store_analysis_type(self, analysis_type):
+        if self.analysis_type != analysis_type:
+            self.analysis_type = analysis_type
+            FreeCAD.FEM_analysis["type"] = analysis_type
+            self.form.pb_edit_inp.setEnabled(False)
+            self.form.pb_run_ccx.setEnabled(False)
+
+    def select_static_analysis(self):
+        self.store_analysis_type('static')
+
+    def select_frequency_analysis(self):
+        self.store_analysis_type('frequency')
 
 
 class _ResultControlTaskPanel:
