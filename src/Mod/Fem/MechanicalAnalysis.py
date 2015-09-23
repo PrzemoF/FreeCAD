@@ -79,7 +79,7 @@ class _CommandNewMechanicalAnalysis:
         FreeCADGui.Selection.clearSelection()
 
     def IsActive(self):
-        return FreeCADGui.ActiveDocument is not None and FemGui.getActiveAnalysis() is None
+        return FreeCADGui.ActiveDocument is not None
 
 
 class _CommandFemFromShape:
