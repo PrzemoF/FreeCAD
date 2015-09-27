@@ -46,11 +46,11 @@ class inp_writer:
         if self.shellthickness_objects:
             self.get_shellthickness_element_sets()
         self.generate_ccx_elsets()
-        self.write_element_sets_material_and_femelement_type(inpfile)
+        self.write_ccx_elsets_elements_material_and_femelementtype(inpfile)
         self.write_node_sets_constraints_fixed(inpfile)
         self.write_node_sets_constraints_force(inpfile)
         self.write_materials(inpfile)
-        self.write_femelementsets(inpfile)
+        self.write_ccx_elsets_definitions_material_and_femelementtype(inpfile)
         self.write_step_begin(inpfile)
         self.write_constraints_fixed(inpfile)
         if self.analysis_type is None or self.analysis_type == "static":
@@ -260,7 +260,6 @@ class inp_writer:
                 ccx_mat_solid_elementset = ccx_mat + ccx_solid
                 ccx_elset = {}
                 ccx_elset['ccx_elset_name'] = ccx_mat_solid_elementset
-                ccx_elset['ccx_elset_name'] = 'MaterialSolidElements'   # temporaer for FemTest and writing inpfile
                 ccx_elset['solid'] = True
                 ccx_elset['ccx_mat_name'] = ccx_mat
                 ccx_elset['material'] = mat_obj.Material['Name'][:80]
@@ -269,9 +268,9 @@ class inp_writer:
 
         # check if all worked out well would be not bad, sum elesets, is neede if multiple materials run
 
-    def write_element_sets_material_and_femelement_type(self, f):
+    def write_ccx_elsets_elements_material_and_femelementtype(self, f):
         f.write('\n***********************************************************\n')
-        f.write('** Element sets for materials and FEM element type (solid, shell, beam)\n')
+        f.write('** Element set elements for materials and FEM element type (solid, shell, beam)\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for ccx_elset in self.ccx_elsets:
             # print ccx_elset
@@ -352,8 +351,9 @@ class inp_writer:
             f.write('*DENSITY \n')
             f.write('{0:.3e}, \n'.format(density_in_tone_per_mm3))
 
-    def write_femelementsets(self, f):
+    def write_ccx_elsets_definitions_material_and_femelementtype(self, f):
         f.write('\n***********************************************************\n')
+        f.write('** Element set definitions for materials and FEM element type (solid, shell, beam)\n')
         f.write('** Sections\n')
         f.write('** written by {} function\n'.format(sys._getframe().f_code.co_name))
         for ccx_elset in self.ccx_elsets:
