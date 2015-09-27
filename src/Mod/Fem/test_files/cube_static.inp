@@ -413,8 +413,8 @@
 
 
 ***********************************************************
-** Element sets for materials and FEM element type (solid, shell, beam)
-** written by write_element_sets_material_and_femelement_type function
+** Element set elements for materials and FEM element type (solid, shell, beam)
+** written by write_ccx_elsets_elements_material_and_femelementtype function
 *ELSET,ELSET=MechanicalMaterialSolid
 Eall
 
@@ -481,8 +481,9 @@ Eall
 7.900e-09, 
 
 ***********************************************************
+** Element set definitions for materials and FEM element type (solid, shell, beam)
 ** Sections
-** written by write_femelementsets function
+** written by write_ccx_elsets_definitions_material_and_femelementtype function
 *SOLID SECTION, ELSET=MechanicalMaterialSolid, MATERIAL=Steel
 
 ***********************************************************
@@ -593,8 +594,8 @@ S
 ***********************************************************
 ** CalculiX Input file
 ** written by write_footer function
-**   written by    --> FreeCAD 0.16.5604 (Git)
-**   written on    --> Mon Sep 21 16:46:15 2015
+**   written by    --> FreeCAD 0.16.5648 (Git)
+**   written on    --> Sun Sep 27 14:16:36 2015
 **   file name     --> 
 **   analysis name --> MechanicalAnalysis
 **
