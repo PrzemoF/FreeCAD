@@ -58,8 +58,10 @@ Gui::ToolBarItem* Workbench::setupToolBars() const
     *fem << "Fem_NewMechanicalAnalysis"
          << "Fem_CreateFromShape"
          << "Fem_MechanicalMaterial"
-         << "Fem_BeamSection"
-         << "Fem_ShellThickness"
+// To be switched on when the problem is solved
+//    http://forum.freecadweb.org/viewtopic.php?f=10&t=12632
+//         << "Fem_BeamSection"
+//         << "Fem_ShellThickness"
          << "Separator"
          << "Fem_CreateNodesSet"
          << "Separator"
@@ -88,8 +90,10 @@ Gui::MenuItem* Workbench::setupMenuBar() const
     *fem << "Fem_NewMechanicalAnalysis"
          << "Fem_CreateFromShape"
          << "Fem_MechanicalMaterial"
-         << "Fem_BeamSection"
-         << "Fem_ShellThickness"
+// To be switched on when the problem is solved
+//    http://forum.freecadweb.org/viewtopic.php?f=10&t=12632
+//         << "Fem_BeamSection"
+//         << "Fem_ShellThickness"
          << "Separator"
          << "Fem_CreateNodesSet"
          << "Separator"

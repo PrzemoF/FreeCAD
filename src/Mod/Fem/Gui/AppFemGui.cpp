@@ -104,8 +104,10 @@ void FemGuiExport initFemGui()
 
     Base::Interpreter().loadModule("MechanicalAnalysis");
     Base::Interpreter().loadModule("MechanicalMaterial");
-    Base::Interpreter().loadModule("FemBeamSection");
-    Base::Interpreter().loadModule("FemShellThickness");
+// To be switched on when the problem is solved
+// http://forum.freecadweb.org/viewtopic.php?f=10&t=12632
+//    Base::Interpreter().loadModule("FemBeamSection");
+//    Base::Interpreter().loadModule("FemShellThickness");
 
     // register preferences pages
     new Gui::PrefPageProducer<FemGui::DlgSettingsFemImp> ("FEM");
