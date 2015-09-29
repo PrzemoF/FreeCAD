@@ -404,9 +404,14 @@ class _JobControlTaskPanel:
         current_wd = get_working_dir()
         wd = QtGui.QFileDialog.getExistingDirectory(None, 'Choose CalculiX working directory',
                                                     current_wd)
-        if os.isdir(wd, os.W_OK):
-            self.analysis_object.WorkingDir = wd
-            self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
+        if not (os.path.isdir(wd)):
+            try:
+                os.path.makedirs(wd)
+            except:
+                raise Exception("Dir {} doesn't exist and cannot create it".format(wd))
+        self.analysis_object.WorkingDir = wd
+        self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
+
 
     def write_input_file_handler(self):
         QApplication.restoreOverrideCursor()
