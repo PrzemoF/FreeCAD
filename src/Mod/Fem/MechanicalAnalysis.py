@@ -203,6 +203,7 @@ class _FemAnalysis:
         self.Type = "FemAnalysis"
         obj.Proxy = self
         fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+        #FIXME how to control it??
         obj.addProperty("App::PropertyPath", "WorkingDir", "Fem", "Directory where the jobs get generated")
         obj.WorkingDir = get_working_dir()
         obj.addProperty("App::PropertyEnumeration", "AnalysisType", "Fem", "Type of the analysis")
