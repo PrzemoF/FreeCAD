@@ -204,7 +204,7 @@ class _FemAnalysis:
         obj.Proxy = self
         fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         obj.addProperty("App::PropertyPath", "WorkingDir", "Fem", "Directory where the jobs get generated")
-        obj.WorkingDir = fem_prefs.GetString("WorkingDir", get_working_dir())
+        obj.WorkingDir = get_working_dir()
         obj.addProperty("App::PropertyEnumeration", "AnalysisType", "Fem", "Type of the analysis")
         obj.AnalysisType = FemTools.known_analysis_types
         analysis_type = fem_prefs.GetInt("AnalysisType", 0)
@@ -401,16 +401,11 @@ class _JobControlTaskPanel:
         FreeCADGui.Control.closeDialog()
 
     def choose_working_dir(self):
-        self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-        w_dir = self.fem_prefs.GetString("WorkingDir", "")
-        if not w_dir:
-            import tempfile
-            w_dir = tempfile.gettempdir()
+        wd = get_working_dir()
         self.analysis_object.WorkingDir = QtGui.QFileDialog.getExistingDirectory(None,
                                                                                  'Choose CalculiX working directory',
-                                                                                 w_dir)
+                                                                                 wd)
         if self.analysis_object.WorkingDir:
-            self.fem_prefs.SetString("WorkingDir", str(self.self.analysis_object.WorkingDir))
             self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
 
     def write_input_file_handler(self):
