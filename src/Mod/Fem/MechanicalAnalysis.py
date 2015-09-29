@@ -401,11 +401,11 @@ class _JobControlTaskPanel:
         FreeCADGui.Control.closeDialog()
 
     def choose_working_dir(self):
-        wd = get_working_dir()
-        self.analysis_object.WorkingDir = QtGui.QFileDialog.getExistingDirectory(None,
-                                                                                 'Choose CalculiX working directory',
-                                                                                 wd)
-        if self.analysis_object.WorkingDir:
+        current_wd = get_working_dir()
+        wd = QtGui.QFileDialog.getExistingDirectory(None, 'Choose CalculiX working directory',
+                                                    current_wd)
+        if os.isdir(wd, os.W_OK):
+            self.analysis_object.WorkingDir = wd
             self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
 
     def write_input_file_handler(self):
