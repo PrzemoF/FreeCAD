@@ -204,14 +204,11 @@ class _FemAnalysis:
         obj.Proxy = self
         fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         obj.addProperty("App::PropertyPath", "WorkingDir", "Fem", "Directory where the jobs get generated")
-        w_dir = fem_prefs.GetString("WorkingDir", "")
-        if not w_dir:
-            import tempfile
-            w_dir = tempfile.gettempdir()
-        obj.WorkingDir = fem_prefs.GetString("WorkingDir", w_dir)
+        obj.WorkingDir = fem_prefs.GetString("WorkingDir", get_working_dir())
         obj.addProperty("App::PropertyEnumeration", "AnalysisType", "Fem", "Type of the analysis")
         obj.AnalysisType = FemTools.known_analysis_types
-        obj.AnalysisType = fem_prefs.GetString("AnalysisType", 'static')
+        analysis_type = fem_prefs.GetInt("AnalysisType", 0)
+        obj.AnalysisType = FemTools.known_analysis_types[analysis_type]
 
     def execute(self, obj):
         return
@@ -391,9 +388,9 @@ class _JobControlTaskPanel:
     def update(self):
         'fills the widgets'
         self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
-        if self.analysis_type == 'static':
+        if self.analysis_object.AnalysisType == 'static':
             self.form.rb_static_analysis.setChecked(True)
-        elif self.analysis_type == 'frequency':
+        elif self.analysis_object.AnalysisType == 'frequency':
             self.form.rb_frequency_analysis.setChecked(True)
         return
 
@@ -422,7 +419,6 @@ class _JobControlTaskPanel:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             self.inp_file_name = ""
             fea = FemTools()
-            fea.set_analysis_type(self.analysis_type)
             fea.update_objects()
             fea.write_inp_file()
             if fea.inp_file_name != "":
@@ -484,8 +480,8 @@ class _JobControlTaskPanel:
         QApplication.restoreOverrideCursor()
 
     def change_analysis_type(self, analysis_type):
-        if self.analysis_type != analysis_type:
-            self.analysis_type = analysis_type
+        if self.analysis_object.AnalysisType != analysis_type:
+            self.analysis_object.AnalysisType = analysis_type
             self.form.pb_edit_inp.setEnabled(False)
             self.form.pb_run_ccx.setEnabled(False)
 
@@ -701,6 +697,15 @@ def get_results_object(sel):
         if(i.isDerivedFrom("Fem::FemResultObject")):
             return i
     return None
+
+
+def get_working_dir():
+    fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+    working_dir = fem_prefs.GetString("WorkingDir", "")
+    if not working_dir:
+        import tempfile
+        working_dir = tempfile.gettempdir()
+    return working_dir
 
 if FreeCAD.GuiUp:
     FreeCADGui.addCommand('Fem_NewMechanicalAnalysis', _CommandNewMechanicalAnalysis())
