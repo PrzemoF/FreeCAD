@@ -199,6 +199,8 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         message = ""
         if not self.analysis:
             message += "No active Analysis\n"
+        if not self.working_dir or self.working_dir is "":
+            message += "Working Dir not set\n"
         if self.analysis_type not in self.known_analysis_types:
             message += "Unknown analysis type: {}\n".format(self.analysis_type)
         if not self.mesh:
