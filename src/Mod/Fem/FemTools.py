@@ -311,11 +311,11 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
     #  @param self The python object self
     #  @working_dir directory to be used for writing .inp file and executing CalculiX ccx
     def setup_working_dir(self, working_dir=None):
-        if working_dir is None:
+        if working_dir is not None:
+            self.working_dir = working_dir
+        else:
             self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
             self.working_dir = self.fem_prefs.GetString("WorkingDir", "/tmp")
-        else:
-            self.working_dir = working_dir
         # Update inp file name
         self.set_inp_file_name()
 
