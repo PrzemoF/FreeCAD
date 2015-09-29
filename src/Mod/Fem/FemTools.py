@@ -295,6 +295,11 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         else:
             self.inp_file_name = self.working_dir + '/' + self.base_name + '.inp'
 
+    ## Sets analysis type.
+    #  @param self The python object self
+    #  @param analysis_type type of the analysis. Allowed values are:
+    #  - static
+    #  - frequency
     def set_analysis_type(self, analysis_type=None):
         if analysis_type is None:
             self.analysis_type = "static"
