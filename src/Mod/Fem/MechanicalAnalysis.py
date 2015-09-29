@@ -202,7 +202,12 @@ class _FemAnalysis:
     def __init__(self, obj):
         self.Type = "FemAnalysis"
         obj.Proxy = self
-        obj.addProperty("App::PropertyString", "OutputDir", "Base", "Directory where the jobs get generated")
+        fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+        obj.addProperty("App::PropertyPath", "WorkingDir", "Fem", "Directory where the jobs get generated")
+        obj.WorkingDir = fem_prefs.GetString("WorkingDir", '/tmp')
+        obj.addProperty("App::PropertyEnumeration", "AnalysisType", "Fem", "Type of the analysis")
+        obj.AnalysisType = FemTools.known_analysis_types
+        obj.AnalysisType = fem_prefs.GetString("AnalysisType", 'static')
 
     def execute(self, obj):
         return
@@ -260,6 +265,7 @@ class _ViewProviderFemAnalysis:
 
 class _JobControlTaskPanel:
     def __init__(self, analysis_object):
+        self.analysis_object = analysis_object
         self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/MechanicalAnalysis.ui")
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
         ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
@@ -274,10 +280,7 @@ class _JobControlTaskPanel:
                 self.CalculixBinary = FreeCAD.getHomePath() + 'bin/ccx.exe'
             else:
                 self.CalculixBinary = 'ccx'
-        self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-        self.working_dir = self.fem_prefs.GetString("WorkingDir", '/tmp')
 
-        self.analysis_object = analysis_object
         try:
             self.analysis_type = FreeCAD.FEM_analysis["type"]
         except:
@@ -387,7 +390,7 @@ class _JobControlTaskPanel:
 
     def update(self):
         'fills the widgets'
-        self.form.le_working_dir.setText(self.working_dir)
+        self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
         if self.analysis_type == 'static':
             self.form.rb_static_analysis.setChecked(True)
         elif self.analysis_type == 'frequency':
@@ -402,12 +405,12 @@ class _JobControlTaskPanel:
 
     def choose_working_dir(self):
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-        self.working_dir = QtGui.QFileDialog.getExistingDirectory(None,
-                                                                  'Choose CalculiX working directory',
-                                                                  self.fem_prefs.GetString("WorkingDir", '/tmp'))
-        if self.working_dir:
-            self.fem_prefs.SetString("WorkingDir", str(self.working_dir))
-            self.form.le_working_dir.setText(self.working_dir)
+        self.analysis_object.WorkingDir = QtGui.QFileDialog.getExistingDirectory(None,
+                                                                                 'Choose CalculiX working directory',
+                                                                                 self.fem_prefs.GetString("WorkingDir", '/tmp'))
+        if self.analysis_object.WorkingDir:
+            self.fem_prefs.SetString("WorkingDir", str(self.self.analysis_object.WorkingDir))
+            self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
 
     def write_input_file_handler(self):
         QApplication.restoreOverrideCursor()
