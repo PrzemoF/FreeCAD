@@ -205,6 +205,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="Gui::PrefComboBox" name="cb_analysis_type">
+              <property name="minimumSize">
+               <size>
+                <width>148</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="toolTip">
                <string>Default type on analysis</string>
               </property>
