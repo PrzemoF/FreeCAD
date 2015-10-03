@@ -30,33 +30,33 @@
 #***************************************************************************/
 
 
-class FemWorkbench (Workbench):
-    "Fem workbench object"
+
+class FemWorkbench ( Workbench ):
+    """Cae workbench object"""
     def __init__(self):
         self.__class__.Icon = FreeCAD.getResourceDir() + "Mod/Fem/Resources/icons/preferences-fem.svg"
-        self.__class__.MenuText = "FEM"
-        self.__class__.ToolTip = "FEM workbench"
-
+        self.__class__.MenuText = "Cae"
+        self.__class__.ToolTip = "CAE(FEM+CFD) workbench"
     def Initialize(self):
-        # load the module
+        # load the c++ module
         import Fem
         import FemGui
-        import subprocess
-        from platform import system
-        ccx_path = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem").GetString("ccxBinaryPath")
-        if not ccx_path:
-            try:
-                if system() == 'Linux':
-                    p1 = subprocess.Popen(['which', 'ccx'], stdout=subprocess.PIPE)
-                    if p1.wait() == 0:
-                        ccx_path = p1.stdout.read().split('\n')[0]
-                elif system() == 'Windows':
-                    ccx_path = FreeCAD.getHomePath() + 'bin/ccx.exe'
-                FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem").SetString("ccxBinaryPath", ccx_path)
-            except Exception as e:
-                FreeCAD.Console.PrintError(e.message)
-
+        
+        import CaeAnalysis
+        import FemShellThickness
+        import FemBeamSection
+        import MechanicalMaterial
+        import FemCommands
+        #setup ccx path code has been moved into makeCaeSolver() and specific solver init section 
+        
     def GetClassName(self):
-        return "FemGui::Workbench"
+        return "FemGui::Workbench"  # <FemToCae> change name later if C++ code got renamed
 
-Gui.addWorkbench(FemWorkbench())
+Gui.addWorkbench(FemWorkbench()) #<FemToCae> change name later if C++ code got renamed
+
+
+
+
+
+
+
