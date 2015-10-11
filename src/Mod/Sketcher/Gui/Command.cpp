@@ -351,73 +351,107 @@ CmdSketcherMapSketch::CmdSketcherMapSketch()
 
 void CmdSketcherMapSketch::activated(int iMsg)
 {
-    App::Document* doc = App::GetApplication().getActiveDocument();
-    std::vector<App::DocumentObject*> sel = doc->getObjectsOfType(Sketcher::SketchObject::getClassTypeId());
-    if (sel.empty()) {
+    std::string featName;
+    App::DocumentObject* feature;
+
+    int no_of_sketches = Gui::Selection().countObjectsOfType(Sketcher::SketchObject::getClassTypeId());
+    int no_of_faces = Gui::Selection().countObjectsOfType(Part::Feature::getClassTypeId());
+
+    if (no_of_sketches > 1) {
         QMessageBox::warning(Gui::getMainWindow(),
-            qApp->translate(className(), "No sketch found"),
-            qApp->translate(className(), "The document doesn't have a sketch"));
-        return;
+                qApp->translate(className(), "Too many sketches selected"),
+                qApp->translate(className(), "More than one sketch selected to map"));
+    } else if (no_of_sketches == 1) {
+        Sketcher::SketchObject* sketch = Gui::Selection().getObjectsOfType<Sketcher::SketchObject>().front();
+        //std::vector<App::DocumentObject*> part = Gui::Selection().getObjectsOfType(Part::Feature::getClassTypeId());
+        featName = sketch->getNameInDocument();
+        //feature needs to be set here for cyclic dependency scan
+    } else {
+        App::Document* doc = App::GetApplication().getActiveDocument();
+        std::vector<App::DocumentObject*> sketches = doc->getObjectsOfType(Sketcher::SketchObject::getClassTypeId());
+        if (sketches.empty()) {
+            QMessageBox::warning(Gui::getMainWindow(),
+                    qApp->translate(className(), "No sketch found"),
+                    qApp->translate(className(), "The document doesn't have a sketch"));
+            return;
+        }
+
+        QStringList items;
+        for (std::vector<App::DocumentObject*>::iterator it = sketches.begin(); it != sketches.end(); ++it) {
+            items.push_back(QString::fromUtf8((*it)->Label.getValue()));
+        }
+        bool ok;
+        QString text = QInputDialog::getItem(Gui::getMainWindow(),
+                qApp->translate(className(), "Select sketch"),
+                qApp->translate(className(), "Select a sketch from the list"),
+                items, 0, false, &ok);
+        if (!ok) return;
+        int index = items.indexOf(text);
+        feature = sketches[index];
+        featName = feature->getNameInDocument();
     }
 
-    bool ok;
-    QStringList items;
-    for (std::vector<App::DocumentObject*>::iterator it = sel.begin(); it != sel.end(); ++it)
-        items.push_back(QString::fromUtf8((*it)->Label.getValue()));
-    QString text = QInputDialog::getItem(Gui::getMainWindow(),
-        qApp->translate(className(), "Select sketch"),
-        qApp->translate(className(), "Select a sketch from the list"),
-        items, 0, false, &ok);
-    if (!ok) return;
-    int index = items.indexOf(text);
-
-    std::string featName = sel[index]->getNameInDocument();
-    Gui::SelectionFilter FaceFilter  ("SELECT Part::Feature SUBELEMENT Face COUNT 1");
-    if (FaceFilter.match()) {
+    //Gui::SelectionFilter FaceFilter  ("SELECT Part::Feature SUBELEMENT Face COUNT 1");
+    //if (FaceFilter.match()) {
+    if (no_of_faces > 1) {
+        QMessageBox::warning(Gui::getMainWindow(),
+                qApp->translate(className(), "Too many faces selected"),
+                qApp->translate(className(), "More than one face  selected to map the sketch to"));
+    } else if (no_of_faces == 0) {
+        QMessageBox::warning(Gui::getMainWindow(),
+                qApp->translate(className(), "No face selected"),
+                qApp->translate(className(), "No face was selected to map the sketch to"));
+    } else {
+        //std::vector<App::DocumentObject*> part = Gui::Selection().getObjectsOfType(Part::Feature::getClassTypeId());
         // get the selected object
-        Part::Feature *part = static_cast<Part::Feature*>(FaceFilter.Result[0][0].getObject());
+        /*Part::Feature *part = static_cast<Part::Feature*>(FaceFilter.Result[0][0].getObject());*/
+
+        Part::Feature* part = Gui::Selection().getObjectsOfType<Part::Feature>().front();
         Base::Placement ObjectPos = part->Placement.getValue();
-        const std::vector<std::string> &sub = FaceFilter.Result[0][0].getSubNames();
+        //const std::vector<std::string> &sub = FaceFilter.Result[0][0].getSubNames();
+        const std::vector<std::string> &sub = part->getSubNames();
+        /*const std::vector<std::string> &sub = part->getNameInDocument();
         if (sub.empty()) {
             // No assert for wrong user input!
             QMessageBox::warning(Gui::getMainWindow(),
-                qApp->translate(className(),"No sub-elements selected"),
-                qApp->translate(className(),"You have to select a single face as support for a sketch!"));
+                    qApp->translate(className(),"No sub-elements selected"),
+                    qApp->translate(className(),"You have to select a single face as support for a sketch!"));
             return;
         }
         else if (sub.size() > 1) {
             // No assert for wrong user input!
             QMessageBox::warning(Gui::getMainWindow(),
-                qApp->translate(className(),"Several sub-elements selected"),
-                qApp->translate(className(),"You have to select a single face as support for a sketch!"));
+                    qApp->translate(className(),"Several sub-elements selected"),
+                    qApp->translate(className(),"You have to select a single face as support for a sketch!"));
             return;
-        }
+        }*/
 
         std::vector<App::DocumentObject*> input = part->getOutList();
-        if (std::find(input.begin(), input.end(), sel[index]) != input.end()) {
+        if (std::find(input.begin(), input.end(), feature) != input.end()) {
             QMessageBox::warning(Gui::getMainWindow(),
-                qApp->translate(className(),"Cyclic dependency"),
-                qApp->translate(className(),"You cannot choose a support object depending on the selected sketch!"));
+                    qApp->translate(className(),"Cyclic dependency"),
+                    qApp->translate(className(),"You cannot choose a support object depending on the selected sketch!"));
             return;
         }
 
         // get the selected sub shape (a Face)
         const Part::TopoShape &shape = part->Shape.getValue();
-        TopoDS_Shape sh = shape.getSubShape(sub[0].c_str());
+        //TopoDS_Shape sh = shape.getSubShape(sub[0].c_str());
+        TopoDS_Shape sh = shape.getSubShape(part->c_str());
         const TopoDS_Face& face = TopoDS::Face(sh);
         if (face.IsNull()) {
             // No assert for wrong user input!
             QMessageBox::warning(Gui::getMainWindow(),
-                qApp->translate(className(),"No support face selected"),
-                qApp->translate(className(),"You have to select a face as support for a sketch!"));
+                    qApp->translate(className(),"No support face selected"),
+                    qApp->translate(className(),"You have to select a face as support for a sketch!"));
             return;
         }
 
         BRepAdaptor_Surface adapt(face);
         if (adapt.GetType() != GeomAbs_Plane){
             QMessageBox::warning(Gui::getMainWindow(),
-                qApp->translate(className(),"No planar support"),
-                qApp->translate(className(),"You need a planar face as support for a sketch!"));
+                    qApp->translate(className(),"No planar support"),
+                    qApp->translate(className(),"You need a planar face as support for a sketch!"));
             return;
         }
 
@@ -427,11 +461,6 @@ void CmdSketcherMapSketch::activated(int iMsg)
         doCommand(Gui,"App.activeDocument().%s.Support = %s",featName.c_str(),supportString.c_str());
         doCommand(Gui,"App.activeDocument().recompute()");
         doCommand(Gui,"Gui.activeDocument().setEdit('%s')",featName.c_str());
-    }
-    else {
-        QMessageBox::warning(Gui::getMainWindow(),
-            qApp->translate(className(), "No face selected"),
-            qApp->translate(className(), "No face was selected to map the sketch to"));
     }
 }
 
