@@ -30,7 +30,14 @@ class _FemAnalysis:
     def __init__(self, obj):
         self.Type = "FemAnalysis"
         obj.Proxy = self
-        obj.addProperty("App::PropertyString", "OutputDir", "Base", "Directory where the jobs get generated")
+        fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+        #FIXME how to control it??
+        obj.addProperty("App::PropertyPath", "WorkingDir", "Fem", "Directory where the jobs get generated")
+        obj.WorkingDir = get_working_dir()
+        obj.addProperty("App::PropertyEnumeration", "AnalysisType", "Fem", "Type of the analysis")
+        obj.AnalysisType = FemTools.known_analysis_types
+        analysis_type = fem_prefs.GetInt("AnalysisType", 0)
+        obj.AnalysisType = FemTools.known_analysis_types[analysis_type]
 
     def execute(self, obj):
         return
@@ -45,3 +52,17 @@ class _FemAnalysis:
     def __setstate__(self, state):
         if state:
             self.Type = state
+
+#Code duplication!
+def get_working_dir():
+    fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+    working_dir = fem_prefs.GetString("WorkingDir", "")
+    if not (os.path.isdir(working_dir)):
+        try:
+            os.path.makedirs(working_dir)
+        except:
+            print ("Dir \'{}\' from FEM preferences doesn't exist and cannot be created.".format(working_dir))
+            import tempfile
+            working_dir = tempfile.gettempdir()
+            print ("Dir \'{}\' will be used instead.".format(working_dir))
+    return working_dir
