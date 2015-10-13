@@ -180,13 +180,14 @@ class _JobControlTaskPanel:
         FreeCADGui.Control.closeDialog()
 
     def choose_working_dir(self):
-        self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-        self.working_dir = QtGui.QFileDialog.getExistingDirectory(None,
-                                                                  'Choose CalculiX working directory',
-                                                                  self.fem_prefs.GetString("WorkingDir", '/tmp'))
-        if self.working_dir:
-            self.fem_prefs.SetString("WorkingDir", str(self.working_dir))
-            self.form.le_working_dir.setText(self.working_dir)
+        current_wd = get_working_dir()
+        wd = QtGui.QFileDialog.getExistingDirectory(None, 'Choose CalculiX working directory',
+                                                    current_wd)
+        if wd:
+            self.analysis_object.WorkingDir = wd
+        else:
+            self.analysis_object.WorkingDir = current_wd
+        self.form.le_working_dir.setText(self.analysis_object.WorkingDir)
 
     def write_input_file_handler(self):
         QApplication.restoreOverrideCursor()
@@ -266,4 +267,19 @@ class _JobControlTaskPanel:
         self.store_analysis_type('static')
 
     def select_frequency_analysis(self):
-        self.store_analysis_type('frequency')
+        self.change_analysis_type('frequency')
+
+
+#Code duplication!!!!
+def get_working_dir():
+    fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
+    working_dir = fem_prefs.GetString("WorkingDir", "")
+    if not (os.path.isdir(working_dir)):
+        try:
+            os.path.makedirs(working_dir)
+        except:
+            print ("Dir \'{}\' from FEM preferences doesn't exist and cannot be created.".format(working_dir))
+            import tempfile
+            working_dir = tempfile.gettempdir()
+            print ("Dir \'{}\' will be used instead.".format(working_dir))
+    return working_dir
