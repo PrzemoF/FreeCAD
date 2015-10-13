@@ -50,7 +50,7 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
             self.analysis = FemGui.getActiveAnalysis()
         if self.analysis:
             self.update_objects()
-            self.set_analysis_type()
+            self.analysis_type = self.analysis.AnalysisType
             self.set_eigenmode_parameters()
             ## @var base_name
             #  base name of .inp/.frd file (without extension). It is used to construct .inp file path that is passed to CalculiX ccx
@@ -58,7 +58,7 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
             ## @var results_present
             #  boolean variable indicating if there are calculation results ready for use
             self.results_present = False
-            self.setup_working_dir()
+            self.working_dir = self.analysis.WorkingDir
             if test_mode:
                 self.ccx_binary_present = True
             else:

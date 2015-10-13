@@ -55,6 +55,13 @@ class FemWorkbench (Workbench):
                 FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem").SetString("ccxBinaryPath", ccx_path)
             except Exception as e:
                 FreeCAD.Console.PrintError(e.message)
+        #split into a separate commit start
+	working_dir = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem").GetString("WorkingDir")
+        if not working_dir:
+            import tempfile
+            working_dir = tempfile.gettempdir()
+            FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem").SetString("WorkingDir", working_dir)
+        #split into a separate commit end
 
     def GetClassName(self):
         return "FemGui::Workbench"
