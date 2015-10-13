@@ -25,6 +25,11 @@ __author__ = "Juergen Riegel"
 __url__ = "http://www.freecadweb.org"
 
 
+import FreeCAD
+from FemTools import FemTools
+import os
+
+
 class _FemAnalysis:
     "The FemAnalysis container object"
     def __init__(self, obj):
@@ -52,6 +57,7 @@ class _FemAnalysis:
     def __setstate__(self, state):
         if state:
             self.Type = state
+
 
 #Code duplication!
 def get_working_dir():
