@@ -91,5 +91,5 @@ void DlgSettingsFemImp::changeEvent(QEvent *e)
         QWidget::changeEvent(e);
     }
 }
-//FIXME retranlsate probably needed, see DlgSettings3DViewImp::retranslate()
+//FIXME retranslate needed, see DlgSettings3DViewImp::retranslate()
 #include "moc_DlgSettingsFemImp.cpp"
