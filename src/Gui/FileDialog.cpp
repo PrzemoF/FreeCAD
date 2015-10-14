@@ -535,6 +535,7 @@ FileChooser::FileChooser ( QWidget * parent )
     connect(lineEdit, SIGNAL(textChanged(const QString &)),
             this, SIGNAL(fileNameChanged(const QString &)));
 
+    connect(lineEdit, SIGNAL(editingFinished()),SLOT(editingFinished()));
     button = new QPushButton(QLatin1String("..."), this);
     button->setFixedWidth(2*button->fontMetrics().width(QLatin1String(" ... ")));
     layout->addWidget(button);
@@ -591,6 +592,16 @@ void FileChooser::chooseFile()
         FileDialog::setWorkingDirectory(fn);
         fileNameSelected(fn);
     }
+}
+
+/**
+ * Converts all \ to / to avoid special character problem
+ */
+void FileChooser::editingFinished()
+{
+    QString qstr = lineEdit->text();
+    qstr.replace(QChar::fromAscii('\\'), QChar::fromAscii('/'));
+    lineEdit->setText(qstr);
 }
 
 /**
