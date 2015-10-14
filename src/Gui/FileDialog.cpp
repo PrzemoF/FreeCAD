@@ -26,6 +26,7 @@
 # include <QApplication>
 # include <QButtonGroup>
 # include <QCompleter>
+# include <QDir>
 # include <QComboBox>
 # include <QDesktopServices>
 # include <QGridLayout>
@@ -566,7 +567,9 @@ QString FileChooser::fileName() const
  */
 void FileChooser::setFileName( const QString& s )
 {
-    lineEdit->setText( s );
+    QDir path;
+    path.setPath(s);
+    lineEdit->setText( path.path() );
 }
 
 /**
