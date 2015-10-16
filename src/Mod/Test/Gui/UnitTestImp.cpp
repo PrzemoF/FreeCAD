@@ -24,6 +24,9 @@
 #include "PreCompiled.h"
 #ifndef _PreComp_
 # include <QMessageBox>
+# include <QTextEdit>
+# include <QPoint>
+# include <QRect>
 # include <QStyleFactory>
 #endif
 
@@ -117,7 +120,16 @@ void UnitTestDialog::setProgressColor(const QColor& col)
  */
 void UnitTestDialog::on_treeViewFailure_itemDoubleClicked(QTreeWidgetItem * item, int column)
 {
-    QMessageBox::information(this, item->text(0), item->data(0, Qt::UserRole).toString());
+    QTextEdit *te = new QTextEdit();
+    QPoint centerPoint = this->geometry().center();
+    te->setText(item->data(0, Qt::UserRole).toString());
+    te->setWindowTitle(item->text(0));
+    te->setDocumentTitle(item->text(0));
+    te->setReadOnly(true);
+    te->adjustSize();
+    te->setMinimumSize(400,300);
+    te->move(centerPoint.x() - te->width()/2, centerPoint.y() - te->height()/2);
+    te->show();
 }
 
 /**
