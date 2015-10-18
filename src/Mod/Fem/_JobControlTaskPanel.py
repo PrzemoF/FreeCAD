@@ -24,8 +24,8 @@ __title__ = "Job Control Task Panel"
 __author__ = "Juergen Riegel"
 __url__ = "http://www.freecadweb.org"
 
-from FemTools import FemTools
 import FreeCAD
+from FemTools import FemTools
 import ccxFrdReader
 import os
 import time
