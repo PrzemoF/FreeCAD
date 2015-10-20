@@ -45,6 +45,10 @@ class _FemAnalysis:
         #Not yet in prefs, so it will always default to 10
         obj.NumberOfEigenmodes = fem_prefs.GetInt("NumberOfEigenmodes", 10)
 
+        obj.addProperty("App::PropertyFloat", "EigenmodeLowLimit", "Fem", "Low frequency limit for eigenmode calculations")
+        #Not yet in prefs, so it will always default to 0.0
+        obj.EigenmodeLowLimit = fem_prefs.GetFloat("EigenmodeLowLimit", 0.0)
+
     def execute(self, obj):
         return
 
