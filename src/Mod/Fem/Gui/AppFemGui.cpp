@@ -102,20 +102,6 @@ void FemGuiExport initFemGui()
     FemGui::ViewProviderResult                 ::init();
     FemGui::ViewProviderResultPython           ::init();
 
-    Base::Interpreter().loadModule("FemCommands");
-
-    Base::Interpreter().loadModule("_CommandMechanicalShowResult");
-    Base::Interpreter().loadModule("_CommandQuickAnalysis");
-    Base::Interpreter().loadModule("_CommandPurgeFemResults");
-    Base::Interpreter().loadModule("_CommandMechanicalJobControl");
-    Base::Interpreter().loadModule("_CommandFemFromShape");
-    Base::Interpreter().loadModule("_CommandNewMechanicalAnalysis");
-
-    Base::Interpreter().loadModule("MechanicalAnalysis");
-    Base::Interpreter().loadModule("MechanicalMaterial");
-    Base::Interpreter().loadModule("FemBeamSection");
-    Base::Interpreter().loadModule("FemShellThickness");
-
     // register preferences pages
     new Gui::PrefPageProducer<FemGui::DlgSettingsFemImp> ("FEM");
 
