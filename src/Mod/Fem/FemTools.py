@@ -422,6 +422,20 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         else:
             raise Exception('FEM: No results found at {}!'.format(frd_result_file))
 
+        import ccxDatReader
+        dat_result_file = os.path.splitext(self.inp_file_name)[0] + '.dat'
+        if os.path.isfile(dat_result_file):
+            mode_frequencies = ccxDatReader.import_dat(dat_result_file, self.analysis)
+            print mode_frequencies
+        else:
+            raise Exception('FEM: No .dat results found at {}!'.format(dat_result_file))
+        for m in self.analysis.Member:
+            if m.isDerivedFrom("Fem::FemResultObject"):
+                print m.Name
+                print m.Eigenmode
+                m.EigenmodeFrequency = mode_frequencies[m.Eigenmode - 1]['frequency']
+                print m.EigenmodeFrequency
+
     def use_results(self, results_name=None):
         for m in self.analysis.Member:
             if m.isDerivedFrom("Fem::FemResultObject") and m.Name == results_name:
