@@ -1628,8 +1628,12 @@ void Application::runApplication(void)
 
 #if !defined(Q_WS_X11)
     QIcon::setThemeSearchPaths(QIcon::themeSearchPaths() << QString::fromLatin1(":/icons/FreeCAD-default"));
-    QIcon::setThemeName(QLatin1String("FreeCAD-default"));
+    #QIcon::setThemeName(QLatin1String("FreeCAD-default"));
 #endif
+    QString user_app_data_dir = QString::fromUtf8(App::Application::getUserAppDataDir().c_str());
+    QIcon::setThemeSearchPaths(QIcon::themeSearchPaths() << user_app_data_dir + QString::fromLatin1("/Themes"));
+// FIXME To be moved to theme selector when the theme selector is implemented
+    QIcon::setThemeName(QLatin1String("FreeCAD-template-theme"));
 
     Application app(true);
     MainWindow mw;

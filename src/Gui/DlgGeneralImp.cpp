@@ -117,6 +117,7 @@ void DlgGeneralImp::setRecentFileSize()
 
 void DlgGeneralImp::saveSettings()
 {
+//FIXME add theme saving
     int index = AutoloadModuleCombo->currentIndex();
     QVariant data = AutoloadModuleCombo->itemData(index);
     QString startWbName = data.toString();
@@ -190,6 +191,7 @@ void DlgGeneralImp::saveSettings()
 
 void DlgGeneralImp::loadSettings()
 {
+//FIXME add theme loading
     std::string start = App::Application::Config()["StartWorkbench"];
     start = App::GetApplication().GetParameterGroupByPath("User parameter:BaseApp/Preferences/General")->
                                   GetASCII("AutoloadModule", start.c_str());
