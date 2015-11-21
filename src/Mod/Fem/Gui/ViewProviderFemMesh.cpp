@@ -69,10 +69,11 @@
 
 using namespace FemGui;
 
-
-
-
-
+const char *dm_face_wire = "Faces & Wireframe";
+const char *dm_face_wire_node = "Faces, Wireframe & Nodes";
+const char *dm_face = "Faces";
+const char *dm_node = "Nodes";
+const char *dm_wire = "Wireframe";
 
 struct FemFace
 {
@@ -249,13 +250,13 @@ void ViewProviderFemMesh::attach(App::DocumentObject *pcObj)
     pcAnoStyle->style = SoDrawStyle::POINTS;
     pcAnoStyle->pointSize = 5;
 
-    SoMaterial * pcAnoMaterial = new SoMaterial;
+    SoMaterial *pcAnoMaterial = new SoMaterial;
     pcAnoMaterial->diffuseColor.setValue(0,1,0);
     pcAnoMaterial->emissiveColor.setValue(0,1,0);
     pcAnotRoot->addChild(pcAnoMaterial);  
     pcAnotRoot->addChild(pcAnoStyle);
     pcAnotRoot->addChild(pcAnoCoords);
-    SoPointSet * pointset = new SoPointSet;
+    SoPointSet *pointset = new SoPointSet;
     pcAnotRoot->addChild(pointset);
 
     // flat
@@ -267,7 +268,7 @@ void ViewProviderFemMesh::attach(App::DocumentObject *pcObj)
     pcFlatRoot->addChild(pcMatBinding);
     pcFlatRoot->addChild(pcFaces);
     pcFlatRoot->addChild(pcAnotRoot);
-    addDisplayMaskMode(pcFlatRoot, "Flat");
+    addDisplayMaskMode(pcFlatRoot, dm_face);
 
     // line
     SoLightModel* pcLightModel = new SoLightModel();
@@ -280,7 +281,7 @@ void ViewProviderFemMesh::attach(App::DocumentObject *pcObj)
     color->rgb.setValue(0.0f,0.0f,0.0f);
     pcWireRoot->addChild(color);
     pcWireRoot->addChild(pcLines);
-    addDisplayMaskMode(pcWireRoot, "Wireframe");
+    addDisplayMaskMode(pcWireRoot, dm_wire);
 
 
     // Points
@@ -290,7 +291,7 @@ void ViewProviderFemMesh::attach(App::DocumentObject *pcObj)
     pcPointsRoot->addChild(pcCoords);
     pointset = new SoPointSet;
     pcPointsRoot->addChild(pointset);
-    addDisplayMaskMode(pcPointsRoot, "Nodes");
+    addDisplayMaskMode(pcPointsRoot, dm_node);
 
     // flat+line (Elements)
     SoPolygonOffset* offset = new SoPolygonOffset();
@@ -310,7 +311,7 @@ void ViewProviderFemMesh::attach(App::DocumentObject *pcObj)
     pcFlatWireRoot->addChild(color);
     pcFlatWireRoot->addChild(pcLines);
 
-    addDisplayMaskMode(pcFlatWireRoot, "Elements");
+    addDisplayMaskMode(pcFlatWireRoot, dm_face_wire);
 
     // flat+line+Nodes (Elements&Nodes)
     SoGroup* pcElemNodesRoot = new SoSeparator();
@@ -328,7 +329,7 @@ void ViewProviderFemMesh::attach(App::DocumentObject *pcObj)
     pcElemNodesRoot->addChild(pcPointMaterial);
     pcElemNodesRoot->addChild(pointset);
 
-    addDisplayMaskMode(pcElemNodesRoot, "Elements & Nodes");
+    addDisplayMaskMode(pcElemNodesRoot, dm_face_wire_node);
 
 
 
@@ -336,16 +337,16 @@ void ViewProviderFemMesh::attach(App::DocumentObject *pcObj)
 
 void ViewProviderFemMesh::setDisplayMode(const char* ModeName)
 {
-    if (strcmp("Elements",ModeName)==0)
-        setDisplayMaskMode("Elements");
-    else if (strcmp("Elements & Nodes",ModeName)==0)
-        setDisplayMaskMode("Elements & Nodes");
-    else if (strcmp("Flat",ModeName)==0)
-        setDisplayMaskMode("Flat");
-    else if (strcmp("Wireframe",ModeName)==0)
-        setDisplayMaskMode("Wireframe");
-    else if (strcmp("Nodes",ModeName)==0)
-        setDisplayMaskMode("Nodes");
+    if (strcmp(dm_face_wire,ModeName)==0)
+        setDisplayMaskMode(dm_face_wire);
+    else if (strcmp(dm_face_wire_node,ModeName)==0)
+        setDisplayMaskMode(dm_face_wire_node);
+    else if (strcmp(dm_face,ModeName)==0)
+        setDisplayMaskMode(dm_face);
+    else if (strcmp(dm_wire,ModeName)==0)
+        setDisplayMaskMode(dm_wire);
+    else if (strcmp(dm_node,ModeName)==0)
+        setDisplayMaskMode(dm_node);
 
     ViewProviderGeometryObject::setDisplayMode( ModeName );
 }
@@ -353,11 +354,11 @@ void ViewProviderFemMesh::setDisplayMode(const char* ModeName)
 std::vector<std::string> ViewProviderFemMesh::getDisplayModes(void) const
 {
     std::vector<std::string> StrList;
-    StrList.push_back("Elements");
-    StrList.push_back("Elements & Nodes");
-    StrList.push_back("Flat");
-    StrList.push_back("Wireframe");
-    StrList.push_back("Nodes");
+    StrList.push_back(dm_face_wire);
+    StrList.push_back(dm_face_wire_node);
+    StrList.push_back(dm_face);
+    StrList.push_back(dm_wire);
+    StrList.push_back(dm_node);
     return StrList;
 }
 
