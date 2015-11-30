@@ -62,8 +62,8 @@ class VersionControl:
     def extractInfo(self, srcdir):
         return False
 
-    def printInfo(self):
-        print ""
+    def get_vc_name(self):
+        return ""
 
     def writeVersion(self, lines):
         content = []
@@ -88,8 +88,8 @@ class UnknownControl(VersionControl):
         self.url = "Unknown"
         return True
 
-    def printInfo(self):
-        print "Unknown version control"
+    def get_vc_name(self):
+        return "Unknown version control"
 
 
 class DebianChangelog(VersionControl):
@@ -112,8 +112,8 @@ class DebianChangelog(VersionControl):
         self.url = "https://code.launchpad.net/~vcs-imports/freecad/trunk"
         return True
 
-    def printInfo(self):
-        print "debian/changelog"
+    def get_vc_name(self):
+        return "debian/changelog"
 
 
 class BazaarControl(VersionControl):
@@ -133,8 +133,8 @@ class BazaarControl(VersionControl):
                 continue
         return True
 
-    def printInfo(self):
-        print "bazaar"
+    def get_vc_name(self):
+        return "bazaar"
 
 
 class GitControl(VersionControl):
@@ -291,8 +291,8 @@ merged."""
                     break
         return True
 
-    def printInfo(self):
-        print "git"
+    def get_vc_name(self):
+        return "git"
 
     def writeVersion(self, lines):
         content = VersionControl.writeVersion(self, lines)
@@ -306,8 +306,8 @@ class MercurialControl(VersionControl):
     def extractInfo(self, srcdir):
         return False
 
-    def printInfo(self):
-        print "mercurial"
+    def get_vc_name(self):
+        return "mercurial"
 
 
 class Subversion(VersionControl):
@@ -363,8 +363,8 @@ class Subversion(VersionControl):
             self.range = Ver[:r.end()]
         return True
 
-    def printInfo(self):
-        print "subversion"
+    def get_vc_name(self):
+        return "subversion"
 
 
 def main():
@@ -396,7 +396,7 @@ def main():
             out.writelines(lines)
             out.write('\n')
             out.close()
-            i.printInfo()
+            sys.stdout.write("{} \n".format(i.get_vc_name()))
             sys.stdout.write("%s/src/Build/Version.h written\n" % (bindir))
             break
 
