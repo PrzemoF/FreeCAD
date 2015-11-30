@@ -385,9 +385,9 @@ def main():
     for i in vcs:
         if i.extractInfo(srcdir):
             # Open the template file and the version file
-            file = open("%s/src/Build/Version.h.in" % (srcdir))
-            lines = file.readlines()
-            file.close()
+            f = open("%s/src/Build/Version.h.in" % (srcdir))
+            lines = f.readlines()
+            f.close()
             lines = i.writeVersion(lines)
             out = open("%s/src/Build/Version.h" % (bindir), "w")
             out.writelines(lines)
