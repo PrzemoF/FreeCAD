@@ -257,7 +257,6 @@ merged."""
         self.branch = self.branch[2:]
         self.getremotes()  # setup self.remotes and branchlst
 
-        remote = 'origin'  # used to determine the url
         self.geturl()
         origin = None  # remote for the blessed master
         for fetchurl in ("git@github.com:FreeCAD/FreeCAD.git",
@@ -276,9 +275,6 @@ merged."""
         if self.branch == '(no branch)':  # check for remote branches
             if len(self.branchlst) >= 2:
                 self.branch = self.branchlst[1]
-                if '/' in self.branch:
-                    # This variable is never used!! FIXME
-                    remote = self.branch.split('/', 1)[0]
             else:  # guess
                 self.branch = '(%s)' % \
                     os.popen("git describe --all --dirty").read().strip()
