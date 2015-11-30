@@ -67,6 +67,9 @@ class VersionControl:
 
     def writeVersion(self, lines):
         content = []
+        sys.stdout.write("Replacing \'$WCREV$\' with {}\n".format(self.rev))
+        sys.stdout.write("Replacing \'$WCDATE$\' with {}\n".format(self.date))
+        sys.stdout.write("Replacing \'$WCURL$\' with {}\n".format(self.url))
         for line in lines:
             line = string.replace(line, '$WCREV$', self.rev)
             line = string.replace(line, '$WCDATE$', self.date)
