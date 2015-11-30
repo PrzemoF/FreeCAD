@@ -196,8 +196,9 @@ different form the master repository"""
         referencerevision = 5235
 
         result = None
-        countallfh = os.popen("git rev-list --count %s..HEAD" %
-                              referencecommit)
+        #countallfh = os.popen("git rev-list --count %s..HEAD" %
+        #                      referencecommit)
+        countallfh = os.popen("git rev-list --count HEAD")
         countallstr = countallfh.read().strip()
         if countallfh.close() is not None:  # reference commit not present
             self.rev = '%04d (Git shallow)' % referencerevision
