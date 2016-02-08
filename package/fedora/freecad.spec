@@ -8,8 +8,8 @@
 
 Name:           freecad
 Epoch:          1
-Version:        0.16
-Release:        git_master_5991
+Version:        0.16_test
+Release:        6398
 Summary:        A general purpose 3D CAD modeler
 Group:          Applications/Engineering
 
@@ -51,6 +51,7 @@ BuildRequires:  libicu-devel
 BuildRequires:  mesa-libGLU-devel
 BuildRequires:  netgen-mesher-devel
 BuildRequires:  pyside-tools
+BuildRequires:  python
 BuildRequires:  python-matplotlib
 BuildRequires:  python-pivy
 BuildRequires:  python-pyside
