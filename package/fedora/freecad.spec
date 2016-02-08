@@ -22,8 +22,6 @@ Source104:      freecad.sharedmimeinfo
 
 # Utilities
 # Development Libraries
-# Not used yet.
-#BuildRequires:  ode-devel
 BuildRequires:  git
 BuildRequires:  Coin3
 BuildRequires:  Coin3-devel
