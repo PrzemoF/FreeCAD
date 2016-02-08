@@ -17,15 +17,8 @@ License:        GPLv2+
 URL:            http://sourceforge.net/apps/mediawiki/free-cad/
 Source0:        freecad.tar.gz
 Source101:      freecad.desktop
-#Source102:      freecad.1
 Source103:      freecad.appdata.xml
 Source104:      freecad.sharedmimeinfo
-
-#Patch0:         freecad-3rdParty.patch
-#Patch1:         freecad-0.14-Xlib_h.patch
-#Patch2:         freecad-0.14-smesh.patch
-#Patch3:         freecad-0.14-DraftSnap.patch
-#Patch4:         freecad-0.14-Version_h.patch
 
 # Utilities
 # Development Libraries
