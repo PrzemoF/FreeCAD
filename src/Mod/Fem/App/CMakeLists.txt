@@ -93,6 +93,7 @@ SET(FemScripts_SRCS
     _TaskPanelFemBeamSection.py
     _TaskPanelFemShellThickness.py
     _TaskPanelFemSolverCalculix.py
+    _TaskPanelFemSolverZ88.py
     _TaskPanelMechanicalMaterial.py
     _TaskPanelShowResult.py
     _ViewProviderFemAnalysis.py
@@ -129,6 +130,7 @@ SET(FemScripts_SRCS
     TaskPanelFemBeamSection.ui
     TaskPanelFemShellThickness.ui
     TaskPanelFemSolverCalculix.ui
+    TaskPanelFemSolverZ88.ui
     TaskPanelMechanicalMaterial.ui
     TaskPanelShowResult.ui
 )

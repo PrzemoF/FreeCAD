@@ -48,6 +48,16 @@ class _ViewProviderFemSolverZ88:
     def onChanged(self, vobj, prop):
         return
 
+    def setEdit(self, vobj, mode=0):
+        import _TaskPanelFemSolverZ88
+        taskd = _TaskPanelFemSolverZ88._TaskPanelFemSolverZ88(self.Object)
+        FreeCADGui.Control.showDialog(taskd)
+        return True
+
+    def unsetEdit(self, vobj, mode=0):
+        FreeCADGui.Control.closeDialog()
+        return
+
     def doubleClicked(self, vobj):
         doc = FreeCADGui.getDocument(vobj.Object.Document)
         if not doc.getInEdit():
@@ -55,8 +65,8 @@ class _ViewProviderFemSolverZ88:
             if FemGui.getActiveAnalysis() is not None:
                 if FemGui.getActiveAnalysis().Document is FreeCAD.ActiveDocument:
                     if self.Object in FemGui.getActiveAnalysis().Member:
-                        FreeCAD.Console.PrintError('Not yet supported, use property editor and "run analysis" button!\n')
-                        # doc.setEdit(vobj.Object.Name)
+                        # FreeCAD.Console.PrintError('Not yet supported, use property editor and "run analysis" button!\n')
+                        doc.setEdit(vobj.Object.Name)
                     else:
                         FreeCAD.Console.PrintError('Activate the analysis this solver belongs to!\n')
                 else:
