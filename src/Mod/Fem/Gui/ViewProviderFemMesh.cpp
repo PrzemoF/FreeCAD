@@ -2193,6 +2193,7 @@ void ViewProviderFEMMeshBuilder::createMesh(const App::Property* prop,
                             indices[index++] = nIdx3;
                             indices[index++] = nIdx5;
                             indices[index++] = nIdx7;
+                            insEdgeVec(EdgeMap, nIdx7, nIdx3);
                             indices[index++] = SO_END_FACE_INDEX;
                             break;    }
                         case 2: { // hexa20 volume: face 2, 8-node quadrangle
@@ -2239,6 +2240,7 @@ void ViewProviderFEMMeshBuilder::createMesh(const App::Property* prop,
                             indices[index++] = nIdx3;
                             indices[index++] = nIdx5;
                             indices[index++] = nIdx7;
+                            insEdgeVec(EdgeMap, nIdx7, nIdx3);
                             indices[index++] = SO_END_FACE_INDEX;
                             break;    }
                         case 3: { // hexa20 volume: face 3, 8-node quadrangle
@@ -2285,6 +2287,7 @@ void ViewProviderFEMMeshBuilder::createMesh(const App::Property* prop,
                             indices[index++] = nIdx3;
                             indices[index++] = nIdx5;
                             indices[index++] = nIdx7;
+                            insEdgeVec(EdgeMap, nIdx7, nIdx3);
                             indices[index++] = SO_END_FACE_INDEX;
                             break;    }
                         case 4: { // hexa20 volume: face 4, 8-node quadrangle
@@ -2331,6 +2334,7 @@ void ViewProviderFEMMeshBuilder::createMesh(const App::Property* prop,
                             indices[index++] = nIdx3;
                             indices[index++] = nIdx5;
                             indices[index++] = nIdx7;
+                            insEdgeVec(EdgeMap, nIdx7, nIdx3);
                             indices[index++] = SO_END_FACE_INDEX;
                             break;    }
                         case 5: { // hexa20 volume: face 5, 8-node quadrangle
@@ -2377,6 +2381,7 @@ void ViewProviderFEMMeshBuilder::createMesh(const App::Property* prop,
                             indices[index++] = nIdx3;
                             indices[index++] = nIdx5;
                             indices[index++] = nIdx7;
+                            insEdgeVec(EdgeMap, nIdx7, nIdx3);
                             indices[index++] = SO_END_FACE_INDEX;
                             break;    }
                         case 6: { // hexa20 volume: face 6, 8-node quadrangle
@@ -2423,6 +2428,7 @@ void ViewProviderFEMMeshBuilder::createMesh(const App::Property* prop,
                             indices[index++] = nIdx3;
                             indices[index++] = nIdx5;
                             indices[index++] = nIdx7;
+                            insEdgeVec(EdgeMap, nIdx7, nIdx3);
                             indices[index++] = SO_END_FACE_INDEX;
                             break;    }
                         default: assert(0);
