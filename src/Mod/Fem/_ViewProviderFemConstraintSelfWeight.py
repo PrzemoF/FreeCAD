@@ -1,6 +1,6 @@
 # ***************************************************************************
 # *                                                                         *
-# *   Copyright (c) 2013-2015 - Juergen Riegel <FreeCAD@juergen-riegel.net> *
+# *   Copyright (c) 2016 - Bernd Hahnebach <bernd@bimstatik.org>            *
 # *                                                                         *
 # *   This program is free software; you can redistribute it and/or modify  *
 # *   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -20,16 +20,44 @@
 # *                                                                         *
 # ***************************************************************************
 
-__title__ = "Fem Analysis"
-__author__ = "Juergen Riegel"
+__title__ = "_ViewProviderFemConstraintSelfWeight"
+__author__ = "Bernd Hahnebach"
 __url__ = "http://www.freecadweb.org"
 
 
-class _FemAnalysis:
-    "The FemAnalysis container object"
-    def __init__(self, obj):
-        self.Type = "FemAnalysis"
-        obj.Proxy = self
+import FreeCAD
+import FreeCADGui
+from pivy import coin
 
-    def execute(self, obj):
+
+class _ViewProviderFemConstraintSelfWeight:
+    "A View Provider for the FemConstraintSelfWeight object"
+    def __init__(self, vobj):
+        vobj.Proxy = self
+
+    def getIcon(self):
+        return ":/icons/fem-constraint-selfweight.svg"
+
+    def attach(self, vobj):
+        self.ViewObject = vobj
+        self.Object = vobj.Object
+        self.standard = coin.SoGroup()
+        vobj.addDisplayMode(self.standard, "Standard")
+
+    def getDisplayModes(self, obj):
+        return ["Standard"]
+
+    def getDefaultDisplayMode(self):
+        return "Standard"
+
+    def updateData(self, obj, prop):
         return
+
+    def onChanged(self, vobj, prop):
+        return
+
+    def __getstate__(self):
+        return None
+
+    def __setstate__(self, state):
+        return None

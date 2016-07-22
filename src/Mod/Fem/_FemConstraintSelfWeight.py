@@ -1,6 +1,6 @@
 # ***************************************************************************
 # *                                                                         *
-# *   Copyright (c) 2013-2015 - Juergen Riegel <FreeCAD@juergen-riegel.net> *
+# *   Copyright (c) 2015 - Bernd Hahnebach <bernd@bimstatik.org>            *
 # *                                                                         *
 # *   This program is free software; you can redistribute it and/or modify  *
 # *   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -20,16 +20,16 @@
 # *                                                                         *
 # ***************************************************************************
 
-__title__ = "Fem Analysis"
-__author__ = "Juergen Riegel"
+__title__ = "the constraint self weight object"
+__author__ = "Bernd Hahnebach"
 __url__ = "http://www.freecadweb.org"
 
 
-class _FemAnalysis:
-    "The FemAnalysis container object"
+class _FemConstraintSelfWeight:
+    "The FemConstraintSelfWeight object"
     def __init__(self, obj):
-        self.Type = "FemAnalysis"
         obj.Proxy = self
+        self.Type = "FemConstraintSelfWeight"
 
     def execute(self, obj):
         return

@@ -74,6 +74,7 @@ SET(FemScripts_SRCS
     _CommandAnalysis.py
     _CommandBeamSection.py
     _CommandControlSolver.py
+    _CommandConstraintSelfWeight.py
     _CommandMechanicalMaterial.py
     _CommandShowResult.py
     _CommandMeshFromShape.py
@@ -84,6 +85,7 @@ SET(FemScripts_SRCS
     _CommandSolverZ88.py
     _FemAnalysis.py
     _FemBeamSection.py
+    _FemConstraintSelfWeight.py
     _FemShellThickness.py
     _FemSolverCalculix.py
     _FemSolverZ88.py
@@ -91,10 +93,12 @@ SET(FemScripts_SRCS
     _TaskPanelFemBeamSection.py
     _TaskPanelFemShellThickness.py
     _TaskPanelFemSolverCalculix.py
+    _TaskPanelFemSolverZ88.py
     _TaskPanelMechanicalMaterial.py
     _TaskPanelShowResult.py
     _ViewProviderFemAnalysis.py
     _ViewProviderFemBeamSection.py
+    _ViewProviderFemConstraintSelfWeight.py
     _ViewProviderFemShellThickness.py
     _ViewProviderFemSolverCalculix.py
     _ViewProviderFemSolverZ88.py
@@ -106,8 +110,9 @@ SET(FemScripts_SRCS
     Init.py
     InitGui.py
     FemAnalysis.py
-    FemCommands.py
     FemBeamSection.py
+    FemCommands.py
+    FemConstraintSelfWeight.py
     FemInputWriter.py
     FemInputWriterCcx.py
     FemInputWriterZ88.py
@@ -125,6 +130,7 @@ SET(FemScripts_SRCS
     TaskPanelFemBeamSection.ui
     TaskPanelFemShellThickness.ui
     TaskPanelFemSolverCalculix.ui
+    TaskPanelFemSolverZ88.ui
     TaskPanelMechanicalMaterial.ui
     TaskPanelShowResult.ui
 )

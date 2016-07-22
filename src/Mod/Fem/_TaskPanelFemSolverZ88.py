@@ -1,6 +1,6 @@
 # ***************************************************************************
 # *                                                                         *
-# *   Copyright (c) 2013-2015 - Juergen Riegel <FreeCAD@juergen-riegel.net> *
+# *   Copyright (c) 2016 - Bernd Hahnebach <bernd@bimstatik.org>            *
 # *                                                                         *
 # *   This program is free software; you can redistribute it and/or modify  *
 # *   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -20,61 +20,60 @@
 # *                                                                         *
 # ***************************************************************************
 
-__title__ = "CalculiX Job Control Task Panel"
-__author__ = "Juergen Riegel"
+__title__ = "Z88 Job Control Task Panel"
+__author__ = "Bernd Hahnebach"
 __url__ = "http://www.freecadweb.org"
 
-import FemToolsCcx
+import FemToolsZ88
 import FreeCAD
 import os
 import time
 
 if FreeCAD.GuiUp:
     import FreeCADGui
-    import FemGui
+    # import FemGui
     from PySide import QtCore, QtGui
     from PySide.QtCore import Qt
     from PySide.QtGui import QApplication
 
 
-class _TaskPanelFemSolverCalculix:
+class _TaskPanelFemSolverZ88:
     def __init__(self, solver_object):
-        self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/TaskPanelFemSolverCalculix.ui")
+        self.form = FreeCADGui.PySideUic.loadUi(FreeCAD.getHomePath() + "Mod/Fem/TaskPanelFemSolverZ88.ui")
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
-        ccx_binary = self.fem_prefs.GetString("ccxBinaryPath", "")
-        if ccx_binary:
-            self.CalculixBinary = ccx_binary
-            print ("Using CalculiX binary path from FEM preferences: {}".format(ccx_binary))
+        # z88_binary = self.fem_prefs.GetString("z88BinaryPath", "")
+        z88_binary = ''
+        if z88_binary:
+            self.Z88Binary = z88_binary
+            print ("Using Z88 binary path from FEM preferences: {}".format(z88_binary))
         else:
             from platform import system
             if system() == 'Linux':
-                self.CalculixBinary = 'ccx'
+                self.Z88Binary = 'z88'
             elif system() == 'Windows':
-                self.CalculixBinary = FreeCAD.getHomePath() + 'bin/ccx.exe'
+                self.Z88Binary = FreeCAD.getHomePath() + 'bin/z88.exe'
             else:
-                self.CalculixBinary = 'ccx'
+                self.Z88Binary = 'z88'
         self.fem_prefs = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Fem")
 
         self.solver_object = solver_object
 
-        self.Calculix = QtCore.QProcess()
+        self.Z88 = QtCore.QProcess()
         self.Timer = QtCore.QTimer()
         self.Timer.start(300)
 
         self.fem_console_message = ''
 
-        # Connect Signals and Slots
+        #Connect Signals and Slots
         QtCore.QObject.connect(self.form.tb_choose_working_dir, QtCore.SIGNAL("clicked()"), self.choose_working_dir)
         QtCore.QObject.connect(self.form.pb_write_inp, QtCore.SIGNAL("clicked()"), self.write_input_file_handler)
-        QtCore.QObject.connect(self.form.pb_edit_inp, QtCore.SIGNAL("clicked()"), self.editCalculixInputFile)
-        QtCore.QObject.connect(self.form.pb_run_ccx, QtCore.SIGNAL("clicked()"), self.runCalculix)
-        QtCore.QObject.connect(self.form.rb_static_analysis, QtCore.SIGNAL("clicked()"), self.select_static_analysis)
-        QtCore.QObject.connect(self.form.rb_frequency_analysis, QtCore.SIGNAL("clicked()"), self.select_frequency_analysis)
+        QtCore.QObject.connect(self.form.pb_edit_inp, QtCore.SIGNAL("clicked()"), self.editZ88InputFile)
+        QtCore.QObject.connect(self.form.pb_run_z88, QtCore.SIGNAL("clicked()"), self.runZ88)
 
-        QtCore.QObject.connect(self.Calculix, QtCore.SIGNAL("started()"), self.calculixStarted)
-        QtCore.QObject.connect(self.Calculix, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.calculixStateChanged)
-        QtCore.QObject.connect(self.Calculix, QtCore.SIGNAL("error(QProcess::ProcessError)"), self.calculixError)
-        QtCore.QObject.connect(self.Calculix, QtCore.SIGNAL("finished(int)"), self.calculixFinished)
+        QtCore.QObject.connect(self.Z88, QtCore.SIGNAL("started()"), self.z88Started)
+        QtCore.QObject.connect(self.Z88, QtCore.SIGNAL("stateChanged(QProcess::ProcessState)"), self.z88StateChanged)
+        QtCore.QObject.connect(self.Z88, QtCore.SIGNAL("error(QProcess::ProcessError)"), self.z88Error)
+        QtCore.QObject.connect(self.Z88, QtCore.SIGNAL("finished(int)"), self.z88Finished)
 
         QtCore.QObject.connect(self.Timer, QtCore.SIGNAL("timeout()"), self.UpdateText)
 
@@ -86,10 +85,10 @@ class _TaskPanelFemSolverCalculix:
         self.form.textEdit_Output.setText(self.fem_console_message)
         self.form.textEdit_Output.moveCursor(QtGui.QTextCursor.End)
 
-    def printCalculiXstdout(self):
-        out = self.Calculix.readAllStandardOutput()
+    def printZ88stdout(self):
+        out = self.Z88.readAllStandardOutput()
         if out.isEmpty():
-            self.femConsoleMessage("CalculiX stdout is empty", "#FF0000")
+            self.femConsoleMessage("Z88 stdout is empty", "#FF0000")
         else:
             try:
                 out = unicode(out, 'utf-8', 'replace')
@@ -103,46 +102,46 @@ class _TaskPanelFemSolverCalculix:
                 out = os.linesep.join([s for s in out.splitlines() if s])
                 self.femConsoleMessage(out.replace('\n', '<br>'))
             except UnicodeDecodeError:
-                self.femConsoleMessage("Error converting stdout from CalculiX", "#FF0000")
+                self.femConsoleMessage("Error converting stdout from Z88", "#FF0000")
 
     def UpdateText(self):
-        if(self.Calculix.state() == QtCore.QProcess.ProcessState.Running):
+        if(self.Z88.state() == QtCore.QProcess.ProcessState.Running):
             self.form.l_time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
 
-    def calculixError(self, error):
+    def z88Error(self, error):
         print ("Error() {}".format(error))
-        self.femConsoleMessage("CalculiX execute error: {}".format(error), "#FF0000")
+        self.femConsoleMessage("Z88 execute error: {}".format(error), "#FF0000")
 
-    def calculixStarted(self):
-        print ("calculixStarted()")
-        print (self.Calculix.state())
-        self.form.pb_run_ccx.setText("Break CalculiX")
+    def z88Started(self):
+        print ("z88Started()")
+        print (self.Z88.state())
+        self.form.pb_run_z88.setText("Break Z88")
 
-    def calculixStateChanged(self, newState):
+    def z88StateChanged(self, newState):
         if (newState == QtCore.QProcess.ProcessState.Starting):
-                self.femConsoleMessage("Starting CalculiX...")
+                self.femConsoleMessage("Starting Z88...")
         if (newState == QtCore.QProcess.ProcessState.Running):
-                self.femConsoleMessage("CalculiX is running...")
+                self.femConsoleMessage("Z88 is running...")
         if (newState == QtCore.QProcess.ProcessState.NotRunning):
-                self.femConsoleMessage("CalculiX stopped.")
+                self.femConsoleMessage("Z88 stopped.")
 
-    def calculixFinished(self, exitCode):
-        print ("calculixFinished() {}".format(exitCode))
-        print (self.Calculix.state())
+    def z88Finished(self, exitCode):
+        print ("z88Finished() {}".format(exitCode))
+        print (self.Z88.state())
 
         # Restore previous cwd
         QtCore.QDir.setCurrent(self.cwd)
 
-        self.printCalculiXstdout()
+        self.printZ88stdout()
         self.Timer.stop()
 
-        self.femConsoleMessage("CalculiX done!", "#00AA00")
+        self.femConsoleMessage("Z88 done!", "#00AA00")
 
-        self.form.pb_run_ccx.setText("Re-run CalculiX")
+        self.form.pb_run_z88.setText("Re-run Z88")
         self.femConsoleMessage("Loading result sets...")
         self.form.l_time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
-        fea = FemToolsCcx.FemToolsCcx(None, self.solver_object)
-        fea.reset_mesh_purge_results_checked()
+        fea = FemToolsZ88.FemToolsZ88()
+        fea.reset_all()
         fea.inp_file_name = self.inp_file_name
         QApplication.setOverrideCursor(Qt.WaitCursor)
         fea.load_results()
@@ -169,7 +168,7 @@ class _TaskPanelFemSolverCalculix:
 
     def choose_working_dir(self):
         current_wd = self.setup_working_dir()
-        wd = QtGui.QFileDialog.getExistingDirectory(None, 'Choose CalculiX working directory',
+        wd = QtGui.QFileDialog.getExistingDirectory(None, 'Choose Z88 working directory',
                                                     current_wd)
         if wd:
             self.solver_object.WorkingDir = wd
@@ -182,7 +181,7 @@ class _TaskPanelFemSolverCalculix:
         if self.check_prerequisites_helper():
             QApplication.setOverrideCursor(Qt.WaitCursor)
             self.inp_file_name = ""
-            fea = FemToolsCcx.FemToolsCcx(None, self.solver_object)
+            fea = FemToolsZ88.FemToolsZ88()
             fea.set_analysis_type(self.solver_object.AnalysisType)
             fea.update_objects()
             fea.write_inp_file()
@@ -190,7 +189,7 @@ class _TaskPanelFemSolverCalculix:
                 self.inp_file_name = fea.inp_file_name
                 self.femConsoleMessage("Write completed.")
                 self.form.pb_edit_inp.setEnabled(True)
-                self.form.pb_run_ccx.setEnabled(True)
+                self.form.pb_run_z88.setEnabled(True)
             else:
                 self.femConsoleMessage("Write .inp file failed!", "#FF0000")
             QApplication.restoreOverrideCursor()
@@ -200,7 +199,7 @@ class _TaskPanelFemSolverCalculix:
         self.femConsoleMessage("Check dependencies...")
         self.form.l_time.setText('Time: {0:4.1f}: '.format(time.time() - self.Start))
 
-        fea = FemToolsCcx.FemToolsCcx(None, self.solver_object)
+        fea = FemToolsZ88.FemToolsZ88()
         fea.update_objects()
         message = fea.check_prerequisites()
         if message != "":
@@ -208,53 +207,31 @@ class _TaskPanelFemSolverCalculix:
             return False
         return True
 
-    def start_ext_editor(self, ext_editor_path, filename):
-        if not hasattr(self, "ext_editor_process"):
-            self.ext_editor_process = QtCore.QProcess()
-        if self.ext_editor_process.state() != QtCore.QProcess.Running:
-            self.ext_editor_process.start(ext_editor_path, [filename])
+    def editZ88InputFile(self):
+        print ('not implemented')
 
-    def editCalculixInputFile(self):
-        print ('editCalculixInputFile {}'.format(self.inp_file_name))
-        if self.fem_prefs.GetBool("UseInternalEditor", True):
-            FemGui.open(self.inp_file_name)
-        else:
-            ext_editor_path = self.fem_prefs.GetString("ExternalEditorPath", "")
-            if ext_editor_path:
-                self.start_ext_editor(ext_editor_path, self.inp_file_name)
-            else:
-                print ("External editor is not defined in FEM preferences. Falling back to internal editor")
-                FemGui.open(self.inp_file_name)
-
-    def runCalculix(self):
-        print ('runCalculix')
+    def runZ88(self):
+        print ('runZ88')
+        fea = FemToolsZ88.FemToolsZ88()
+        fea.FemToolsZ88.setup_z88()
+        print ('not implemented')
+        '''
         self.Start = time.time()
 
-        self.femConsoleMessage("CalculiX binary: {}".format(self.CalculixBinary))
-        self.femConsoleMessage("Run CalculiX...")
+        self.femConsoleMessage("Z88 binary: {}".format(self.Z88Binary))
+        self.femConsoleMessage("Run Z88...")
 
-        # run Calculix
-        print ('run CalculiX at: {} with: {}'.format(self.CalculixBinary, os.path.splitext(self.inp_file_name)[0]))
-        # change cwd because ccx may crash if directory has no write permission
+        # run Z88
+        print ('run Z88 at: {} with: {}'.format(self.Z88Binary, os.path.splitext(self.inp_file_name)[0]))
+        # change cwd because z88 may crash if directory has no write permission
         # there is also a limit of the length of file names so jump to the document directory
         self.cwd = QtCore.QDir.currentPath()
         fi = QtCore.QFileInfo(self.inp_file_name)
         QtCore.QDir.setCurrent(fi.path())
-        self.Calculix.start(self.CalculixBinary, ['-i', fi.baseName()])
+        self.Z88.start(self.Z88Binary, ['-i', fi.baseName()])
 
         QApplication.restoreOverrideCursor()
-
-    def select_analysis_type(self, analysis_type):
-        if self.solver_object.AnalysisType != analysis_type:
-            self.solver_object.AnalysisType = analysis_type
-            self.form.pb_edit_inp.setEnabled(False)
-            self.form.pb_run_ccx.setEnabled(False)
-
-    def select_static_analysis(self):
-        self.select_analysis_type('static')
-
-    def select_frequency_analysis(self):
-        self.select_analysis_type('frequency')
+        '''
 
     # That function overlaps with FemTools setup_working_dir and needs to be removed when we migrate fully to FemTools
     def setup_working_dir(self):
