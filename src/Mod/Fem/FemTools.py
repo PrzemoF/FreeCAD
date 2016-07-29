@@ -151,8 +151,12 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         # [{'Object':fixed_constraints, 'NodeSupports':bool}, {}, ...]
         # [{'Object':force_constraints, 'NodeLoad':value}, {}, ...
         # [{'Object':pressure_constraints, 'xxxxxxxx':value}, {}, ...]
+        # [{'Object':temerature_constraints, 'xxxxxxxx':value}, {}, ...]
+        # [{'Object':heatflux_constraints, 'xxxxxxxx':value}, {}, ...]
+        # [{'Object':initialtemperature_constraints, 'xxxxxxxx':value}, {}, ...]
         # [{'Object':beam_sections, 'xxxxxxxx':value}, {}, ...]
         # [{'Object':shell_thicknesses, 'xxxxxxxx':value}, {}, ...]
+        # [{'Object':contact_constraints, 'xxxxxxxx':value}, {}, ...]
 
         ## @var mesh
         #  mesh of the analysis. Used to generate .inp file and to show results
@@ -189,6 +193,26 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
         # set of displacements for the analysis. Updated with update_objects
         # Individual displacement_constraints are Proxy.Type "FemConstraintDisplacement"
         self.displacement_constraints = []
+        ## @var temperature_constraints
+        # set of temperatures for the analysis. Updated with update_objects
+        # Individual temperature_constraints are Proxy.Type "FemConstraintTemperature"
+        self.temperature_constraints = []
+        ## @var heatflux_constraints
+        # set of heatflux constraints for the analysis. Updated with update_objects
+        # Individual heatflux_constraints are Proxy.Type "FemConstraintHeatflux"
+        self.heatflux_constraints = []
+        ## @var initialtemperature_constraints
+        # set of initial temperatures for the analysis. Updated with update_objects
+        # Individual initialTemperature_constraints are Proxy.Type "FemConstraintInitialTemperature"
+        self.initialtemperature_constraints = []
+        ## @var planerotation_constraints
+        #  set of plane rotation constraints from the analysis. Updated with update_objects
+        #  Individual constraints are "Fem::ConstraintPlaneRotation" type
+        self.planerotation_constraints = []
+        ## @var contact_constraints
+        #  set of contact constraints from the analysis. Updated with update_objects
+        #  Individual constraints are "Fem::ConstraintContact" type
+        self.contact_constraints = []
 
         found_solver_for_use = False
         for m in self.analysis.Member:
@@ -231,10 +255,30 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
                 PressureObjectDict = {}
                 PressureObjectDict['Object'] = m
                 self.pressure_constraints.append(PressureObjectDict)
-            elif m.isDerivedFrom("Fem::ConstraintDisplacement"):  # OvG: Replacement reference to C++ implementation of Displacement Constraint
+            elif m.isDerivedFrom("Fem::ConstraintDisplacement"):
                 displacement_constraint_dict = {}
                 displacement_constraint_dict['Object'] = m
                 self.displacement_constraints.append(displacement_constraint_dict)
+            elif m.isDerivedFrom("Fem::ConstraintTemperature"):
+                temperature_constraint_dict = {}
+                temperature_constraint_dict['Object'] = m
+                self.temperature_constraints.append(temperature_constraint_dict)
+            elif m.isDerivedFrom("Fem::ConstraintHeatflux"):
+                heatflux_constraint_dict = {}
+                heatflux_constraint_dict['Object'] = m
+                self.heatflux_constraints.append(heatflux_constraint_dict)
+            elif m.isDerivedFrom("Fem::ConstraintInitialTemperature"):
+                initialtemperature_constraint_dict = {}
+                initialtemperature_constraint_dict['Object'] = m
+                self.initialtemperature_constraints.append(initialtemperature_constraint_dict)
+            elif m.isDerivedFrom("Fem::ConstraintPlaneRotation"):
+                planerotation_constraint_dict = {}
+                planerotation_constraint_dict['Object'] = m
+                self.planerotation_constraints.append(planerotation_constraint_dict)
+            elif m.isDerivedFrom("Fem::ConstraintContact"):
+                contact_constraint_dict = {}
+                contact_constraint_dict['Object'] = m
+                self.contact_constraints.append(contact_constraint_dict)
             elif hasattr(m, "Proxy") and m.Proxy.Type == "FemBeamSection":
                 beam_section_dict = {}
                 beam_section_dict['Object'] = m
@@ -426,6 +470,10 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
     #  - U1, U2, U3 - deformation
     #  - Uabs - absolute deformation
     #  - Sabs - Von Mises stress
+    #    Prin1 Principal stress 1
+    #    Prin2 Principal stress 2
+    #    Prin3 Principal stress 3
+    #    MaxSear maximum shear stress
     #  - None - always return (0.0, 0.0, 0.0)
     def get_stats(self, result_type):
         stats = (0.0, 0.0, 0.0)
@@ -436,6 +484,10 @@ class FemTools(QtCore.QRunnable, QtCore.QObject):
                          "U3": (m.Stats[6], m.Stats[7], m.Stats[8]),
                          "Uabs": (m.Stats[9], m.Stats[10], m.Stats[11]),
                          "Sabs": (m.Stats[12], m.Stats[13], m.Stats[14]),
+                         "MaxPrin": (m.Stats[15], m.Stats[16], m.Stats[17]),
+                         "MidPrin": (m.Stats[18], m.Stats[19], m.Stats[20]),
+                         "MinPrin": (m.Stats[21], m.Stats[22], m.Stats[23]),
+                         "MaxShear": (m.Stats[24], m.Stats[25], m.Stats[26]),
                          "None": (0.0, 0.0, 0.0)}
                 stats = match[result_type]
         return stats
