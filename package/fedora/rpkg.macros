@@ -1,0 +1,5 @@
+function git_commits_no {
+	commits_since_0_17=$(git rev-list --count 0.17...HEAD)
+	total_commits=$((13509 + $commits_since_0_17))
+	echo $total_commits
+}
