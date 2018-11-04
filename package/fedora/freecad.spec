@@ -146,7 +146,8 @@ rm -rf build && mkdir build && cd build
 # Deal with cmake projects that tend to link excessively.
 #LDFLAGS='-Wl,--as-needed'; export LDFLAGS
 
-%cmake -DCMAKE_INSTALL_PREFIX=%{_libdir}/%{name} \
+%cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-COPR}
+       -DCMAKE_INSTALL_PREFIX=%{_libdir}/%{name} \
        -DCMAKE_INSTALL_DATADIR=%{_datadir}/%{name} \
        -DCMAKE_INSTALL_DOCDIR=%{_docdir}/%{name} \
        -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
