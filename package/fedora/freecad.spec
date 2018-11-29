@@ -35,6 +35,8 @@ BuildRequires:  boost-python2-devel
 BuildRequires:  boost-python3-devel
 BuildRequires:  boost-python2
 BuildRequires:  boost-python3
+BuildRequires:  openmpi
+BuildRequires:  openmpi-devel
 %endif
 BuildRequires:  cmake
 BuildRequires:  desktop-file-utils
