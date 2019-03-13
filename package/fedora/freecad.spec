@@ -47,7 +47,12 @@ BuildRequires:  netgen-mesher-devel-private
 BuildRequires:  pyside-tools
 BuildRequires:  python
 BuildRequires:  python-matplotlib
+%if 0%{?fedora} <= 29
 BuildRequires:  python-pivy
+%endif
+%if 0%{?fedora} > 29
+BuildRequires:  python3-pivy
+%endif
 BuildRequires:  python-pyside
 BuildRequires:  python-pyside-devel
 BuildRequires:  python2-devel
@@ -83,11 +88,6 @@ Requires:       %{name}-data = %{epoch}:%{version}-%{release}
 # Obsolete old doc package since it's required for functionality.
 Obsoletes:      %{name}-doc < 0.13-5
 
-# Needed for plugin support and is not a soname dependency.
-%if ! 0%{?rhel} <= 6 && "%{_arch}" != "ppc64"
-# python-pivy does not build on EPEL 6 ppc64.
-Requires:       python-pivy
-%endif
 Requires:       hicolor-icon-theme
 Requires:       python-matplotlib
 Requires:       python-collada
