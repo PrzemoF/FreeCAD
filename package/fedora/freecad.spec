@@ -50,6 +50,9 @@ BuildRequires:  python-matplotlib
 %if 0%{?fedora} < 30
 BuildRequires:  python-pivy
 %endif
+%if 0%{?fedora} > 29
+BuildRequires:  python3-pivy
+%endif
 BuildRequires:  python-pyside
 BuildRequires:  python-pyside-devel
 BuildRequires:  python2-devel
@@ -86,9 +89,12 @@ Requires:       %{name}-data = %{epoch}:%{version}-%{release}
 Obsoletes:      %{name}-doc < 0.13-5
 
 # Needed for plugin support and is not a soname dependency.
-%if ! 0%{?rhel} <= 6 && "%{_arch}" != "ppc64"
+%if ! 0%{?rhel} <= 6 && "%{_arch}" != "ppc64" && ! 0%{?fedora} > 29
 # python-pivy does not build on EPEL 6 ppc64.
 Requires:       python-pivy
+%endif
+%if 0%{?fedora} > 29
+Requires:       python3-pivy
 %endif
 Requires:       hicolor-icon-theme
 Requires:       python-matplotlib
