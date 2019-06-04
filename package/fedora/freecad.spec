@@ -3,6 +3,9 @@
 # List plugins in %%{_libdir}/%{name}/lib, less '.so' and 'Gui.so', here
 %global plugins Drawing Fem FreeCAD Image Import Inspection Mesh MeshPart Part Points QtUnit Raytracing ReverseEngineering Robot Sketcher Start Web PartDesignGui _PartDesign Path PathGui Spreadsheet SpreadsheetGui area DraftUtils DraftUtils libDriver libDriverDAT libDriverSTL libDriverUNV libMEFISTO2 libSMDS libSMESH libSMESHDS libStdMeshers Measure TechDraw TechDrawGui libarea-native Surface SurfaceGui PathSimulator
 
+# Setup python target for shiboken so the right cmake file is imported.
+%global py_suffix %(%{__python3} -c "import sysconfig; print(sysconfig.get_config_var('SOABI'))")
+
 # Some plugins go in the Mod folder instead of lib. Deal with those here:
 %global mod_plugins Mod/PartDesign
 %define name freecad
@@ -86,14 +89,25 @@ Requires:       %{name}-data = %{epoch}:%{version}-%{release}
 Obsoletes:      %{name}-doc < 0.13-5
 
 # Needed for plugin support and is not a soname dependency.
-%if ! 0%{?rhel} <= 6 && "%{_arch}" != "ppc64"
+%if ! 0%{?rhel} <= 6 && "%{_arch}" != "ppc64" || 0%{?fedora} < 30
 # python-pivy does not build on EPEL 6 ppc64.
 Requires:       python-pivy
 %endif
-Requires:       hicolor-icon-theme
+
+%if 0%{?fedora} < 30
 Requires:       python-matplotlib
 Requires:       python-collada
 Requires:       python-pyside
+%endif
+
+Requires:       hicolor-icon-theme
+
+%if 0%{?fedora} > 28
+Requires:       python3-pivy
+Requires:       python3-matplotlib
+Requires:       python3-collada
+Requires:       python3-pyside
+%endif
 
 # plugins and private shared libs in %%{_libdir}/freecad/lib are private;
 # prevent private capabilities being advertised in Provides/Requires
@@ -152,6 +166,10 @@ rm -rf build && mkdir build && cd build
        -DCMAKE_INSTALL_DATADIR=%{_datadir}/%{name} \
        -DCMAKE_INSTALL_DOCDIR=%{_docdir}/%{name} \
        -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
+       -DPYTHON_EXECUTABLE=%{__python3} \
+%if 0%{?fedora} < 30
+       -DPYTHON_SUFFIX=.%{py_suffix} \
+%endif
        -DRESOURCEDIR=%{_datadir}/%{name} \
        -DFREECAD_USE_EXTERNAL_PIVY=TRUE \
        -DMEDFILE_INCLUDE_DIRS=%{MEDFILE_INCLUDE_DIRS} \
