@@ -85,11 +85,6 @@ Requires:       %{name}-data = %{epoch}:%{version}-%{release}
 # Obsolete old doc package since it's required for functionality.
 Obsoletes:      %{name}-doc < 0.13-5
 
-# Needed for plugin support and is not a soname dependency.
-%if ! 0%{?rhel} <= 6 && "%{_arch}" != "ppc64"
-# python-pivy does not build on EPEL 6 ppc64.
-Requires:       python-pivy
-%endif
 Requires:       hicolor-icon-theme
 Requires:       python-matplotlib
 Requires:       python-collada
