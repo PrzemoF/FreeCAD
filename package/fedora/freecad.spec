@@ -33,10 +33,6 @@ Group:          Applications/Engineering
 License:        GPLv2+
 URL:            http://freecadweb.org/
 Source0:        https://github.com/%{github_name}/FreeCAD/archive/%{branch}.tar.gz
-Source102:      freecad.1
-
-Patch2:         freecad-0.15-zipios.patch
-Patch3:         freecad-0.14-Version_h.patch
 
 
 # Utilities
@@ -119,7 +115,7 @@ Data files for FreeCAD
 
 
 %prep
-%autosetup -p1 -n FreeCAD-%{version}%{?pre:_pre}
+%autosetup -p1 -n FreeCAD-%{branch}
 # Remove bundled pycxx if we're not using it
 %if ! %{bundled_pycxx}
 rm -rf src/CXX
@@ -177,6 +173,9 @@ LDFLAGS='-Wl,--as-needed -Wl,--no-undefined'; export LDFLAGS
 %endif
        -DMEDFILE_INCLUDE_DIRS=%{_includedir}/med \
        ../
+
+sed -i 's,FCRevision      \"Unknown\",FCRevision      \"%{release} (Git)\",' src/Build/Version.h
+sed -i 's,FCRepositoryURL \"Unknown\",FCRepositoryURL \"git://github.com/FreeCAD/FreeCAD.git master\",' src/Build/Version.h
 
 make %{?_smp_mflags}
 
