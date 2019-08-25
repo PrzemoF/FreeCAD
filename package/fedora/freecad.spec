@@ -20,8 +20,8 @@
 %global bundled_smesh %{?_with_bundled_smesh: 0} %{?!_with_bundled_smesh: 1}
 
 %define name freecad
-%define github_name FreeCAD
-%define branch master
+%define github_name PrzemoF
+%define branch copr_fix_v18
 
 Name:           %{name}
 Epoch:          1
