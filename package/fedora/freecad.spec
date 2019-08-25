@@ -259,7 +259,6 @@ desktop-file-validate \
 %{_libdir}/%{name}/lib/
 %{_libdir}/%{name}/Ext/
 %{_libdir}/%{name}/Mod/
-%{_mandir}/man1/*.1.gz
 
 %files data
 %{_datadir}/%{name}/
