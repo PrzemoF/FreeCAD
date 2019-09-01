@@ -21,12 +21,12 @@
 
 %define name freecad
 %define github_name PrzemoF
-%define branch copr_fix_v18
+%define branch master
 
 Name:           %{name}
 Epoch:          1
 Version:        0.19_pre
-Release:        {{{ git_commits_no }}}
+Release:        99999
 Summary:        A general purpose 3D CAD modeler
 Group:          Applications/Engineering
 
@@ -205,16 +205,6 @@ mv %{buildroot}%{_libdir}/%{name}/share/* \
 # Install desktop icon
 #install -pD -m 0644 src/Gui/Icons/%{name}.svg \
 #    %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
-
-# Install man page
-install -pD -m 0644 %{SOURCE102} \
-    %{buildroot}%{_mandir}/man1/%{name}.1
-
-# Symlink manpage to other binary names
-pushd %{buildroot}%{_mandir}/man1
-ln -sf %{name}.1.gz FreeCAD.1.gz 
-ln -sf %{name}.1.gz FreeCADCmd.1.gz
-popd
 
 # Remove obsolete Start_Page.html
 rm -f %{buildroot}%{_docdir}/%{name}/Start_Page.html
