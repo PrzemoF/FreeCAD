@@ -35,7 +35,7 @@ Release:        {{{ git_commits_no }}}
 Summary:        A general purpose 3D CAD modeler
 Group:          Applications/Engineering
 
-License:        GPLv2+
+License:        LGPLv2+
 URL:            http://sourceforge.net/apps/mediawiki/free-cad/
 Source0:        https://github.com/%{github_name}/FreeCAD/archive/%{branch}.tar.gz
 Patch0:		FreeCAD-external-smesh.patch
