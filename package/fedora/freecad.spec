@@ -38,7 +38,7 @@ Group:          Applications/Engineering
 License:        LGPLv2+
 URL:            http://sourceforge.net/apps/mediawiki/free-cad/
 Source0:        https://github.com/%{github_name}/FreeCAD/archive/%{branch}.tar.gz
-Patch0:		FreeCAD-external-smesh.patch
+#Patch0:		FreeCAD-external-smesh.patch
 
 # Utilities
 BuildRequires:  cmake gcc-c++ gettext dos2unix
