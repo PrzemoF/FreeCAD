@@ -22,8 +22,14 @@
 
 # Some plugins go in the Mod folder instead of lib. Deal with those here:
 %global mod_plugins Mod/PartDesign
+
+# Name of package
 %define name freecad
-%define github_name FreeCAD
+# Source code location: gitlab of github
+%define web_address github.com
+# Name of the repo used to pull the source code
+%define git_name FreeCAD
+# Name of the branch in the repo
 %define branch master
 
 Name:           %{name}
@@ -35,7 +41,7 @@ Group:          Applications/Engineering
 
 License:        LGPLv2+
 URL:            http://www.freecadweb.org/
-Source0:        https://github.com/%{github_name}/FreeCAD/archive/%{branch}.tar.gz
+Source0:        https://%{web_address}/%{git_name}/FreeCAD/archive/%{branch}.tar.gz
 
 # Utilities
 BuildRequires:  cmake gcc-c++ gettext dos2unix
