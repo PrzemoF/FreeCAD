@@ -3,7 +3,7 @@
 %global _python_bytecompile_extra 1
 
 # Setup python target for shiboken so the right cmake file is imported.
-%global py_suffix %(/usr/bin/python3.7 -c "import sysconfig; print(sysconfig.get_config_var('SOABI'))")
+%global py_suffix %(/usr/bin/python3.6 -c "import sysconfig; print(sysconfig.get_config_var('SOABI'))")
 
 # Maintainers:  keep this list of plugins up to date
 # List plugins in %%{_libdir}/%{name}/lib, less '.so' and 'Gui.so', here
