@@ -23,8 +23,8 @@
 # Some plugins go in the Mod folder instead of lib. Deal with those here:
 %global mod_plugins Mod/PartDesign
 %define name freecad
-%define github_name FreeCAD
-%define branch master
+%define github_name wwmayer
+%define branch fedora_fixes
 
 Name:           %{name}
 Epoch:          1
