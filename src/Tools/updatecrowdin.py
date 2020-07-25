@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 #***************************************************************************
 #*                                                                         *
@@ -48,9 +48,17 @@ Example:
 
 # See crowdin API docs at https://crowdin.com/page/api
 
+import os
+import sys
+import xml.sax
+
+import pycurl
 
 
-import sys,os,xml.sax,pycurl,StringIO
+try:
+    from StringIO import StringIO  # for Python 2
+except ImportError:
+    from io import StringIO  # for Python 3
 
 
 files = [ ["AddonManager.ts",      "/Mod/AddonManager/Resources/translations/AddonManager.ts"],
