@@ -1,142 +1,114 @@
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_3
-%global py_bytecompile 1
-
 # Setup python target for shiboken so the right cmake file is imported.
 %global py_suffix %(%{__python3} -c "import sysconfig; print(sysconfig.get_config_var('SOABI'))")
 
 # Maintainers:  keep this list of plugins up to date
-# List plugins in %%{_libdir}/%{name}/lib, less '.so' and 'Gui.so', here
-%global plugins Drawing Fem FreeCAD Image Import Inspection Mesh MeshPart Part Points QtUnit Raytracing ReverseEngineering Robot Sketcher Start Web PartDesignGui _PartDesign Path PathGui Spreadsheet SpreadsheetGui area DraftUtils DraftUtils libDriver libDriverDAT libDriverSTL libDriverUNV libMEFISTO2 libSMDS libSMESH libSMESHDS libStdMeshers Measure TechDraw TechDrawGui libarea-native Surface SurfaceGui PathSimulator
+# List plugins in %%{_libdir}/freecad/lib, less '.so' and 'Gui.so', here
+%global plugins Complete DraftUtils Drawing Fem FreeCAD Image Import Inspection Mesh MeshPart Part PartDesign Path Points QtUnit Raytracing ReverseEngineering Robot Sketcher Spreadsheet Start Web PartDesignGui _PartDesign Spreadsheet SpreadsheetGui area
 
 # Some configuration options for other environments
 # rpmbuild --with=bundled_zipios:  use bundled version of zipios++
 %global bundled_zipios %{?_with_bundled_zipios: 1} %{?!_with_bundled_zipios: 0}
 # rpmbuild --without=bundled_pycxx:  don't use bundled version of pycxx
-%global bundled_pycxx %{?_without_bundled_pycxx: 0} %{?!_without_bundled_pycxx: 1}
+%global bundled_pycxx %{?_with_bundled_pycxx: 1} %{?!_with_bundled_pycxx: 0}
 # rpmbuild --without=bundled_smesh:  don't use bundled version of Salome's Mesh
-%global bundled_smesh %{?_without_bundled_smesh: 0} %{?!_without_bundled_smesh: 1}
+%global bundled_smesh %{?_with_bundled_smesh: 0} %{?!_with_bundled_smesh: 1}
 
-# Prevent RPM from doing its magical 'build' directory for now
-%global __cmake_in_source_build 0
+%global commit a50ae33557e1992a938542b319cacb8b09d7fb08
+%global short %(c=%{commit}; echo ${c:0:10})
+%global date 20201125
 
-# See FreeCAD-master/src/3rdParty/salomesmesh/CMakeLists.txt to find this out.
-%global bundled_smesh_version 7.7.1.0
 
-# Some plugins go in the Mod folder instead of lib. Deal with those here:
-%global mod_plugins Mod/PartDesign
-%define name freecad
-%define github_name FreeCAD
-%define branch master
-
-Name:           %{name}
+Name:           freecad
 Epoch:          1
-Version:    	0.19
-Release:        pre_{{{ git_commit_no }}}
+Version:        0.19
+Release:        0.3.%{date}git%{short}%{?dist}
 Summary:        A general purpose 3D CAD modeler
-Group:          Applications/Engineering
 
-License:        LGPLv2+
-URL:            http://www.freecadweb.org/
-Source0:        https://github.com/%{github_name}/FreeCAD/archive/%{branch}.tar.gz
+License:        GPLv2+
+URL:            http://freecadweb.org/
+#Source0:        https://github.com/FreeCAD/FreeCAD/archive/%{version}%{?pre:_pre}/FreeCAD-%{version}%{?pre:_pre}.tar.gz
+Source0:        https://github.com/FreeCAD/FreeCAD/archive/%{commit}/FreeCAD-%{version}.%{date}git%{short}.tar.gz
+Source102:      freecad.1
+
+Patch0:         freecad-0.15-zipios.patch
+Patch1:         freecad-0.14-Version_h.patch
+Patch2:         freecad-unbundled-pycxx.patch
+Patch3:         freecad-vtk9.patch
+
 
 # Utilities
 BuildRequires:  cmake gcc-c++ gettext dos2unix
 BuildRequires:  doxygen swig graphviz
 BuildRequires:  gcc-gfortran
 BuildRequires:  desktop-file-utils
-BuildRequires:  git
-
+%ifnarch ppc64
+BuildRequires:  tbb-devel
+%endif
 # Development Libraries
-
-BuildRequires:  Coin4-devel
-BuildRequires:  Inventor-devel
-BuildRequires:  opencascade-devel
-BuildRequires:  boost-devel
-BuildRequires:  boost-python3-devel
-BuildRequires:  eigen3-devel
 BuildRequires:  freeimage-devel
 BuildRequires:  libXmu-devel
+BuildRequires:  mesa-libGL-devel
+BuildRequires:  mesa-libGLU-devel
+BuildRequires:  libglvnd-devel
+BuildRequires:  opencascade-devel
+%if 0%{?fedora} > 31
+BuildRequires:  Coin4-devel
+%else
+BuildRequires:  Coin3-devel
+%endif
+BuildRequires:  python3-devel
+BuildRequires:  python3-matplotlib
+BuildRequires:  boost-devel boost-python3-devel
+BuildRequires:  eigen3-devel
+# Qt5 dependencies
+BuildRequires:  cmake(Qt5Core)
+BuildRequires:  cmake(Qt5Svg)
+BuildRequires:  cmake(Qt5UiTools)
+BuildRequires:  cmake(Qt5WebKit)
+BuildRequires:  cmake(Qt5XmlPatterns)
+#BuildRequires:  SoQt-devel
+BuildRequires:  xerces-c xerces-c-devel
+BuildRequires:  libspnav-devel
+BuildRequires:  python3-shiboken2-devel
+BuildRequires:  python3-pyside2-devel pyside2-tools
+%if ! %{bundled_smesh}
+BuildRequires:  smesh-devel
+%endif
+# Does not build with current versions of OCCT.
+#BuildRequires:  netgen-mesher-devel
+%if ! %{bundled_zipios}
+BuildRequires:  zipios++-devel
+%endif
+%if ! %{bundled_pycxx}
+BuildRequires:  python3-pycxx-devel
+%endif
+BuildRequires:  libicu-devel
+BuildRequires:  vtk-devel
+#BuildRequires:  openmpi-devel
+BuildRequires:  med-devel
+BuildRequires:  libkdtree++-devel
+
 # For appdata
 %if 0%{?fedora}
 BuildRequires:  libappstream-glib
 %endif
-BuildRequires:  libglvnd-devel
-BuildRequires:  libicu-devel
-BuildRequires:  libkdtree++-devel
-BuildRequires:  libspnav-devel
-BuildRequires:  libusb-devel
-BuildRequires:  med-devel
-BuildRequires:  mesa-libEGL-devel
-BuildRequires:  mesa-libGLU-devel
-BuildRequires:  netgen-mesher-devel
-BuildRequires:  netgen-mesher-devel-private
-BuildRequires:  python3-pivy
-BuildRequires:  mesa-libEGL-devel
-BuildRequires:  openmpi-devel
-BuildRequires:  pcl-devel
-BuildRequires:  pyside2-tools
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  python3-matplotlib
-%if ! %{bundled_pycxx}
-BuildRequires:  python3-pycxx-devel
-%endif
-BuildRequires:  python3-pyside2-devel
-BuildRequires:  python3-shiboken2-devel
-BuildRequires:  qt5-qtwebkit-devel
-BuildRequires:  qt5-qtsvg-devel
-BuildRequires:  qt5-qttools-static
-BuildRequires:  qt5-qtxmlpatterns-devel
-%if ! %{bundled_smesh}
-BuildRequires:  smesh-devel
-%endif
-BuildRequires:  tbb-devel
-BuildRequires:  vtk-devel
-BuildRequires:  xerces-c
-BuildRequires:  xerces-c-devel
-%if ! %{bundled_zipios}
-BuildRequires:  zipios++-devel
-%endif
-BuildRequires:  zlib-devel
 
-# Packages separated because they are noarch, but not optional so require them
-# here.
-Requires:       %{name}-data = %{epoch}:%{version}-%{release}
-# Obsolete old doc package since it's required for functionality.
-Obsoletes:      %{name}-doc < 0.13-5
-
-Requires:       hicolor-icon-theme
-Requires:       python3-collada
-Requires:       python3-matplotlib
 Requires:       python3-pivy
+Requires:       python3-matplotlib
+Requires:       python3-collada
 Requires:       python3-pyside2
-Requires:	qt5-assistant
-%if %{bundled_smesh} 
-Provides:       bundled(smesh) = %{bundled_smesh_version}
-%endif
-%if %{bundled_pycxx} 
-Provides:       bundled(python-pycxx)
-%endif
-Recommends:	python3-pysolar
+Requires:       qt5-assistant
 
-# plugins and private shared libs in %%{_libdir}/freecad/lib are private;
-# prevent private capabilities being advertised in Provides/Requires
-%define plugin_regexp /^\\\(libFreeCAD.*%(for i in %{plugins}; do echo -n "\\\|$i\\\|$iGui"; done)\\\)\\\(\\\|Gui\\\)\\.so/d
-%{?filter_setup:
-%filter_provides_in %{_libdir}/%{name}/lib
-%filter_from_requires %{plugin_regexp}
-%filter_from_provides %{plugin_regexp}
-%filter_provides_in %{_libdir}/%{name}/Mod
-%filter_requires_in %{_libdir}/%{name}/Mod
-%filter_setup
-}
+Requires:       %{name}-data = %{epoch}:%{version}-%{release}
+
+Provides:       bundled(smesh) = 5.1.2.2
+
 
 %description
 FreeCAD is a general purpose Open Source 3D CAD/MCAD/CAx/CAE/PLM modeler, aimed
 directly at mechanical engineering and product design but also fits a wider
 range of uses in engineering, such as architecture or other engineering
-specialities. It is a feature-based parametric modeler with a modular software
+specialties. It is a feature-based parametric modeler with a modular software
 architecture which makes it easy to provide additional functionality without
 modifying the core system.
 
@@ -151,8 +123,7 @@ Data files for FreeCAD
 
 
 %prep
-%autosetup -p1 -n FreeCAD-%{branch}
-
+%autosetup -p1 -n FreeCAD-%{commit}
 # Remove bundled pycxx if we're not using it
 %if ! %{bundled_pycxx}
 rm -rf src/CXX
@@ -169,47 +140,31 @@ dos2unix -k src/Mod/Test/unittestgui.py \
             ChangeLog.txt \
             data/License.txt
 
-# Removed bundled libraries
 
 %build
-rm -rf build && mkdir build && cd build
-
-# Deal with cmake projects that tend to link excessively.
-CXXFLAGS='-Wno-error=cast-function-type'; export CXXFLAGS
-LDFLAGS='-Wl,--as-needed -Wl,--no-undefined'; export LDFLAGS
-
-%if 0%{?fedora} > 27
-%define MEDFILE_INCLUDE_DIRS %{_includedir}/med/
-%else
-%define MEDFILE_INCLUDE_DIRS %{_includedir}/
-%endif
-
-%cmake \
-       -DCMAKE_INSTALL_PREFIX=%{_libdir}/%{name} \
+%cmake -DCMAKE_INSTALL_PREFIX=%{_libdir}/%{name} \
        -DCMAKE_INSTALL_DATADIR=%{_datadir}/%{name} \
        -DCMAKE_INSTALL_DOCDIR=%{_docdir}/%{name} \
        -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
        -DRESOURCEDIR=%{_datadir}/%{name} \
-       -DFREECAD_USE_EXTERNAL_PIVY=TRUE \
-       -DFREECAD_USE_PCL=TRUE \
-       -DBUILD_QT5=ON \
-       -DSHIBOKEN_INCLUDE_DIR=%{_includedir}/shiboken2 \
-       -DSHIBOKEN_LIBRARY=-lshiboken2.%{py_suffix} \
-       -DPYTHON_SUFFIX=.%{py_suffix} \
+       -DPYTHON_EXECUTABLE=%{__python3} \
        -DPYSIDE_INCLUDE_DIR=/usr/include/PySide2 \
-       -DPYSIDE_LIBRARY=-lpyside2.%{py_suffix} \
-       -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3 \
-       -DMEDFILE_INCLUDE_DIRS=%{MEDFILE_INCLUDE_DIRS} \
-       -DOpenGL_GL_PREFERENCE=GLVND \
+       -DPYSIDE_LIBRARY=%{_libdir}/libpyside2.%{py_suffix}.so \
+       -DSHIBOKEN_INCLUDE_DIR=%{_includedir}/shiboken2 \
+       -DSHIBOKEN_LIBRARY=%{_libdir}/libshiboken2.%{py_suffix}.so \
+       -DBUILD_QT5=ON \
+       -DOpenGL_GL_PREFERENCE=LEGACY \
+%if 0%{?fedora} > 31
        -DCOIN3D_INCLUDE_DIR=%{_includedir}/Coin4 \
        -DCOIN3D_DOC_PATH=%{_datadir}/Coin4/Coin \
-       -DFREECAD_USE_EXTERNAL_PIVY=TRUE \
+%else
+       -DCOIN3D_INCLUDE_DIR=%{_includedir}/Coin3 \
+       -DCOIN3D_DOC_PATH=%{_datadir}/Coin3/Coin \
+%endif
        -DUSE_OCC=TRUE \
 %if ! %{bundled_smesh}
        -DFREECAD_USE_EXTERNAL_SMESH=TRUE \
-       -DSMESH_FOUND=TRUE \
        -DSMESH_INCLUDE_DIR=%{_includedir}/smesh \
-       -DSMESH_DIR=`pwd`/../cMake \
 %endif
 %if ! %{bundled_zipios}
        -DFREECAD_USE_EXTERNAL_ZIPIOS=TRUE \
@@ -218,124 +173,83 @@ LDFLAGS='-Wl,--as-needed -Wl,--no-undefined'; export LDFLAGS
        -DPYCXX_INCLUDE_DIR=$(pkg-config --variable=includedir PyCXX) \
        -DPYCXX_SOURCE_DIR=$(pkg-config --variable=srcdir PyCXX) \
 %endif
-       -DPACKAGE_WCREF="%{release} (Git)" \
-       -DPACKAGE_WCURL="git://github.com/%{github_name}/FreeCAD.git master" \
-       ../
+       -DMEDFILE_INCLUDE_DIRS=%{_includedir}/med
 
-make fc_version
-for I in src/Build/Version.h src/Build/Version.h.out; do
-	sed -i 's,FCRevision      \"Unknown\",FCRevision      \"%{release} (Git)\",' $I
-	sed -i 's,FCRepositoryURL \"Unknown\",FCRepositoryURL \"git://github.com/FreeCAD/FreeCAD.git master\",' $I
-done
+%cmake_build
 
-%{make_build}
 
 %install
-cd build
-%make_install
+%cmake_install
 
 # Symlink binaries to /usr/bin
 mkdir -p %{buildroot}%{_bindir}
-ln -s ../%{_lib}/%{name}/bin/FreeCAD %{buildroot}%{_bindir}/FreeCAD
-ln -s ../%{_lib}/%{name}/bin/FreeCADCmd %{buildroot}%{_bindir}/FreeCADCmd
+ln -rs %{buildroot}%{_libdir}/freecad/bin/FreeCAD %{buildroot}%{_bindir}
+ln -rs %{buildroot}%{_libdir}/freecad/bin/FreeCADCmd %{buildroot}%{_bindir}
 
-mkdir %{buildroot}%{_metainfodir}/
-mv %{buildroot}%{_libdir}/%{name}/share/metainfo/* %{buildroot}%{_metainfodir}/
+# Move mis-installed files to the right location
+# Need to figure out if FreeCAD can install correctly at some point.
+mkdir -p %{buildroot}%{_datadir}
+mv %{buildroot}%{_libdir}/%{name}/share/* \
+   %{buildroot}%{_datadir}
 
-mkdir %{buildroot}%{_datadir}/applications/
-mv %{buildroot}%{_libdir}/%{name}/share/applications/* %{buildroot}%{_datadir}/applications/
+# Install man page
+install -pD -m 0644 %{SOURCE102} \
+    %{buildroot}%{_mandir}/man1/%{name}.1
 
-mkdir -p %{buildroot}%{_datadir}/thumbnailers/
-mv %{buildroot}%{_libdir}/%{name}/share/thumbnailers/* %{buildroot}%{_datadir}/thumbnailers/
-
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/
-mv %{buildroot}%{_libdir}/%{name}/share/icons/hicolor/scalable/* %{buildroot}%{_datadir}/icons/hicolor/scalable/
-
-mkdir -p %{buildroot}%{_datadir}/pixmaps/
-mv %{buildroot}%{_libdir}/%{name}/share/pixmaps/* %{buildroot}%{_datadir}/pixmaps/
-
-mkdir -p %{buildroot}%{_datadir}/mime/packages/
-mv %{buildroot}%{_libdir}/%{name}/share/mime/packages/* %{buildroot}%{_datadir}/mime/packages/
-
-pushd %{buildroot}%{_libdir}/%{name}/share/
-rmdir metainfo/
-rmdir applications/
-rm -rf mime
-rm -rf icons
+# Symlink manpage to other binary names
+pushd %{buildroot}%{_mandir}/man1
+ln -sf %{name}.1.gz FreeCAD.1.gz 
+ln -sf %{name}.1.gz FreeCADCmd.1.gz
 popd
 
 # Remove obsolete Start_Page.html
 rm -f %{buildroot}%{_docdir}/%{name}/Start_Page.html
-# Belongs in %%license not %%doc
-#No longer present?
-#rm -f %{buildroot}%{_docdir}/freecad/ThirdPartyLibraries.html
 
-# Bug maintainers to keep %%{plugins} macro up to date.
-#
-# Make sure there are no plugins that need to be added to plugins macro
-new_plugins=`ls %{buildroot}%{_libdir}/%{name}/%{_lib} | sed -e  '%{plugin_regexp}'`
-if [ -n "$new_plugins" ]; then
-    echo -e "\n\n\n**** ERROR:\n" \
-        "\nPlugins not caught by regexp:  " $new_plugins \
-        "\n\nPlugins in %{_libdir}/%{name}/lib do not exist in" \
-         "\nspecfile %%{plugins} macro.  Please add these to" \
-         "\n%%{plugins} macro at top of specfile and rebuild.\n****\n" 1>&2
-    exit 1
-fi
-# Make sure there are no entries in the plugins macro that don't match plugins
-for p in %{plugins}; do
-    if [ -z "`ls %{buildroot}%{_libdir}/%{name}/%{_lib}/$p*.so`" ]; then
-        set +x
-        echo -e "\n\n\n**** ERROR:\n" \
-             "\nExtra entry in %%{plugins} macro with no matching plugin:" \
-             "'$p'.\n\nPlease remove from %%{plugins} macro at top of" \
-             "\nspecfile and rebuild.\n****\n" 1>&2
-        exit 1
-    fi
-done
+# Belongs in %%license not %%doc
+rm -f %{buildroot}%{_docdir}/freecad/ThirdPartyLibraries.html
+
+# Bytecompile Python modules
+%py_byte_compile %{__python3} %{buildroot}%{_libdir}/%{name}
 
 %check
 desktop-file-validate \
     %{buildroot}%{_datadir}/applications/org.freecadweb.FreeCAD.desktop
 %{?fedora:appstream-util validate-relax --nonet \
-    %{buildroot}/%{_metainfodir}/*.appdata.xml}
+    %{buildroot}%{_metainfodir}/*.appdata.xml}
 
 
+%if 0%{?rhel} < 8
 %post
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 /usr/bin/update-desktop-database &> /dev/null || :
 /usr/bin/update-mime-database %{_datadir}/mime &> /dev/null || :
 
 %postun
-if [ $1 -eq 0 ] ; then
-    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-fi
 /usr/bin/update-desktop-database &> /dev/null || :
 /usr/bin/update-mime-database %{_datadir}/mime &> /dev/null || :
-
-%posttrans
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor/scalable/apps &>/dev/null || :
+%endif
 
 
 %files
-%license data/License.txt
-%doc ChangeLog.txt
-%exclude %{_docdir}/%{name}/%{name}.*
-%exclude %{_docdir}/%{name}/ThirdPartyLibraries.html
+%license data/License.txt src/Doc/ThirdPartyLibraries.html
+%doc ChangeLog.txt README.md
+%exclude %{_docdir}/freecad/freecad.*
 %{_bindir}/*
-%{_metainfodir}/*
+%{_metainfodir}/*.appdata.xml
+%{_datadir}/applications/*.desktop
+%{_datadir}/icons/hicolor/*/apps/*.png
+%{_datadir}/icons/hicolor/scalable/apps/freecad.svg
+%{_datadir}/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg
+%{_datadir}/icons/hicolor/scalable/mimetypes/application-x-extension-fcstd.svg
+%{_datadir}/pixmaps/freecad.xpm
+%{_datadir}/mime/packages/*.xml
+%{_datadir}/thumbnailers/FreeCAD.thumbnailer
 %dir %{_libdir}/%{name}
 %{_libdir}/%{name}/bin/
 %{_libdir}/%{name}/%{_lib}/
-%{_libdir}/%{name}/Mod/
 %{_libdir}/%{name}/Ext/
-%{_datadir}/applications/*
-%{_datadir}/icons/hicolor/scalable/*
-%{_datadir}/pixmaps/*
-%{_datadir}/mime/packages/*
-%{_datadir}/thumbnailers/*
+%{_libdir}/%{name}/Mod/
+%{_mandir}/man1/*.1.gz
 
 %files data
 %{_datadir}/%{name}/
-%{_docdir}/%{name}/%{name}.q*
+%{_docdir}/%{name}/freecad.q*
