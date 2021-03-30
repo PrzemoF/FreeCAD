@@ -88,9 +88,7 @@ BuildRequires:  qt5-qtwebkit-devel
 BuildRequires:  qt5-qtsvg-devel
 BuildRequires:  qt5-qttools-static
 BuildRequires:  qt5-qtxmlpatterns-devel
-%if ! %{bundled_smesh}
 BuildRequires:  smesh-devel
-%endif
 BuildRequires:  tbb-devel
 BuildRequires:  vtk-devel
 BuildRequires:  xerces-c
@@ -205,12 +203,10 @@ LDFLAGS='-Wl,--as-needed -Wl,--no-undefined'; export LDFLAGS
        -DCOIN3D_DOC_PATH=%{_datadir}/Coin4/Coin \
        -DFREECAD_USE_EXTERNAL_PIVY=TRUE \
        -DUSE_OCC=TRUE \
-%if ! %{bundled_smesh}
        -DFREECAD_USE_EXTERNAL_SMESH=TRUE \
        -DSMESH_FOUND=TRUE \
        -DSMESH_INCLUDE_DIR=%{_includedir}/smesh \
        -DSMESH_DIR=`pwd`/../cMake \
-%endif
 %if ! %{bundled_zipios}
        -DFREECAD_USE_EXTERNAL_ZIPIOS=TRUE \
 %endif
