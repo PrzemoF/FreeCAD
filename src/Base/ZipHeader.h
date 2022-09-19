@@ -25,8 +25,8 @@
 #define ZIPIOS_ZIP_HEADER_H
 
 #include <FCGlobal.h>
-#include <zipios++/backbuffer.h>
-#include <zipios++/fcoll.h>
+#include <backbuffer.h>
+#include <fcoll.h>
 
 namespace zipios
 {
