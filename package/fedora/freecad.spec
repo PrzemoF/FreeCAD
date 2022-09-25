@@ -213,9 +213,7 @@ LDFLAGS='-Wl,--as-needed -Wl,--no-undefined'; export LDFLAGS
        -DSMESH_INCLUDE_DIR=%{_includedir}/smesh \
        -DSMESH_DIR=`pwd`/../cMake \
 %endif
-%if ! %{bundled_zipios}
-       -DFREECAD_USE_EXTERNAL_ZIPIOS=TRUE \
-%endif
+       -DFREECAD_USE_EXTERNAL_ZIPIOS=FALSE \
 %if ! %{bundled_pycxx}
        -DPYCXX_INCLUDE_DIR=$(pkg-config --variable=includedir PyCXX) \
        -DPYCXX_SOURCE_DIR=$(pkg-config --variable=srcdir PyCXX) \
