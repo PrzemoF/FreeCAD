@@ -178,8 +178,7 @@ rm -rf src/zipios++
 %endif
 
 # Fix encodings
-dos2unix -k src/Mod/Test/unittestgui.py \
-            data/License.txt
+dos2unix -k src/Mod/Test/unittestgui.py
 
 # Removed bundled libraries
 
@@ -335,7 +334,6 @@ fi
 
 
 %files
-%license data/License.txt
 %exclude %{_docdir}/%{name}/%{name}.*
 %exclude %{_docdir}/%{name}/ThirdPartyLibraries.html
 %{_bindir}/*
