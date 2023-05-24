@@ -1758,6 +1758,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     {
     case QtInfoMsg:
     case QtDebugMsg:
+    Base::Console().Message("%s\n", context.category);
 #ifdef FC_DEBUG
         Base::Console().Message("%s\n", msg.toUtf8().constData());
 #else
