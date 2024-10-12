@@ -73,6 +73,10 @@ BuildRequires:  fmt-devel
 BuildRequires:  xerces-c
 BuildRequires:  xerces-c-devel
 BuildRequires:  libspnav-devel
+BuildRequires:  python3-shiboken2-devel
+BuildRequires:  python3-pyside2-devel
+BuildRequires:  pyside2-tools
+
 %if ! %{bundled_smesh}
 BuildRequires:  smesh-devel
 %endif
