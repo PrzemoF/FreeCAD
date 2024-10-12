@@ -65,6 +65,7 @@ BuildRequires:  python3-pivy
 BuildRequires:  boost-devel
 BuildRequires:  boost-python3-devel
 BuildRequires:  eigen3-devel
+BuildRequires:  guidelines-support-library-devel
 # Qt5 dependencies
 BuildRequires:  qt5-qtsvg-devel
 BuildRequires:  qt5-qttools-static
