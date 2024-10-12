@@ -66,6 +66,7 @@ BuildRequires:  boost-devel
 BuildRequires:  boost-python3-devel
 BuildRequires:  eigen3-devel
 # Qt5 dependencies
+BuildRequires:  qt5-qtsvg-devel
 BuildRequires:  qt5-qttools-static
 BuildRequires:  fmt-devel
 BuildRequires:  xerces-c
