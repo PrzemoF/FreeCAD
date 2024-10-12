@@ -347,5 +347,8 @@ fi
 
 
 %changelog
+* Sat Oct 12 2024 Przemo Firszt <przemo@firszt.eu> - 1:0.22-pre_{{{git_commit_no}}}.1
+- Fix type and dpendencies
+
 
 
