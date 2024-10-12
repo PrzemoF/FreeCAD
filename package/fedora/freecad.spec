@@ -74,8 +74,8 @@ BuildRequires:  xerces-c
 BuildRequires:  xerces-c-devel
 BuildRequires:  libspnav-devel
 BuildRequires:  python3-shiboken2-devel
-BuildRequires:  python3-pyside2-devel
-BuildRequires:  pyside2-tools
+BuildRequires:  python3-pyside6-devel
+BuildRequires:  pyside6-tools
 
 %if ! %{bundled_smesh}
 BuildRequires:  smesh-devel
@@ -118,7 +118,7 @@ Requires:       fmt
 Requires:       python3-pivy
 Requires:       python3-matplotlib
 Requires:       python3-collada
-Requires:       python3-pyside2
+Requires:       python3-pyside6
 Requires:       qt5-assistant
 
 %if %{bundled_smesh}
@@ -202,7 +202,7 @@ LDFLAGS='-Wl,--as-needed -Wl,--no-undefined'; export LDFLAGS
        -DSHIBOKEN_LIBRARY=-lshiboken2.%{py_suffix} \
        -DPYTHON_SUFFIX=.%{py_suffix} \
        -DPYSIDE_INCLUDE_DIR=/usr/include/PySide2 \
-       -DPYSIDE_LIBRARY=-lpyside2.%{py_suffix} \
+       -DPYSIDE_LIBRARY=-lpyside6.%{py_suffix} \
        -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3 \
        -DMEDFILE_INCLUDE_DIRS=%{MEDFILE_INCLUDE_DIRS} \
        -DOpenGL_GL_PREFERENCE=GLVND \
